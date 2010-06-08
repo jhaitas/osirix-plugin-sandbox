@@ -2,7 +2,7 @@
 //  ConsoleSuccessFilter.m
 //  ConsoleSuccess
 //
-//  Copyright (c) 2010 John. All rights reserved.
+//  Copyright (c) 2010 John Haitas. All rights reserved.
 //
 
 #import "ConsoleSuccessFilter.h"
