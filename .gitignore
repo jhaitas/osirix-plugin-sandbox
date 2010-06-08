@@ -8,4 +8,7 @@ build/
 *.perspective
 *.perspectivev3
 
+*.mode1v3
+*.mode2v3
+
 Osirix\ Plugin\ Generator.app/
