@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		588E585F11C02E5C00E2F64E /* ROImm.h in Headers */ = {isa = PBXBuildFile; fileRef = 588E585D11C02E5C00E2F64E /* ROImm.h */; };
+		588E586011C02E5C00E2F64E /* ROImm.m in Sources */ = {isa = PBXBuildFile; fileRef = 588E585E11C02E5C00E2F64E /* ROImm.m */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* DistanceROI_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* DistanceROI_Prefix.pch */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -28,6 +30,8 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* DistanceROI_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DistanceROI_Prefix.pch; sourceTree = "<group>"; };
+		588E585D11C02E5C00E2F64E /* ROImm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ROImm.h; sourceTree = "<group>"; };
+		588E585E11C02E5C00E2F64E /* ROImm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ROImm.m; sourceTree = "<group>"; };
 		59C2B9280FF0ED7100B50385 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB5D36050680E57E00F4007A /* DistanceROI.osirixplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DistanceROI.osirixplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,6 +135,8 @@
 			children = (
 				ABA48A640680BB600089EB4F /* DistanceROIFilter.h */,
 				ABA48A660680BB690089EB4F /* DistanceROIFilter.m */,
+				588E585D11C02E5C00E2F64E /* ROImm.h */,
+				588E585E11C02E5C00E2F64E /* ROImm.m */,
 			);
 			name = DistanceROIFilter;
 			sourceTree = "<group>";
@@ -167,6 +173,7 @@
 				ABB76346067FB2A8000912C1 /* ViewerController.h in Headers */,
 				ABA48A650680BB600089EB4F /* DistanceROIFilter.h in Headers */,
 				59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */,
+				588E585F11C02E5C00E2F64E /* ROImm.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABA48A670680BB690089EB4F /* DistanceROIFilter.m in Sources */,
+				588E586011C02E5C00E2F64E /* ROImm.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

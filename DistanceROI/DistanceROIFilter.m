@@ -11,7 +11,6 @@
 
 - (void) initPlugin
 {
-	// initialize plugin
 	allROIs = [[NSMutableArray alloc] initWithCapacity:0];
 	NSLog(@"DistanceROI plugin loaded...\n");
 }
@@ -19,37 +18,66 @@
 - (void) getAllROIs {
 	// this method populates allROIs with all ROIs
 	// start by clearing allROIs array
+	int i,ii;
+	
+	// clear allROIs array
 	[allROIs removeAllObjects];
-	for (NSArray *thisRoiList in [[viewerController imageView] dcmRoiList]) {
-		for (ROI *thisROI in thisRoiList) {
-			[allROIs addObject:thisROI];
+	
+	// get both dcmPixList and dcmRoiList
+	NSArray *pixList = [viewerController pixList];
+	NSArray *roiList = [viewerController roiList];	
+	for (i = 0; i < [roiList count]; i++) {
+		DCMPix *pix = [pixList objectAtIndex:i];
+		NSArray *thisPixRoiList = [roiList objectAtIndex:i];
+		for (ii = 0; ii < [thisPixRoiList count]; ii++) {
+			ROI *roi = [thisPixRoiList objectAtIndex:ii];
+			NSMutableArray *roiPoints = [ roi points ];
+			NSPoint roiCenterPoint;
+			// calc center of the ROI
+			if ( [ roi type ] == t2DPoint ) {
+				// ROI has a bug which causes miss-calculating center of 2DPoint roi
+				roiCenterPoint = [ [ roiPoints objectAtIndex: 0 ] point ];
+			} else {
+				roiCenterPoint = [ roi centroid ];
+			}
+			float location[3];
+			[pix convertPixX:roiCenterPoint.x pixY:roiCenterPoint.y toDICOMCoords:location];
+			[allROIs addObject: [[ROImm alloc] initWithName:roi.name withX:location[0] withY:location[1] withZ:location[2]]];
 		}
 	}
-	NSLog(@"Collected %d ROIs\n",[allROIs count]);
 }
 
-- (void) printEachROI {
-	// this method prints out point values for each ROI
-	int counter = 0;
-	for (ROI *thisROI in allROIs) {
-		counter++;
-		NSLog(@"ROI %d: %@ = %@\n",counter,[thisROI name],[thisROI points]);
+- (void) printAllDistances
+{
+	int i,ii;
+	for (i = 0; i < ([allROIs count]-1); i++) {
+		ROImm *thisROImm = [allROIs objectAtIndex:i];
+		NSLog(@"%@ distance from:\n",thisROImm);
+		for (ii = (i + 1); ii < [allROIs count]; ii++) {
+			ROImm *otherROImm = [allROIs objectAtIndex:ii];
+			NSLog(@"\t%@: %fmm\n",otherROImm.name,[thisROImm distanceFrom: otherROImm]);
+		}
 	}
-	NSLog(@"Done printing each ROI\n");
+}
+
+- (void) printAllROIs
+{
+	for (ROImm *thisROImm in allROIs) {
+		NSLog(@"%@\n",thisROImm);
+	}
 }
 
 - (long) filterImage:(NSString*) menuName
 {
 	// entry point for plugin
 	[self getAllROIs];
-	[self printEachROI];
+	[self printAllROIs];
+	[self printAllDistances];
 	return 0; // No Errors
 }
 
 -(void)dealloc
 {
-	// cleanup
-	[allROIs release]; allROIs = NULL;
 	[super dealloc];
 }
 @end

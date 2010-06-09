@@ -7,12 +7,14 @@
 
 #import <Foundation/Foundation.h>
 #import "PluginFilter.h"
+#import "ROImm.h"
 
 @interface DistanceROIFilter : PluginFilter {
 	NSMutableArray *allROIs;
 }
 
 - (void) getAllROIs;
+- (void) printAllDistances;
 - (long) filterImage:(NSString*) menuName;
 
 @end
