@@ -18,16 +18,11 @@
 
 - (void) getAllROIs {
 	// this method populates allROIs with all ROIs
-	int currentList,currentROI;
-	currentList = 0;
-	for( NSArray *thisRoiList in [[viewerController imageView] dcmRoiList]) {
-		currentList++;
-		currentROI = 0;
-		NSLog(@"List item %3d\n",currentList);
+	// start by clearing allROIs array
+	[allROIs removeAllObjects];
+	for (NSArray *thisRoiList in [[viewerController imageView] dcmRoiList]) {
 		for (ROI *thisROI in thisRoiList) {
-			currentROI++;
 			[allROIs addObject:thisROI];
-			NSLog(@"\tROI %d\n",currentROI);
 		}
 	}
 	NSLog(@"Collected %d ROIs\n",[allROIs count]);
@@ -39,8 +34,8 @@
 	for (ROI *thisROI in allROIs) {
 		counter++;
 		NSLog(@"ROI %d: %@ = %@\n",counter,[thisROI name],[thisROI points]);
-
 	}
+	NSLog(@"Done printing each ROI\n");
 }
 
 - (long) filterImage:(NSString*) menuName
@@ -54,7 +49,7 @@
 -(void)dealloc
 {
 	// cleanup
-	[allROIs release];
+	[allROIs release]; allROIs = NULL;
 	[super dealloc];
 }
 @end
