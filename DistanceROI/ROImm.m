@@ -20,29 +20,38 @@
 			   withZ: (double) inZ
 {
 	self = [super init];
+	[name autorelease];
 	
-    [name autorelease];
+	// assign values to variables
 	name	= [inName retain];
 	mmX		= inX;
 	mmY		= inY;
 	mmZ		= inZ;
+
+	// return this instance
 	return self;
 }
 
 -(double) distanceFrom: (ROImm *) otherROI
 {
+	// create variables to store intermediate values
 	double distanceX,distanceY,distanceZ,distanceTotal;
+	
+	// calculate the distance on each plane
 	distanceX = abs(mmX - otherROI.mmX);
 	distanceY = abs(mmY - otherROI.mmY);
 	distanceZ = abs(mmZ - otherROI.mmZ);
-	distanceTotal = sqrt(pow(distanceX,2) + pow(distanceY,2) + pow(distanceZ,2));
-	return distanceTotal;
 	
+	// apply the distance formula
+	distanceTotal = sqrt(pow(distanceX,2) + pow(distanceY,2) + pow(distanceZ,2));
+	
+	// return the total distance between the ROIs
+	return distanceTotal;
 }
 
 -(NSString *)description
 {
-	return [NSString stringWithFormat:@"%@ X:%0.3f mm Y:%0.3f mm Z:%0.3f mm",name,mmX,mmY,mmZ];
+	return [NSString stringWithFormat:@"%@\tX: %0.3fmm\tY: %0.3fmm\tZ: %0.3fmm",name,mmX,mmY,mmZ];
 }
 
 
