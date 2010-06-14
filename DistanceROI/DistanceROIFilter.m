@@ -39,6 +39,7 @@
 			ROI *roi = [thisPixRoiList objectAtIndex:ii];
 			NSMutableArray *roiPoints = [ roi points ];
 			NSPoint roiCenterPoint;
+			
 			// calc center of the ROI
 			if ( [ roi type ] == t2DPoint ) {
 				// ROI has a bug which causes miss-calculating center of 2DPoint roi
@@ -46,8 +47,14 @@
 			} else {
 				roiCenterPoint = [ roi centroid ];
 			}
+			
+			// declare 3 element array to store XYZ coordinates for this point
 			float location[3];
+			
+			// convert pixel values to mm values
 			[pix convertPixX:roiCenterPoint.x pixY:roiCenterPoint.y toDICOMCoords:location];
+			
+			// instanciate a ROImm object and add it to the allROIs NSMutableArray
 			[allROIs addObject: [[ROImm alloc] initWithName:roi.name withX:location[0] withY:location[1] withZ:location[2]]];
 		}
 	}
