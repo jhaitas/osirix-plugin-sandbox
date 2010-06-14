@@ -131,15 +131,33 @@
 
 - (void) drawIntermediateROIs
 {
-	int i;
-	MyPoint *thisPoint = [MyPoint alloc];
+	int				i,thisRoiType;
+	double			pixelSpacingX,pixelSpacingY;
+	
+	MyPoint			*thisPoint				= [MyPoint alloc];
+	ROI				*thisROI				= [ROI alloc];
+	NSMutableArray	*thisRoiList			= [[viewerController imageView] dcmRoiList];
+	
+	DCMPix			*thisDCMPix				= [[viewerController imageView] curDCM];
+	NSPoint			thisOrigin				= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
+	
+		
+	pixelSpacingX = [thisDCMPix pixelSpacingX];
+	pixelSpacingY = [thisDCMPix pixelSpacingY];
+	thisRoiType = t2DPoint;
 	
 	for (i = 0; i < [currentInterPoints count]; i++) {
 		thisPoint = [currentInterPoints objectAtIndex:i];
 		
 		// right now we just print pixel coordinates to Console
 		NSLog(@"Point %d: %@\n",i+1,thisPoint);
+		
+		[thisROI initWithType: thisRoiType :pixelSpacingX :pixelSpacingY :thisOrigin];
+		thisROI.points = [[NSMutableArray alloc] initWithCapacity:0];
+		[thisROI.points addObject:thisPoint];
+		[thisRoiList addObject:thisROI];
 	}
+	
 }
 
 - (float) accumulatedIntervalAtIndex: (int)index
