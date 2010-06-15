@@ -38,9 +38,9 @@
 	double distanceX,distanceY,distanceZ,distanceTotal;
 	
 	// calculate the distance on each plane
-	distanceX = abs(mmX - otherROI.mmX);
-	distanceY = abs(mmY - otherROI.mmY);
-	distanceZ = abs(mmZ - otherROI.mmZ);
+	distanceX = fabs(mmX - otherROI.mmX);
+	distanceY = fabs(mmY - otherROI.mmY);
+	distanceZ = fabs(mmZ - otherROI.mmZ);
 	
 	// apply the distance formula
 	distanceTotal = sqrt(pow(distanceX,2) + pow(distanceY,2) + pow(distanceZ,2));
