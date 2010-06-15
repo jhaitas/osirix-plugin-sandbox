@@ -106,58 +106,70 @@
 
 - (void) partitionAllOpenPolyROIs
 {
-	int				i,ii,numInterPoints;
-	long			numSplinePoints;
+	int				i,ii;
+	long			numInterPoints,numSplinePoints;
 	ROI				*roiOPoly;
 	
 	// iterate through each selected Open Polygon ROI
 	for (i = 0; i < [selectedOPolyRois count]; i++) {
 		roiOPoly			= [selectedOPolyRois objectAtIndex:i];
 		currentSpline		= [roiOPoly splinePoints];
-		currentInterPoints	= [NSMutableArray arrayWithCapacity:numInterPoints];
+		currentInterPoints	= [NSMutableArray arrayWithCapacity:0];
 		numSplinePoints		= [currentSpline count];
 		numInterPoints		= [tenTwentyIntervals count] - 1;
 		
 		for (ii = 0; ii < [tenTwentyIntervals count]; ii++) {
+			// determine where on the spline we want to be
 			float accumulatedInterval = [self accumulatedIntervalAtIndex:ii];
+			
+			// calculate the index of the point we want on spline
 			int pointIndex = (numSplinePoints * accumulatedInterval) - 1;
 			
+			// select indexed point from spline and add it to array
 			[currentInterPoints addObject: [currentSpline objectAtIndex:pointIndex]];
 		}
-		[self drawIntermediateROIs];
 		
+		// add these intermediate points on line as ROIs
+		[self addIntermediateROIs];
 	}
 }
 
-- (void) drawIntermediateROIs
+- (void) addIntermediateROIs
 {
-	int				i,thisRoiType;
+	
+	int				i;
+	int				thisRoiType;
 	double			pixelSpacingX,pixelSpacingY;
+	NSPoint			thisOrigin;
 	
-	MyPoint			*thisPoint				= [MyPoint alloc];
-	ROI				*thisROI				= [ROI alloc];
-	NSMutableArray	*thisRoiList			= [[viewerController imageView] dcmRoiList];
+	// temporary pointers for creating new ROI
+	MyPoint			*thisPoint;
+	ROI				*thisROI;
 	
+	// pointer to current DCMPix in OsiriX
 	DCMPix			*thisDCMPix				= [[viewerController imageView] curDCM];
-	NSPoint			thisOrigin				= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
-	
-		
-	pixelSpacingX = [thisDCMPix pixelSpacingX];
-	pixelSpacingY = [thisDCMPix pixelSpacingY];
-	thisRoiType = t2DPoint;
+
+	// parameters necessary for initializting a new ROI
+	thisRoiType		= t2DPoint;
+	pixelSpacingX	= [thisDCMPix pixelSpacingX];
+	pixelSpacingY	= [thisDCMPix pixelSpacingY];
+	thisOrigin		= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
 	
 	for (i = 0; i < [currentInterPoints count]; i++) {
-		thisPoint = [currentInterPoints objectAtIndex:i];
+		// point to 
+		thisPoint = [[MyPoint alloc] initWithPoint: [[currentInterPoints objectAtIndex:i] point]];
 		
-		// right now we just print pixel coordinates to Console
-		NSLog(@"Point %d: %@\n",i+1,thisPoint);
+		// allocate and initialize a new ROI
+		thisROI = [[ROI alloc] initWithType: thisRoiType :pixelSpacingX :pixelSpacingY :thisOrigin];
 		
-		[thisROI initWithType: thisRoiType :pixelSpacingX :pixelSpacingY :thisOrigin];
-		thisROI.points = [[NSMutableArray alloc] initWithCapacity:0];
-		[thisROI.points addObject:thisPoint];
-		[thisRoiList addObject:thisROI];
+		// move the ROI from the 0,0 to correct coordinates
+		thisROI.rect = NSOffsetRect(thisROI.rect, thisPoint.x, thisPoint.y);
+		
+		// add the new ROI to the current ROI list
+		[[[viewerController imageView] curRoiList] addObject:thisROI];
 	}
-	
+	[thisPoint release];
+	[thisROI release];
 }
 
 - (float) accumulatedIntervalAtIndex: (int)index

@@ -23,7 +23,7 @@
 - (void) findSelectedROIs;
 - (void) findLineROIs;
 - (void) partitionAllOpenPolyROIs;
-- (void) drawIntermediateROIs;
+- (void) addIntermediateROIs;
 - (float) accumulatedIntervalAtIndex: (int)index;
 
 @end
