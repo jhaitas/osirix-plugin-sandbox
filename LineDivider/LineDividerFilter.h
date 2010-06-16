@@ -11,6 +11,7 @@
 #define FBOX(x) [NSNumber numberWithFloat:x]
 
 @interface LineDividerFilter : PluginFilter {
+	float			scaleValue;
 	NSArray			*tenTwentyIntervals;
 	NSMutableArray	*roiSelectedArray;
 	NSMutableArray	*selectedOPolyRois;
@@ -19,11 +20,13 @@
 	NSMutableArray	*currentInterPoints;
 }
 
-- (long) filterImage:(NSString*) menuName;
-- (void) findSelectedROIs;
-- (void) findLineROIs;
-- (void) partitionAllOpenPolyROIs;
-- (void) addIntermediateROIs;
-- (float) accumulatedIntervalAtIndex: (int)index;
+- (long)filterImage:(NSString*)menuName;
+- (void)findSelectedROIs;
+- (void)findLineROIs;
+- (void)partitionAllOpenPolyROIs;
+- (void)addIntermediateROIs;
+- (float)measureOPolyLength:(ROI *)thisROI fromPointAtIndex:(long)indexPointA toPointAtIndex:(long)indexPointB;
+- (float)measureOPolyLength:(ROI *)thisROI;
+- (float)accumulatedIntervalAtIndex:(int) index;
 
 @end

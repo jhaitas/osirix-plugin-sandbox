@@ -9,11 +9,15 @@
 
 @implementation LineDividerFilter
 
-- (void) initPlugin
+- (void)initPlugin
 {
+	// OsiriX default scale is 2.0 ...
+	// ... we want to program this so that we may change this if we want
+	scaleValue			= 2.0;
 	tenTwentyIntervals	= [[NSArray alloc] initWithObjects:
-										FBOX(.1),FBOX(.2),FBOX(.2),
-						   FBOX(.2),FBOX(.2),FBOX(.1),nil];
+								FBOX(.1),FBOX(.2),FBOX(.2),
+								FBOX(.2),FBOX(.2),nil];
+	
 	roiSelectedArray	= [[NSMutableArray alloc] initWithCapacity:0];
 	selectedOPolyRois	= [[NSMutableArray alloc] initWithCapacity:0];
 	
@@ -22,7 +26,7 @@
 	currentInterPoints	= [[NSMutableArray alloc] initWithCapacity:0];
 }
 
-- (long) filterImage:(NSString*) menuName
+- (long)filterImage:(NSString*) menuName
 {
 		
 	[self findSelectedROIs];	
@@ -43,7 +47,7 @@
 	return 0; // No Errors
 }
 
-- (void) findSelectedROIs
+- (void)findSelectedROIs
 {
 	int				i;
 	BOOL			roiSelected			= NO;
@@ -73,7 +77,7 @@
 	}
 }
 
-- (void) findLineROIs
+- (void)findLineROIs
 {
 	int				i;
 	BOOL			selectedLines		= NO;
@@ -83,9 +87,11 @@
 	
 	// iterate through each selected ROI
 	for (i = 0; i < [roiSelectedArray count]; i++) {
-		// check if this ROI is an Open Polygon
 		ROI *thisROI = [roiSelectedArray objectAtIndex:i];
-		if (thisROI.type == tOPolygon) {
+		
+		// check if this ROI is an Open Polygon...
+		// ... defined by at least 3 points
+		if (thisROI.type == tOPolygon && [thisROI.points count] > 2) {
 			// note that there are lines selected
 			selectedLines = YES;
 			
@@ -104,26 +110,40 @@
 	}
 }
 
-- (void) partitionAllOpenPolyROIs
+- (void)partitionAllOpenPolyROIs
 {
-	int				i,ii;
+	long			i,ii;
 	long			numInterPoints,numSplinePoints;
+	float			oPolyLength, thisSectionLength;
 	ROI				*roiOPoly;
 	
 	// iterate through each selected Open Polygon ROI
 	for (i = 0; i < [selectedOPolyRois count]; i++) {
 		roiOPoly			= [selectedOPolyRois objectAtIndex:i];
-		currentSpline		= [roiOPoly splinePoints];
+		currentSpline		= [roiOPoly splinePoints: scaleValue];
 		currentInterPoints	= [NSMutableArray arrayWithCapacity:0];
 		numSplinePoints		= [currentSpline count];
 		numInterPoints		= [tenTwentyIntervals count] - 1;
+		oPolyLength			= [self measureOPolyLength:roiOPoly];
+		
+		NSLog(@"oPoly %d length = %f mm",i,[self measureOPolyLength:roiOPoly]);
 		
 		for (ii = 0; ii < [tenTwentyIntervals count]; ii++) {
 			// determine where on the spline we want to be
 			float accumulatedInterval = [self accumulatedIntervalAtIndex:ii];
 			
 			// calculate the index of the point we want on spline
-			int pointIndex = (numSplinePoints * accumulatedInterval) - 1;
+			int pointIndex			= (numSplinePoints * accumulatedInterval) - 1;
+			float expectedLength	= (oPolyLength * accumulatedInterval);
+			
+			// perform measurement computations
+			thisSectionLength		= [self measureOPolyLength:roiOPoly fromPointAtIndex:0 toPointAtIndex: pointIndex];
+			float actualInterval	= ((thisSectionLength/oPolyLength));
+			float percentError		= fabs(accumulatedInterval - actualInterval)*100.0;
+			
+			// print information out to console
+			NSLog(@"Section %d expectedLength = %f and length = %f is %f%% of total length with a %f%% error",
+				  ii,expectedLength,thisSectionLength,actualInterval*100.0,percentError);
 			
 			// select indexed point from spline and add it to array
 			[currentInterPoints addObject: [currentSpline objectAtIndex:pointIndex]];
@@ -134,7 +154,7 @@
 	}
 }
 
-- (void) addIntermediateROIs
+- (void)addIntermediateROIs
 {
 	
 	int				i;
@@ -147,7 +167,7 @@
 	ROI				*thisROI;
 	
 	// pointer to current DCMPix in OsiriX
-	DCMPix			*thisDCMPix				= [[viewerController imageView] curDCM];
+	DCMPix			*thisDCMPix	= [[viewerController imageView] curDCM];
 
 	// parameters necessary for initializting a new ROI
 	thisRoiType		= t2DPoint;
@@ -156,7 +176,7 @@
 	thisOrigin		= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
 	
 	for (i = 0; i < [currentInterPoints count]; i++) {
-		// point to 
+		// point to appropriate selected intermediate point
 		thisPoint = [[MyPoint alloc] initWithPoint: [[currentInterPoints objectAtIndex:i] point]];
 		
 		// allocate and initialize a new ROI
@@ -172,7 +192,39 @@
 	[thisROI release];
 }
 
-- (float) accumulatedIntervalAtIndex: (int)index
+- (float)measureOPolyLength:(ROI *)thisROI fromPointAtIndex:(long)indexPointA toPointAtIndex:(long)indexPointB
+{
+	long i;
+	float length = 0;
+	
+	NSMutableArray *splinePoints = [thisROI splinePoints: scaleValue];
+	
+	// we can't count up to an index that doesn't exist...
+	// ... a negative length should be regarded as invalid
+	if (indexPointB > ([splinePoints count] - 1)) {
+		return -1;
+	}
+	
+	// accumulate distance between consective points on spline
+	for(i = 0; i < indexPointB; i++)
+	{
+		length += [thisROI Length:[[splinePoints objectAtIndex:i] point] :[[splinePoints objectAtIndex:i+1] point]];
+	}
+
+	return length;
+}
+
+- (float)measureOPolyLength:(ROI *)thisROI
+{
+	long			lastIndex;
+	NSMutableArray	*splinePoints = [thisROI splinePoints: scaleValue];
+	
+	lastIndex = [splinePoints count] - 1;
+	
+	return [self measureOPolyLength: thisROI fromPointAtIndex: 0 toPointAtIndex: lastIndex];
+}
+
+- (float)accumulatedIntervalAtIndex:(int)index
 {
 	// instanciate iterator
 	int i;
