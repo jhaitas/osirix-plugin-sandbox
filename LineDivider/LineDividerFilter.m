@@ -114,36 +114,42 @@
 {
 	long			i,ii;
 	long			numInterPoints,numSplinePoints;
-	float			oPolyLength, thisSectionLength;
+	float			oPolyLength;
+	NSMutableArray	*percentLength;
 	ROI				*roiOPoly;
+	
 	
 	// iterate through each selected Open Polygon ROI
 	for (i = 0; i < [selectedOPolyRois count]; i++) {
+		
 		roiOPoly			= [selectedOPolyRois objectAtIndex:i];
 		currentSpline		= [roiOPoly splinePoints: scaleValue];
 		currentInterPoints	= [NSMutableArray arrayWithCapacity:0];
 		numSplinePoints		= [currentSpline count];
 		numInterPoints		= [tenTwentyIntervals count] - 1;
 		oPolyLength			= [self measureOPolyLength:roiOPoly];
+		percentLength		= [self computePercentLength:roiOPoly];
 		
 		NSLog(@"oPoly %d length = %f mm",i,[self measureOPolyLength:roiOPoly]);
+		
+		// declare pointIndex outside of scope of following for-loop
+		long pointIndex = 0;
 		
 		for (ii = 0; ii < [tenTwentyIntervals count]; ii++) {
 			// determine where on the spline we want to be
 			float accumulatedInterval = [self accumulatedIntervalAtIndex:ii];
 			
-			// calculate the index of the point we want on spline
-			int pointIndex			= (numSplinePoints * accumulatedInterval) - 1;
-			float expectedLength	= (oPolyLength * accumulatedInterval);
+			// walk the line to next point
+			while ([[percentLength objectAtIndex:(pointIndex+1)] floatValue] < accumulatedInterval) {				
+				pointIndex +=1;
+			}
 			
-			// perform measurement computations
-			thisSectionLength		= [self measureOPolyLength:roiOPoly fromPointAtIndex:0 toPointAtIndex: pointIndex];
-			float actualInterval	= ((thisSectionLength/oPolyLength));
-			float percentError		= fabs(accumulatedInterval - actualInterval)*100.0;
 			
 			// print information out to console
-			NSLog(@"Section %d expectedLength = %f and length = %f is %f%% of total length with a %f%% error",
-				  ii,expectedLength,thisSectionLength,actualInterval*100.0,percentError);
+			NSLog(@"Section %d length = %f is %f%% of total length",
+				  ii,
+				  [self measureOPolyLength:roiOPoly fromPointAtIndex:0 toPointAtIndex:pointIndex],
+				  [[percentLength objectAtIndex:pointIndex] floatValue]*100.0);
 			
 			// select indexed point from spline and add it to array
 			[currentInterPoints addObject: [currentSpline objectAtIndex:pointIndex]];
@@ -192,6 +198,40 @@
 	[thisROI release];
 }
 
+- (NSMutableArray *)computePercentLength:(ROI *)thisROI
+{
+	long			i,numPoints;
+	float			totalLength,thisLength,thisPercent;
+	NSMutableArray	*splinePoints,*distanceFromStart,*percentLength;
+	
+	// do initial calculations
+	totalLength			= [self measureOPolyLength:thisROI];
+	splinePoints		= [thisROI splinePoints: scaleValue];
+	numPoints			= [splinePoints count];
+	
+	// allocate subsequent arrays
+	distanceFromStart	= [[NSMutableArray alloc] initWithCapacity:numPoints];
+	percentLength		= [[NSMutableArray alloc] initWithCapacity:numPoints];
+	
+	// the first element in both cases is 0
+	[distanceFromStart addObject:FBOX(0.0)];
+	[percentLength addObject:FBOX(0.0)];
+	
+	// iterate through each point on Open Polygon
+	for (i = 1; i < numPoints; i++) {
+		// compute length from first point on Open Polygon
+		thisLength = [self measureOPolyLength:thisROI fromPointAtIndex:0 toPointAtIndex:i];
+		
+		// compute what percent this length is of total length
+		thisPercent = thisLength/totalLength;
+		
+		// store computed values to respective matrices
+		[distanceFromStart addObject:FBOX(thisLength)];
+		[percentLength addObject:FBOX(thisPercent)];
+	}
+	return percentLength;
+}
+
 - (float)measureOPolyLength:(ROI *)thisROI fromPointAtIndex:(long)indexPointA toPointAtIndex:(long)indexPointB
 {
 	long i;
@@ -223,6 +263,7 @@
 	
 	return [self measureOPolyLength: thisROI fromPointAtIndex: 0 toPointAtIndex: lastIndex];
 }
+
 
 - (float)accumulatedIntervalAtIndex:(int)index
 {
