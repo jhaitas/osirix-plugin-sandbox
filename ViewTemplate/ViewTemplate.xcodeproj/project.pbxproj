@@ -11,6 +11,9 @@
 		58C367F712401027009883A4 /* ROImm.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C367F512401027009883A4 /* ROImm.m */; };
 		58C36810124290A0009883A4 /* tenTwentyTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C3680E124290A0009883A4 /* tenTwentyTemplate.h */; };
 		58C36811124290A0009883A4 /* tenTwentyTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C3680F124290A0009883A4 /* tenTwentyTemplate.m */; };
+		58C3702C1247AD7A009883A4 /* parseCSV.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C3702A1247AD7A009883A4 /* parseCSV.h */; };
+		58C3702D1247AD7A009883A4 /* parseCSV.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C3702B1247AD7A009883A4 /* parseCSV.m */; };
+		58C3703C1247AE52009883A4 /* zeroedTemplate.csv in Resources */ = {isa = PBXBuildFile; fileRef = 58C3703B1247AE52009883A4 /* zeroedTemplate.csv */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* ViewTemplate_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* ViewTemplate_Prefix.pch */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -36,6 +39,9 @@
 		58C367F512401027009883A4 /* ROImm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ROImm.m; sourceTree = "<group>"; };
 		58C3680E124290A0009883A4 /* tenTwentyTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tenTwentyTemplate.h; sourceTree = "<group>"; };
 		58C3680F124290A0009883A4 /* tenTwentyTemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tenTwentyTemplate.m; sourceTree = "<group>"; };
+		58C3702A1247AD7A009883A4 /* parseCSV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parseCSV.h; sourceTree = "<group>"; };
+		58C3702B1247AD7A009883A4 /* parseCSV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = parseCSV.m; sourceTree = "<group>"; };
+		58C3703B1247AE52009883A4 /* zeroedTemplate.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zeroedTemplate.csv; sourceTree = "<group>"; };
 		59C2B9280FF0ED7100B50385 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB5D36050680E57E00F4007A /* ViewTemplate.osirixplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ViewTemplate.osirixplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +92,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				58C3703B1247AE52009883A4 /* zeroedTemplate.csv */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -137,6 +144,8 @@
 		AB2C26750677B0C400A08910 /* ViewTemplateFilter */ = {
 			isa = PBXGroup;
 			children = (
+				58C3702A1247AD7A009883A4 /* parseCSV.h */,
+				58C3702B1247AD7A009883A4 /* parseCSV.m */,
 				ABA48A640680BB600089EB4F /* ViewTemplateFilter.h */,
 				ABA48A660680BB690089EB4F /* ViewTemplateFilter.m */,
 				58C367F412401027009883A4 /* ROImm.h */,
@@ -181,6 +190,7 @@
 				59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */,
 				58C367F612401027009883A4 /* ROImm.h in Headers */,
 				58C36810124290A0009883A4 /* tenTwentyTemplate.h in Headers */,
+				58C3702C1247AD7A009883A4 /* parseCSV.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -230,6 +240,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
+				58C3703C1247AE52009883A4 /* zeroedTemplate.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +264,7 @@
 				ABA48A670680BB690089EB4F /* ViewTemplateFilter.m in Sources */,
 				58C367F712401027009883A4 /* ROImm.m in Sources */,
 				58C36811124290A0009883A4 /* tenTwentyTemplate.m in Sources */,
+				58C3702D1247AD7A009883A4 /* parseCSV.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

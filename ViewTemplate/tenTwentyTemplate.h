@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ROImm.h"
+#import "parseCSV.h"
 
 
 @interface tenTwentyTemplate : NSObject {
@@ -18,5 +19,6 @@
 - (id) initWithOrigin: (ROImm *) thisOrigin;
 
 - (void) populateTemplate;
+- (ROImm *) parsedLineToROImm: (NSArray *) thisParsedLine;
 
 @end

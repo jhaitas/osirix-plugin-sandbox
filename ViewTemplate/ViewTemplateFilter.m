@@ -16,7 +16,12 @@
 - (long) filterImage:(NSString*) menuName
 {
 	NSLog(@"Starting Plugin\n");
+	tenTwentyTemplate *myTenTwenty = [[tenTwentyTemplate alloc] init];
+	
 	[self findOriginROI];
+	
+	[myTenTwenty initWithOrigin:originROI];
+	
 	NSLog(@"executed method\n");
 	return 0;
 }
@@ -62,7 +67,7 @@
 				originROI = [[ROImm alloc] initWithName:selectedROI.name
 												  withX:location[0] 
 												  withY:location[1] 
-												  withZ:location[2]];
+												  withZ:location[2]			];
 			}
 		}
 	}
