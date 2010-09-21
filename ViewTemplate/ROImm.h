@@ -26,7 +26,10 @@
 // Returns the distance from the other referenced ROI
 -(double) distanceFrom: (ROImm *) otherROI;
 
+-(void) dicomCoords: (double *)theDICOMcoords;
+
 // Returns a string describing an instance
 -(NSString *)description;
 
+-(void) dealloc;
 @end

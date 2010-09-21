@@ -7,18 +7,26 @@
 //
 
 #import <Cocoa/Cocoa.h>
+
 #import "ROImm.h"
 #import "parseCSV.h"
 
 
 @interface tenTwentyTemplate : NSObject {
 	ROImm			*originROI;
+	
+	// electrodes is an array of ROImm objects
 	NSMutableArray	*electrodes;
 }
+@property (assign)	ROImm *originROI;
+@property (assign)	NSMutableArray *electrodes;
 
 - (id) initWithOrigin: (ROImm *) thisOrigin;
 
 - (void) populateTemplate;
-- (ROImm *) parsedLineToROImm: (NSArray *) thisParsedLine;
+
+- (void) parsedLine: (NSArray *) thisParsedLine toROImm: (ROImm *) tmpROImm;
+
+- (void) registerWithOrigin;
 
 @end

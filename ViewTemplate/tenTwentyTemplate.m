@@ -11,11 +11,14 @@
 
 @implementation tenTwentyTemplate
 
+@synthesize originROI;
+@synthesize electrodes;
+
 - (id) initWithOrigin: (ROImm *) thisOrigin
 {
 	self = [super init];
-	[originROI autorelease];
-	[electrodes autorelease];
+//	[originROI autorelease];
+//	[electrodes autorelease];
 	
 	// allocate and inititalize electrodes array
 	electrodes = [[NSMutableArray alloc] init];
@@ -28,6 +31,8 @@
 	
 	[self populateTemplate];
 	
+	[self registerWithOrigin];
+	
 	// return this instance
 	return self;
 }
@@ -37,11 +42,11 @@
 	int i,arrayOffset;
 	
 	// Identify plugin Bundle
-	NSString *name			= [[NSString alloc] initWithString:@"zeroedTemplate"];
-	NSString *ext			= [[NSString alloc] initWithString:@"csv"];
+	NSString *name			= [NSString stringWithString:@"zeroedTemplate"];
+	NSString *ext			= [NSString stringWithString:@"csv"];
 	NSString *path			= [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.viewtemplate"] resourcePath];
 		
-	NSString *fullFilename	= [[NSString alloc] initWithFormat:@"%@/%@.%@",path,name,ext];
+	NSString *fullFilename	= [NSString stringWithFormat:@"%@/%@.%@",path,name,ext];
 		
 	CSVParser		*myCSVParser		= [[CSVParser alloc] init];
 	NSMutableArray	*parsedElectrodes;
@@ -53,39 +58,45 @@
 		NSLog(@"%d csv lines parsed.\n",[parsedElectrodes count]);
 	} else {
 		NSLog(@"Failed to open %@\n",fullFilename);
+		return;
 	}
-	
+
 	// start from object at index 2 ...
 	// ... index 0 contains headers ...
 	// ... index 1 contains origin
 	arrayOffset = 2;
 	for (i = arrayOffset; i < [parsedElectrodes count]; i++) {
-		NSArray *thisElectrode = [parsedElectrodes objectAtIndex:i];
-		[electrodes insertObject:[self parsedLineToROImm:thisElectrode]
-						 atIndex:i-arrayOffset							];
+		ROImm *tmpROImm = [ROImm alloc];
+		[self parsedLine:[parsedElectrodes objectAtIndex:i] toROImm: tmpROImm];
+		[electrodes addObject:tmpROImm];
+		[tmpROImm release];
 	}
 	
-	for (i = 0; i < [electrodes count]; i++) {
-		NSLog(@"%@\n",[electrodes objectAtIndex:i]);
-	}
-	
-	[myCSVParser autorelease];
-	[name autorelease];
-	[ext autorelease];
-/*
-	[path autorelease];
-	[fullFilename autorelease];
-*/
+	[myCSVParser closeFile];
+	[myCSVParser release];
 }
 
-- (ROImm *) parsedLineToROImm: (NSArray *) thisParsedLine
+- (void) parsedLine: (NSArray *) thisParsedLine toROImm: (ROImm *) thisROImm
 {
-	ROImm	*thisROImm;
-	thisROImm = [[ROImm alloc] initWithName:[[NSString alloc] initWithString:[thisParsedLine objectAtIndex:0]]
-										withX:[[thisParsedLine objectAtIndex:2] doubleValue]
-										withY:[[thisParsedLine objectAtIndex:1] doubleValue]
-										withZ:[[thisParsedLine objectAtIndex:3] doubleValue]					];
-	return thisROImm;
+	[thisROImm initWithName:[[NSString alloc] initWithString:[thisParsedLine objectAtIndex:0]]
+					 withX:[[thisParsedLine objectAtIndex:2] doubleValue]
+					 withY:[[thisParsedLine objectAtIndex:1] doubleValue]
+					 withZ:[[thisParsedLine objectAtIndex:3] doubleValue]						];
+}
+
+- (void) registerWithOrigin
+{
+	int i;
+	ROImm	*tmpROImm;
+	
+	for (i = 0; i < [electrodes count]; i++)
+	{
+		tmpROImm = [electrodes objectAtIndex:i];
+		tmpROImm.mmX += originROI.mmX;
+		tmpROImm.mmY += originROI.mmY;
+		tmpROImm.mmZ += originROI.mmZ;
+		NSLog(@"%@\n",[electrodes objectAtIndex:i]);
+	}
 }
 
 @end

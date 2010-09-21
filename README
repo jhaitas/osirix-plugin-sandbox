@@ -1,1 +1,7 @@
 This is a sandbox for experimenting with OsiriX plugins
+
+To debug OsiriX plugins
+=======================
+Add a custom executable to your plug-in project and set the path to OsiriX (Project -> New Custom Executable...).
+
+You should now be able to build-and-run or build-and-debug your project. It will launch OsiriX from the build products directory. You might also want to set OsiriX to look for bundles in your build products directory, if it doesn't already. Or you could create a symbolic link from one of OsiriX's plug-in directories to the bundle in your build products directory.

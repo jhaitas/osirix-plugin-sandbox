@@ -20,14 +20,14 @@
 			   withZ: (double) inZ
 {
 	self = [super init];
-	[name autorelease];
+//	[name autorelease];
 	
 	// assign values to variables
-	name	= [inName retain];
+	name	= [NSString stringWithString:inName];
 	mmX		= inX;
 	mmY		= inY;
 	mmZ		= inZ;
-
+	
 	// return this instance
 	return self;
 }
@@ -49,9 +49,22 @@
 	return distanceTotal;
 }
 
+-(void) dicomCoords: (double *)theDICOMcoords
+{
+	theDICOMcoords[0] = mmX;
+	theDICOMcoords[1] = mmY;
+	theDICOMcoords[2] = mmZ;
+}
+
 -(NSString *)description
 {
 	return [NSString stringWithFormat:@"%@\tX: %0.3fmm\tY: %0.3fmm\tZ: %0.3fmm",name,mmX,mmY,mmZ];
+}
+
+-(void) dealloc
+{
+	NSLog(@"ROImm deallocating...\n");
+	[super dealloc];
 }
 
 

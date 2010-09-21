@@ -11,10 +11,13 @@
 #import "tenTwentyTemplate.h"
 
 @interface ViewTemplateFilter : PluginFilter {
-	ROImm	*originROI;
+	int					originROIslice;
+	ROImm				*originROI;
+	tenTwentyTemplate	*myTenTwenty;
 }
 
 - (long) filterImage:(NSString*) menuName;
 - (void) findOriginROI;
+- (void) addElectrodes;
 
 @end
