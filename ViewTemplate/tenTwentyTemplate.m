@@ -11,10 +11,10 @@
 
 @implementation tenTwentyTemplate
 
-@synthesize originROI;
+@synthesize stereotaxOrigin;
 @synthesize electrodes;
 
-- (id) initWithOrigin: (ROImm *) thisOrigin
+- (id) initWithOrigin: (StereotaxCoord *) thisOrigin
 {
 	self = [super init];
 //	[originROI autorelease];
@@ -24,14 +24,10 @@
 	electrodes = [[NSMutableArray alloc] init];
 	
 	// set origin location
-	originROI = [[ROImm alloc] initWithName:thisOrigin.name
-									  withX:thisOrigin.mmX
-									  withY:thisOrigin.mmY
-									  withZ:thisOrigin.mmZ	];
-	
-	[self populateTemplate];
-	
-	[self registerWithOrigin];
+	stereotaxOrigin = [[StereotaxCoord alloc] initWithName:thisOrigin.name
+									  withAP:thisOrigin.AP
+									  withML:thisOrigin.ML
+									  withDV:thisOrigin.DV	];
 	
 	// return this instance
 	return self;
@@ -39,13 +35,10 @@
 
 - (void) populateTemplate
 {
-	int i,arrayOffset;
-	
 	// Identify plugin Bundle
 	NSString *name			= [NSString stringWithString:@"zeroedTemplate"];
 	NSString *ext			= [NSString stringWithString:@"csv"];
 	NSString *path			= [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.viewtemplate"] resourcePath];
-		
 	NSString *fullFilename	= [NSString stringWithFormat:@"%@/%@.%@",path,name,ext];
 		
 	CSVParser		*myCSVParser		= [[CSVParser alloc] init];
@@ -64,26 +57,22 @@
 	// start from object at index 2 ...
 	// ... index 0 contains headers ...
 	// ... index 1 contains origin
-	arrayOffset = 2;
-	for (i = arrayOffset; i < [parsedElectrodes count]; i++) {
-		ROImm *tmpROImm = [ROImm alloc];
-		[self parsedLine:[parsedElectrodes objectAtIndex:i] toROImm: tmpROImm];
-		[electrodes addObject:tmpROImm];
-		[tmpROImm release];
+	[parsedElectrodes removeObjectAtIndex:0];
+	[parsedElectrodes removeObjectAtIndex:1];
+	for (id thisParsedLine in parsedElectrodes) {
+		StereotaxCoord *tmpElectrode = [StereotaxCoord alloc];
+		[tmpElectrode initWithName:[[NSString alloc] initWithString:[thisParsedLine objectAtIndex:0]]
+							 withAP:[[thisParsedLine objectAtIndex:2] doubleValue]
+							 withML:[[thisParsedLine objectAtIndex:1] doubleValue]
+							 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]						];
+		[electrodes addObject:tmpElectrode];
 	}
 	
 	[myCSVParser closeFile];
 	[myCSVParser release];
 }
 
-- (void) parsedLine: (NSArray *) thisParsedLine toROImm: (ROImm *) thisROImm
-{
-	[thisROImm initWithName:[[NSString alloc] initWithString:[thisParsedLine objectAtIndex:0]]
-					 withX:[[thisParsedLine objectAtIndex:2] doubleValue]
-					 withY:[[thisParsedLine objectAtIndex:1] doubleValue]
-					 withZ:[[thisParsedLine objectAtIndex:3] doubleValue]						];
-}
-
+/*
 - (void) registerWithOrigin
 {
 	int i;
@@ -98,5 +87,6 @@
 		NSLog(@"%@\n",[electrodes objectAtIndex:i]);
 	}
 }
+*/
 
 @end

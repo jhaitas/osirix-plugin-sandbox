@@ -1,0 +1,31 @@
+//
+//  StereotaxCoord.h
+//  ViewTemplate
+//
+//  Created by John Haitas on 9/22/10.
+//  Copyright 2010 Vanderbilt University. All rights reserved.
+//
+
+#import <Cocoa/Cocoa.h>
+
+
+@interface StereotaxCoord : NSObject {
+	NSString *name;
+	double AP,ML,DV;
+}
+
+@property(assign) NSString *name;
+@property double AP,ML,DV;
+
+
+// Initializes an instance of this class
+-(id) initWithName: (NSString *) inName
+			 withAP: (double) inAP 
+			 withML: (double) inML
+			 withDV: (double) inDV;
+
+
+// Returns a string describing an instance
+-(NSString *)description;
+
+@end

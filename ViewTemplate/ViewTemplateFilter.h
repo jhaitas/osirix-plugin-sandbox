@@ -7,17 +7,20 @@
 
 #import <Foundation/Foundation.h>
 #import "PluginFilter.h"
-#import "ROImm.h"
+#import "StereotaxCoord.h"
 #import "tenTwentyTemplate.h"
 
 @interface ViewTemplateFilter : PluginFilter {
-	int					originROIslice;
-	ROImm				*originROI;
+	BOOL				foundNasion,foundInion;
+	StereotaxCoord		*nasion;
+	StereotaxCoord		*inion;
 	tenTwentyTemplate	*myTenTwenty;
 }
 
 - (long) filterImage:(NSString*) menuName;
-- (void) findOriginROI;
+- (void) findUserInput;
+- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location;
+- (void) computeOrientation;
 - (void) addElectrodes;
 
 @end

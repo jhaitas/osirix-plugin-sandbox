@@ -8,25 +8,25 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "ROImm.h"
+#import "StereotaxCoord.H"
 #import "parseCSV.h"
 
 
 @interface tenTwentyTemplate : NSObject {
-	ROImm			*originROI;
+	StereotaxCoord	*stereotaxOrigin;
 	
 	// electrodes is an array of ROImm objects
 	NSMutableArray	*electrodes;
 }
-@property (assign)	ROImm *originROI;
+@property (assign)	StereotaxCoord *stereotaxOrigin;
 @property (assign)	NSMutableArray *electrodes;
 
-- (id) initWithOrigin: (ROImm *) thisOrigin;
+- (id) initWithOrigin: (StereotaxCoord *) thisOrigin;
 
 - (void) populateTemplate;
 
-- (void) parsedLine: (NSArray *) thisParsedLine toROImm: (ROImm *) tmpROImm;
-
+/*
 - (void) registerWithOrigin;
+*/
 
 @end
