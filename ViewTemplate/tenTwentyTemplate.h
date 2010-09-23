@@ -13,17 +13,27 @@
 
 
 @interface tenTwentyTemplate : NSObject {
-	StereotaxCoord	*stereotaxOrigin;
+	StereotaxCoord		*nasion,*inion;
+	NSMutableDictionary	*orientation;
 	
 	// electrodes is an array of ROImm objects
 	NSMutableArray	*electrodes;
 }
-@property (assign)	StereotaxCoord *stereotaxOrigin;
-@property (assign)	NSMutableArray *electrodes;
+@property (assign)	StereotaxCoord		*nasion;
+@property (assign)	StereotaxCoord		*inion;
+@property (assign)	NSMutableDictionary	*orientation;
+@property (assign)	NSMutableArray		*electrodes;
 
-- (id) initWithOrigin: (StereotaxCoord *) thisOrigin;
 
+- (id) initWithNasion: (StereotaxCoord *) thisNasion
+			 andInion: (StereotaxCoord *) thisInion;
+
+- (void) computeOrientation;
+- (void) computeScalingFactor;
 - (void) populateTemplate;
+- (void) shiftCoordinates;
+- (void) scaleCoordinates;
+
 
 /*
 - (void) registerWithOrigin;

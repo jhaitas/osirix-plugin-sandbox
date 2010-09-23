@@ -10,20 +10,29 @@
 
 
 @interface StereotaxCoord : NSObject {
-	NSString *name;
-	double AP,ML,DV;
+	NSString	*name;
+	float		AP,ML,DV;
 }
 
 @property(assign) NSString *name;
-@property double AP,ML,DV;
+@property float AP,ML,DV;
 
 
 // Initializes an instance of this class
 -(id) initWithName: (NSString *) inName
-			 withAP: (double) inAP 
-			 withML: (double) inML
-			 withDV: (double) inDV;
+			 withAP: (float) inAP 
+			 withML: (float) inML
+			 withDV: (float) inDV;
 
+-(StereotaxCoord *) copy;
+
+
+// for remapping orientation of stereotaxic coordinates
+- (void) remapWithOrientation: (NSMutableDictionary *) theOrientation;
+
+// returns coordinates mapped back to DICOM
+- (void) returnDICOMCoords: (float *) dicomCoords
+		   withOrientation: (NSMutableDictionary *) theOrientation;
 
 // Returns a string describing an instance
 -(NSString *)description;

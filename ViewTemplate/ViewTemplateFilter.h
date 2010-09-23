@@ -12,15 +12,16 @@
 
 @interface ViewTemplateFilter : PluginFilter {
 	BOOL				foundNasion,foundInion;
+	int					slicePlane;
 	StereotaxCoord		*nasion;
 	StereotaxCoord		*inion;
 	tenTwentyTemplate	*myTenTwenty;
 }
 
 - (long) filterImage:(NSString*) menuName;
+- (void) determineSlicePlane;
 - (void) findUserInput;
 - (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location;
-- (void) computeOrientation;
 - (void) addElectrodes;
 
 @end

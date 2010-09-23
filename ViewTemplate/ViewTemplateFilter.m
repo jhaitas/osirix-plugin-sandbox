@@ -17,24 +17,45 @@
 {
 	NSLog(@"Starting Plugin\n");
 	
+	[self determineSlicePlane];
+	
 	// there should be an ROI named 'origin' in current DCMView
 	[self findUserInput];
 	
-	[self computeOrientation];
-	
-	// pass the origin to the tenTwentyTemplate
-//	myTenTwenty = [[tenTwentyTemplate alloc] initWithOrigin:stereotaxOrigin];
-	// read in template from CSV file
-//	[myTenTwenty populateTemplate];
-	// shift electrodes with respect to origin
-//	[myTenTwenty registerWithOrigin];
+	// pass the nasion and inion to the tenTwentyTemplate
+	myTenTwenty = [[tenTwentyTemplate alloc] initWithNasion:nasion andInion:inion];
 	
 	// place electrodes on MRI
-//	[self addElectrodes];
+	[self addElectrodes];
 	
 	NSLog(@"executed method\n");
 	return 0;
 }
+
+- (void) determineSlicePlane
+{
+	// for now we will assume the slice plane is 0 ...
+	// ... this needs to be verified
+	slicePlane = 0;
+/*
+	int		i;
+	double	locationSet1[3],locationSet2[3],diffSet[3];
+	DCMPix	*pix1,*pix2;
+	
+	pix1 = [[viewerController pixList] objectAtIndex:0];
+	pix2 = [[viewerController pixList] objectAtIndex:1];
+	
+	[pix1 convertPixDoubleX:0.0 pixY:0.0 toDICOMCoords:locationSet1];
+	[pix2 convertPixDoubleX:0.0 pixY:0.0 toDICOMCoords:locationSet2];
+	
+	for (i = 0; i < 3; i++) {
+		diffSet[i] = locationSet2[i] - locationSet1[i];
+	}
+	
+	NSLog(@"diffSet = (%f,%f,%f)\n",diffSet[0],diffSet[1],diffSet[2]);
+ */
+}
+
 
 - (void) findUserInput
 {
@@ -83,71 +104,6 @@
 	
 }
 
-// coordinates natively in (x,y,z) ...
-// ... greatest difference between nasion and inion should be AP
-// ... ML should be same in nasion and inion
-// ... DV should be smaller difference than AP
-//
-// no doubt there is a more elegant way to do this
-- (void) computeOrientation
-{
-	int				i,ii,firstIndex,secondIndex;
-	double			thisDouble,firstDouble,secondDouble;
-	int				indexAP,indexML,indexDV;
-	NSNumber		*diffAP,*diffML,*diffDV;
-	NSMutableArray	*diff,*orientation;
-	
-	diffAP	= [NSNumber numberWithDouble:(nasion.AP - inion.AP)];
-	diffML	= [NSNumber numberWithDouble:(nasion.ML - inion.ML)];
-	diffDV	= [NSNumber numberWithDouble:(nasion.DV - inion.DV)];
-	
-	diff		= [[NSMutableArray alloc] initWithObjects:diffAP,diffML,diffDV,nil];
-	orientation	= [[NSMutableArray alloc] initWithCapacity:3];
-	
-	// first we identify and eliminate ML
-	for (i = 0; i < [diff count]; i++) {
-		thisDouble = [[diff objectAtIndex:i] doubleValue];
-		if (thisDouble == 0.0) {
-			// found ML ... store its index
-			indexML = i;
-		}
-	}
-	
-	// now find which magnitude is greater between remaining diffs
-	for (i = 0; i < ([diff count] - 1); i++) {
-		// ignore item identified as ML
-		if (i == indexML) continue;
-		firstDouble = [[diff objectAtIndex:i] doubleValue];
-		firstIndex = i;
-		for (ii = i + 1; ii < [diff count]; ii++) {
-			// ignore item identified as ML
-			if (ii == indexML) continue;
-			secondDouble = [[diff objectAtIndex:ii] doubleValue];
-			secondIndex = ii;
-		}
-	}
-	
-	NSLog(@"firstIndex = %d\n",firstIndex);
-	NSLog(@"secondIndex = %d\n",secondIndex);
-	
-	if (fabs(firstDouble) > fabs(secondDouble)) {
-		indexAP = firstIndex;
-		indexDV = secondIndex;
-	} else {
-		indexAP = secondIndex;
-		indexDV = firstIndex;
-	}
-	
-	NSLog(@"%@\n",orientation);		
-	
-	NSLog(@"ML identified at index %d\n",indexML);
-	
-	NSLog(@"diffAP = %f\n",[diffAP doubleValue]);
-	NSLog(@"diffML = %f\n",[diffML doubleValue]);
-	NSLog(@"diffDV = %f\n",[diffDV doubleValue]);
-	
-	NSLog(@"(AP,ML,DV) are mapped as (%d,%d,%d)\n",indexAP,indexML,indexDV);
-}
 
 - (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location
 {				
@@ -171,9 +127,9 @@
 
 - (void) addElectrodes
 {
-	int				thisRoiType;
+	int				thisRoiType,bestSlice;
 	double			pixelSpacingX,pixelSpacingY;
-	NSPoint			thisOrigin;
+	float			dicomCoords[3],sliceCoords[3];
 	
 	// temporary pointers for creating new ROI
 	ROI				*thisROI;
@@ -185,20 +141,36 @@
 	thisRoiType		= t2DPoint;
 	pixelSpacingX	= [thisDCMPix pixelSpacingX];
 	pixelSpacingY	= [thisDCMPix pixelSpacingY];
-	thisOrigin		= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
-	
+		
 	for (StereotaxCoord *thisElectrode in myTenTwenty.electrodes) {
+		// get DICOM coords which we will convert to slice coords
+		[thisElectrode returnDICOMCoords:dicomCoords withOrientation:myTenTwenty.orientation];
+		
+//		NSLog(@"DICOM coords = (%.3f,%.3f,%.3f)\n",dicomCoords[0],dicomCoords[1],dicomCoords[2]);
+		
+		// find nearest slice
+		bestSlice = [DCMPix nearestSliceInPixelList:[[viewerController imageView] dcmPixList]
+									withDICOMCoords:dicomCoords
+										sliceCoords:sliceCoords									];
+		
+		// FIXME DICOM coordinates are incorrectly mapping to slice coordinates
+		
 		// allocate and initialize a new ROI
 		thisROI = [[ROI alloc] initWithType:thisRoiType
 										   :pixelSpacingX
 										   :pixelSpacingY
-										   :thisOrigin];
+										   :NSMakePoint(0.0, 0.0)];
+		
+		
+		thisROI.rect = NSOffsetRect(thisROI.rect, sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
 		
 		thisROI.name = [NSString stringWithString:thisElectrode.name];
 				
-		// add the new ROI to the current ROI list
-		[[[viewerController imageView] curRoiList] addObject:thisROI];
+		// add the new ROI to the correct ROI list
+		[[[[viewerController imageView] dcmRoiList] objectAtIndex:bestSlice] addObject:thisROI];
 	}
+	// update screen
+	[viewerController updateImage:self];
 }
 
 @end
