@@ -5,3 +5,18 @@ To debug OsiriX plugins
 Add a custom executable to your plug-in project and set the path to OsiriX (Project -> New Custom Executable...).
 
 You should now be able to build-and-run or build-and-debug your project. It will launch OsiriX from the build products directory. You might also want to set OsiriX to look for bundles in your build products directory, if it doesn't already. Or you could create a symbolic link from one of OsiriX's plug-in directories to the bundle in your build products directory.
+
+Converting from DICOM coordinates to slice coordinates
+======================================================
+http://tech.groups.yahoo.com/group/osirix-dev/message/668
+
+*** 
+Note however that sliceCoords are not technically pixel space since
+they are 3D (pixels are by definition 2D). What I called sliceCoords
+(when I originally wrote this utility) are mm based pixel coords
+where the pixel coordinate (center of each pixel) and the origin is
+always the upper left corner pixel, X is to the right, Y is down, and
+Z is perpendicular to the slice representing in mm the perpendicular
+distance in mm a given DICOM coordinate is from the actual slice. To
+get the actual pixels, simply divide the X,Y sliceCoords by
+pixelSpacingX and pixelSpacingY respectively.

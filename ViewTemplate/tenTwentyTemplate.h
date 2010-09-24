@@ -29,14 +29,8 @@
 			 andInion: (StereotaxCoord *) thisInion;
 
 - (void) computeOrientation;
-- (void) computeScalingFactor;
 - (void) populateTemplate;
 - (void) shiftCoordinates;
 - (void) scaleCoordinates;
-
-
-/*
-- (void) registerWithOrigin;
-*/
 
 @end

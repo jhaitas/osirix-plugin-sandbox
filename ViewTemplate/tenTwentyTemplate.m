@@ -48,11 +48,8 @@
 	// shift template values to match DICOM coordinate space
 	[self shiftCoordinates];
 	
-	// compute scaling factor
-//	[self computeScalingFactor];
-	
 	// scale the template to the subject
-//	[self scaleCoordinates];
+	[self scaleCoordinates];
 	
 	return self;	
 }
@@ -135,7 +132,7 @@
 	NSMutableArray	*parsedElectrodes;
 	
 	[myCSVParser setDelimiter:','];
-	if ([myCSVParser openFile:fullFilename]) {
+	if ([myCSVParser openFile:[NSString stringWithString:fullFilename]]) {
 		NSLog(@"Success opening %@\n",fullFilename);
 		parsedElectrodes = [myCSVParser parseFile];
 		NSLog(@"%d csv lines parsed.\n",[parsedElectrodes count]);
@@ -156,10 +153,15 @@
 							 withML:[[thisParsedLine objectAtIndex:2] doubleValue]
 							 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]						];
 		[electrodes addObject:tmpElectrode];
+		[tmpElectrode release];
 	}
 	
 	[myCSVParser closeFile];
 	[myCSVParser release];
+	[name release];
+	[ext release];
+	[path release];
+	[fullFilename release];
 }
 
 - (void) shiftCoordinates
@@ -185,9 +187,10 @@
 	}
 }
 
-- (void) computeScalingFactor
+- (void) scaleCoordinates
 {
-	float	scaleAP;
+	float			referenceAP,scaleAP;
+	float			referenceDV,scaleDV;
 	StereotaxCoord	*Fpz,*Oz;
 	
 	// populate a temporary dictionary
@@ -201,22 +204,14 @@
 	
 	
 	scaleAP = (fabs(nasion.AP - inion.AP) / fabs(Fpz.AP - Oz.AP));
+	referenceAP = Fpz.AP;
 	
-	NSLog(@"((nasion.AP - inion.AP) / (Fpz.AP - Oz.AP)) = ((%f - %f) / (%f - %f)) = %f\n",
-				nasion.AP,inion.AP,Fpz.AP,Oz.AP,scaleAP);
-	
-}
-
-- (void) scaleCoordinates
-{
-	float			scaleAP,scaleDV;
-	StereotaxCoord	*Fpz,*Oz;
-	
-	
-	scaleAP = ((nasion.AP - inion.AP) / (Fpz.AP - Oz.AP));
+	scaleDV = (fabs(nasion.DV - inion.DV) / fabs(Fpz.DV - Oz.DV));
+	referenceDV = Fpz.DV;
 	
 	for (StereotaxCoord *thisElectrode in electrodes) {
-		thisElectrode.AP = scaleAP * (Fpz.AP - thisElectrode.AP);
+		thisElectrode.AP = referenceAP - (scaleAP * (referenceAP - thisElectrode.AP));
+		thisElectrode.DV = referenceDV - (scaleDV * (referenceDV - thisElectrode.DV));
 	}
 }
 

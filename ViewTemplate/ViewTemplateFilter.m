@@ -130,6 +130,7 @@
 	int				thisRoiType,bestSlice;
 	double			pixelSpacingX,pixelSpacingY;
 	float			dicomCoords[3],sliceCoords[3];
+	float			thisPixelMean;
 	
 	// temporary pointers for creating new ROI
 	ROI				*thisROI;
@@ -153,8 +154,6 @@
 									withDICOMCoords:dicomCoords
 										sliceCoords:sliceCoords									];
 		
-		// FIXME DICOM coordinates are incorrectly mapping to slice coordinates
-		
 		// allocate and initialize a new ROI
 		thisROI = [[ROI alloc] initWithType:thisRoiType
 										   :pixelSpacingX
@@ -168,6 +167,13 @@
 				
 		// add the new ROI to the correct ROI list
 		[[[[viewerController imageView] dcmRoiList] objectAtIndex:bestSlice] addObject:thisROI];
+		
+		// next two lines demonstrate how to determine the pixel value at the given ROI ...
+		// ... this will be used to determine if ROI is correctly placed
+		[[[[viewerController imageView] dcmPixList] objectAtIndex:bestSlice] computeROI:thisROI :&thisPixelMean :NULL :NULL :NULL :NULL];
+		NSLog(@"%@ value = %f\n",thisROI.name,thisPixelMean);
+		
+		[thisROI release];
 	}
 	// update screen
 	[viewerController updateImage:self];
