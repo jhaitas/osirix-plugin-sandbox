@@ -20,15 +20,15 @@
 			withML: (float) inML
 			withDV: (float) inDV
 {
-	self = [super init];
-	[name autorelease];
-	
-	// assign values to variables
-	name	= [NSString stringWithString:inName];
-	AP		= inAP;
-	ML		= inML;
-	DV		= inDV;
-	
+    if ((self = [super init])) {
+		[name autorelease];
+		
+		// assign values to variables
+		name	= [NSString stringWithString:inName];
+		AP		= inAP;
+		ML		= inML;
+		DV		= inDV;
+	}
 	// return this instance
 	return self;
 }
@@ -105,9 +105,6 @@
 	dicomCoords[[[theOrientation objectForKey:@"AP"] intValue]] = AP;
 	dicomCoords[[[theOrientation objectForKey:@"ML"] intValue]] = ML;
 	dicomCoords[[[theOrientation objectForKey:@"DV"] intValue]] = DV;
-	
-	NSLog(@"%@ AP,ML,DV (%.1f,%.1f,%.1f) remapped to x,y,z (%.1f,%.1f,%.1f)\n",
-				name,AP,ML,DV,dicomCoords[0],dicomCoords[1],dicomCoords[2]);
 }
 
 -(NSString *)description

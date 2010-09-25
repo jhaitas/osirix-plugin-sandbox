@@ -17,39 +17,40 @@
 - (id) initWithNasion: (StereotaxCoord *) thisNasion
 			 andInion: (StereotaxCoord *) thisInion
 {
-	self = [super init];
-	
-	// allocate and init orientation dictionary
-	orientation	= [[NSMutableDictionary alloc] init];
-	
-	// allocate and inititalize electrodes array
-	electrodes = [[NSMutableArray alloc] init];
-	
-	nasion	= [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisNasion.name]
-												withAP:thisNasion.AP
-												withML:thisNasion.ML
-												withDV:thisNasion.DV	];
-	
-	inion	= [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisInion.name]
-												withAP:thisInion.AP
-												withML:thisInion.ML
-												withDV:thisInion.DV	];
-	
-	// compute orientation of AP, ML, and DV
-	[self computeOrientation];
-	
-	// remap coordinates per computed orientation
-	[nasion remapWithOrientation:orientation];
-	[inion remapWithOrientation:orientation];
-	
-	// create array containing electrode names and coordinates
-	[self populateTemplate];
-	
-	// shift template values to match DICOM coordinate space
-	[self shiftCoordinates];
-	
-	// scale the template to the subject
-	[self scaleCoordinates];
+	if (self = [super init])
+	{
+		// allocate and init orientation dictionary
+		orientation	= [[NSMutableDictionary alloc] init];
+		
+		// allocate and inititalize electrodes array
+		electrodes = [[NSMutableArray alloc] init];
+		
+		nasion	= [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisNasion.name]
+													withAP:thisNasion.AP
+													withML:thisNasion.ML
+													withDV:thisNasion.DV	];
+		
+		inion	= [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisInion.name]
+													withAP:thisInion.AP
+													withML:thisInion.ML
+													withDV:thisInion.DV	];
+		
+		// compute orientation of AP, ML, and DV
+		[self computeOrientation];
+		
+		// remap coordinates per computed orientation
+		[nasion remapWithOrientation:orientation];
+		[inion remapWithOrientation:orientation];
+		
+		// create array containing electrode names and coordinates
+		[self populateTemplate];
+		
+		// shift template values to match DICOM coordinate space
+		[self shiftCoordinates];
+		
+		// scale the template to the subject
+		[self scaleCoordinates];
+	}
 	
 	return self;	
 }
@@ -58,23 +59,33 @@
 // ... greatest difference between nasion and inion should be AP
 // ... ML should be same in nasion and inion
 // ... DV should be smaller difference than AP
-//
-// no doubt there is a more elegant way to do this
 - (void) computeOrientation
 {
-	int					i,ii,firstIndex,secondIndex;
-	double				thisDouble,firstDouble,secondDouble;
+	int					i,firstIndex,secondIndex;
 	int					indexAP,indexML,indexDV;
+	double				thisDouble,firstDouble,secondDouble;
 	NSNumber			*diffAP,*diffML,*diffDV;
 	NSMutableArray		*diff;
 	
-	diffAP	= [NSNumber numberWithDouble:(nasion.AP - inion.AP)];
-	diffML	= [NSNumber numberWithDouble:(nasion.ML - inion.ML)];
-	diffDV	= [NSNumber numberWithDouble:(nasion.DV - inion.DV)];
 	
-	diff		= [[NSMutableArray alloc] initWithObjects:diffAP,diffML,diffDV,nil];
+	diffAP	= [[NSNumber alloc] initWithDouble:(nasion.AP - inion.AP)];
+	diffML	= [[NSNumber alloc] initWithDouble:(nasion.ML - inion.ML)];
+	diffDV	= [[NSNumber alloc] initWithDouble:(nasion.DV - inion.DV)];
 	
-	// first we identify and eliminate ML
+	diff	= [[NSMutableArray alloc] initWithObjects:diffAP,diffML,diffDV,nil];
+	
+	// no longer need these objects...
+	// ... they have been incorporated into diff array
+	[diffAP release];
+	[diffML release];
+	[diffDV release];
+	
+	
+	// initialize values that aren't acceptable after the following routine
+	indexML			= -1;
+	
+	// first we identify and eliminate ML ...
+	// ... there should be only one plane with no difference
 	for (i = 0; i < [diff count]; i++) {
 		thisDouble = [[diff objectAtIndex:i] doubleValue];
 		if (thisDouble == 0.0) {
@@ -83,20 +94,40 @@
 		}
 	}
 	
+	// We failed to find the ML index
+	if (indexML == -1) {
+		[diff release];
+		return;
+	}
+	
+	// initialize values that aren't acceptable after the following routine
+	firstIndex		= -1;
+	secondIndex		= -1;
+	firstDouble		= 0.0;
+	secondDouble	= 0.0;
+	
 	// now find which magnitude is greater between remaining diffs
+	// [diff count] should equal 3
+	// we don't want the first for loop to hit the last diff element
 	for (i = 0; i < ([diff count] - 1); i++) {
 		// ignore item identified as ML
 		if (i == indexML) continue;
 		firstDouble = [[diff objectAtIndex:i] doubleValue];
 		firstIndex = i;
-		for (ii = i + 1; ii < [diff count]; ii++) {
-			// ignore item identified as ML
-			if (ii == indexML) continue;
-			secondDouble = [[diff objectAtIndex:ii] doubleValue];
-			secondIndex = ii;
-		}
 	}
 	
+	// start with the index after previously selected first index
+	for (i = firstIndex + 1; i < [diff count]; i++) {
+		// ignore item identified as ML
+		if (i == indexML) continue;
+		secondDouble = [[diff objectAtIndex:i] doubleValue];
+		secondIndex = i;
+	}
+	
+	// release diff object because we no longer need it
+	[diff release];
+	
+	// set appropriate indices based on magnitude comparison
 	if (fabs(firstDouble) > fabs(secondDouble)) {
 		indexAP = firstIndex;
 		indexDV = secondIndex;
@@ -105,82 +136,77 @@
 		indexDV = firstIndex;
 	}
 	
+	// set orientation dictionary objects
 	[orientation setObject:[NSNumber numberWithInt:indexAP] forKey:@"AP"];
 	[orientation setObject:[NSNumber numberWithInt:indexML] forKey:@"ML"];
 	[orientation setObject:[NSNumber numberWithInt:indexDV] forKey:@"DV"];
-	
-	NSLog(@"ML identified at index %d\n",indexML);
-	
-	NSLog(@"diffAP = %f\n",[diffAP doubleValue]);
-	NSLog(@"diffML = %f\n",[diffML doubleValue]);
-	NSLog(@"diffDV = %f\n",[diffDV doubleValue]);
-	
-	NSLog(@"(AP,ML,DV) are mapped as (%d,%d,%d)\n",indexAP,indexML,indexDV);
-	
-	NSLog(@"orientation is %@\n",orientation);
 }
 
 - (void) populateTemplate
 {
 	// Identify plugin Bundle
-	NSString *name			= [NSString stringWithString:@"zeroedTemplate"];
-	NSString *ext			= [NSString stringWithString:@"csv"];
-	NSString *path			= [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.viewtemplate"] resourcePath];
-	NSString *fullFilename	= [NSString stringWithFormat:@"%@/%@.%@",path,name,ext];
-		
+	NSString *path			= [[[NSBundle bundleWithIdentifier:@"edu.vanderbilt.viewtemplate"] resourcePath] retain];
+	NSString *fullFilename	= [[NSString stringWithFormat:@"%@/zeroedTemplate.csv",path,@"zeroedTemplate.csv"] retain];
+
+	// parse the csv file included in plugin bundle ...
+	// each parsed line goes into parsedElectrodes array
 	CSVParser		*myCSVParser		= [[CSVParser alloc] init];
 	NSMutableArray	*parsedElectrodes;
-	
 	[myCSVParser setDelimiter:','];
-	if ([myCSVParser openFile:[NSString stringWithString:fullFilename]]) {
+	if ([myCSVParser openFile:fullFilename]) {
 		NSLog(@"Success opening %@\n",fullFilename);
-		parsedElectrodes = [myCSVParser parseFile];
+		parsedElectrodes = [[myCSVParser parseFile] retain];
 		NSLog(@"%d csv lines parsed.\n",[parsedElectrodes count]);
 	} else {
 		NSLog(@"Failed to open %@\n",fullFilename);
+		[myCSVParser release];
+		[fullFilename release];
+		[path release];
 		return;
 	}
-
-	// start from object at index 2 ...
+	// close csv file
+	[myCSVParser closeFile];
+	
+	// release objects used by the csv parser
+	[myCSVParser release];
+	[fullFilename release];
+	[path release];
+	
+	// remove first two objects ...
 	// ... index 0 contains headers ...
 	// ... index 1 contains origin
 	[parsedElectrodes removeObjectAtIndex:1];
 	[parsedElectrodes removeObjectAtIndex:0];
 	for (id thisParsedLine in parsedElectrodes) {
-		StereotaxCoord *tmpElectrode = [StereotaxCoord alloc];
-		[tmpElectrode initWithName:[[NSString alloc] initWithString:[thisParsedLine objectAtIndex:0]]
-							 withAP:[[thisParsedLine objectAtIndex:1] doubleValue]
-							 withML:[[thisParsedLine objectAtIndex:2] doubleValue]
-							 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]						];
-		[electrodes addObject:tmpElectrode];
+		StereotaxCoord *tmpElectrode = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:[thisParsedLine objectAtIndex:0]]
+																	 withAP:[[thisParsedLine objectAtIndex:1] doubleValue]
+																	 withML:[[thisParsedLine objectAtIndex:2] doubleValue]
+																	 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]						];
+		[electrodes addObject: tmpElectrode];
 		[tmpElectrode release];
 	}
 	
-	[myCSVParser closeFile];
-	[myCSVParser release];
-	[name release];
-	[ext release];
-	[path release];
-	[fullFilename release];
+	// release parsed electrodes array
+	[parsedElectrodes release];
 }
 
 - (void) shiftCoordinates
 {
 	float	diffAP,diffML,diffDV;
-	StereotaxCoord *thisElectrode;
 	
 	// for now we are matching nasion to Fpz electrode
 	StereotaxCoord	*firstElectrode = [[electrodes objectAtIndex:0] copy];
 	
+	// calcuate difference from nasion to Fpz
 	diffAP = nasion.AP - firstElectrode.AP;
 	diffML = nasion.ML - firstElectrode.ML;
 	diffDV = nasion.DV - firstElectrode.DV;
 	
-	NSLog(@"%@\n",firstElectrode);
-	NSLog(@"%@\n",nasion);
-	NSLog(@"(%.3f,%.3f,%.3f)\n",diffAP,diffML,diffDV);
+	// release firstElectrode because it is no longer needed
+	[firstElectrode release];
 	
-	for (thisElectrode in electrodes) {
+	// apply differences to each electrode
+	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.AP += diffAP;
 		thisElectrode.ML += diffML;
 		thisElectrode.DV += diffDV;
@@ -197,17 +223,22 @@
 	NSMutableDictionary	*tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		[tmpElectrodeDict setObject:thisElectrode forKey:[NSString stringWithString:thisElectrode.name]];
+		[thisElectrode retain];
 	}
 	
 	Fpz	= [[tmpElectrodeDict objectForKey:@"Fpz"] copy];
 	Oz	= [[tmpElectrodeDict objectForKey:@"Oz"] copy];
 	
+	[tmpElectrodeDict release];
 	
 	scaleAP = (fabs(nasion.AP - inion.AP) / fabs(Fpz.AP - Oz.AP));
 	referenceAP = Fpz.AP;
 	
 	scaleDV = (fabs(nasion.DV - inion.DV) / fabs(Fpz.DV - Oz.DV));
 	referenceDV = Fpz.DV;
+	
+	[Fpz release];
+	[Oz release];
 	
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.AP = referenceAP - (scaleAP * (referenceAP - thisElectrode.AP));
