@@ -17,9 +17,7 @@
 {
 	NSLog(@"Starting Plugin\n");
 	
-	[self determineSlicePlane];
-	
-	// there should be an ROI named 'origin' in current DCMView
+	// there should be an ROI named 'nasion' and 'inion'
 	[self findUserInput];
 	
 	// pass the nasion and inion to the tenTwentyTemplate
@@ -31,31 +29,6 @@
 	NSLog(@"executed method\n");
 	return 0;
 }
-
-- (void) determineSlicePlane
-{
-	// for now we will assume the slice plane is 0 ...
-	// ... this needs to be verified
-	slicePlane = 0;
-/*
-	int		i;
-	double	locationSet1[3],locationSet2[3],diffSet[3];
-	DCMPix	*pix1,*pix2;
-	
-	pix1 = [[viewerController pixList] objectAtIndex:0];
-	pix2 = [[viewerController pixList] objectAtIndex:1];
-	
-	[pix1 convertPixDoubleX:0.0 pixY:0.0 toDICOMCoords:locationSet1];
-	[pix2 convertPixDoubleX:0.0 pixY:0.0 toDICOMCoords:locationSet2];
-	
-	for (i = 0; i < 3; i++) {
-		diffSet[i] = locationSet2[i] - locationSet1[i];
-	}
-	
-	NSLog(@"diffSet = (%f,%f,%f)\n",diffSet[0],diffSet[1],diffSet[2]);
- */
-}
-
 
 - (void) findUserInput
 {
