@@ -113,8 +113,6 @@
 - (void)partitionAllOpenPolyROIs
 {
 	long			i,ii;
-	long			numInterPoints,numSplinePoints;
-	float			oPolyLength;
 	NSMutableArray	*percentLength;
 	ROI				*roiOPoly;
 	
@@ -125,9 +123,6 @@
 		roiOPoly			= [selectedOPolyRois objectAtIndex:i];
 		currentSpline		= [roiOPoly splinePoints: scaleValue];
 		currentInterPoints	= [NSMutableArray arrayWithCapacity:0];
-		numSplinePoints		= [currentSpline count];
-		numInterPoints		= [tenTwentyIntervals count] - 1;
-		oPolyLength			= [self measureOPolyLength:roiOPoly];
 		percentLength		= [self computePercentLength:roiOPoly];
 		
 		NSLog(@"oPoly %d length = %f mm",i,[self measureOPolyLength:roiOPoly]);
@@ -191,11 +186,12 @@
 		// move the ROI from the 0,0 to correct coordinates
 		thisROI.rect = NSOffsetRect(thisROI.rect, thisPoint.x, thisPoint.y);
 		
+		[thisPoint release];
+		
 		// add the new ROI to the current ROI list
 		[[[viewerController imageView] curRoiList] addObject:thisROI];
+		[thisROI release];
 	}
-	[thisPoint release];
-	[thisROI release];
 }
 
 - (NSMutableArray *)computePercentLength:(ROI *)thisROI
@@ -229,6 +225,8 @@
 		[distanceFromStart addObject:FBOX(thisLength)];
 		[percentLength addObject:FBOX(thisPercent)];
 	}
+	[distanceFromStart release];
+	[percentLength autorelease];
 	return percentLength;
 }
 

@@ -37,6 +37,7 @@
 		for (ii = 0; ii < [thisPixRoiList count]; ii++) {
 			// Pointer reassigned to each object in the list
 			ROI *roi = [thisPixRoiList objectAtIndex:ii];
+			ROImm *tmpROImm;
 			NSMutableArray *roiPoints = [ roi points ];
 			NSPoint roiCenterPoint;
 			
@@ -54,8 +55,11 @@
 			// convert pixel values to mm values
 			[pix convertPixX:roiCenterPoint.x pixY:roiCenterPoint.y toDICOMCoords:location];
 			
+			tmpROImm = [[ROImm alloc] initWithName:roi.name withX:location[0] withY:location[1] withZ:location[2]];
+			
 			// instanciate a ROImm object and add it to the allROIs NSMutableArray
-			[allROIs addObject: [[ROImm alloc] initWithName:roi.name withX:location[0] withY:location[1] withZ:location[2]]];
+			[allROIs addObject: tmpROImm];
+			[tmpROImm release];
 		}
 	}
 }
