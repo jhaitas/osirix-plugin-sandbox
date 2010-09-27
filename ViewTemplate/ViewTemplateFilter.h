@@ -21,5 +21,6 @@
 - (void) findUserInput;
 - (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location;
 - (void) addElectrodes;
+- (void) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice;
 
 @end

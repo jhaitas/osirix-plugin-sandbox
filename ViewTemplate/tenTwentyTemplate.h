@@ -7,13 +7,16 @@
 //
 
 #import <Cocoa/Cocoa.h>
-
-#import "StereotaxCoord.H"
+#import "ViewerController.h"
+#import "StereotaxCoord.h"
 #import "parseCSV.h"
 
 
 @interface tenTwentyTemplate : NSObject {
+	ViewerController	*viewerController;
 	StereotaxCoord		*nasion,*inion;
+	StereotaxCoord		*userM1,*userM2;
+	double				templateM1M2_AP;
 	NSMutableDictionary	*orientation;
 	
 	// electrodes is an array of ROImm objects
@@ -25,12 +28,16 @@
 @property (assign)	NSMutableArray		*electrodes;
 
 
-- (id) initWithNasion: (StereotaxCoord *) thisNasion
-			 andInion: (StereotaxCoord *) thisInion;
+- (id) initFromViewerController: (ViewerController *) thisViewerController
+					 WithNasion: (StereotaxCoord *) thisNasion
+					   andInion: (StereotaxCoord *) thisInion;
 
 - (void) computeOrientation;
 - (void) populateTemplate;
 - (void) shiftCoordinates;
-- (void) scaleCoordinates;
+- (void) scaleCoordinatesAP;
+- (void) getUserM1andM2;
+- (void) scaleCoordinatesML;
+- (void) shiftElectrodesUp: (double) mmDistance;
 
 @end

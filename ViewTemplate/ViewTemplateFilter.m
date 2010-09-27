@@ -21,7 +21,9 @@
 	[self findUserInput];
 	
 	// pass the nasion and inion to the tenTwentyTemplate
-	myTenTwenty = [[tenTwentyTemplate alloc] initWithNasion:nasion andInion:inion];
+	myTenTwenty = [[tenTwentyTemplate alloc] initFromViewerController:viewerController
+														   WithNasion:nasion
+															 andInion:inion				];
 	
 	// place electrodes on MRI
 	[self addElectrodes];
@@ -103,7 +105,6 @@
 	int				thisRoiType,bestSlice;
 	double			pixelSpacingX,pixelSpacingY;
 	float			dicomCoords[3],sliceCoords[3];
-	float			thisPixelMean;
 	
 	// temporary pointers for creating new ROI
 	ROI				*thisROI;
@@ -140,16 +141,116 @@
 				
 		// add the new ROI to the correct ROI list
 		[[[[viewerController imageView] dcmRoiList] objectAtIndex:bestSlice] addObject:thisROI];
+		[viewerController updateImage:self];
 		
-		// next two lines demonstrate how to determine the pixel value at the given ROI ...
-		// ... this will be used to determine if ROI is correctly placed
-		[[[[viewerController imageView] dcmPixList] objectAtIndex:bestSlice] computeROI:thisROI :&thisPixelMean :NULL :NULL :NULL :NULL];
-		NSLog(@"%@ value = %f\n",thisROI.name,thisPixelMean);
+		[self lowerElectrode:thisROI inSlice:[[[viewerController imageView] dcmPixList] objectAtIndex:bestSlice]];
 		
 		[thisROI release];
 	}
 	// update screen
 	[viewerController updateImage:self];
+}
+
+- (void) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice
+{
+	int		indexDV;
+	float	currentPixelMean;
+	double	pixelSpacingX,pixelSpacingY;
+	float	dicomCoords[3],sliceCoords[3];
+	float	minScalpValue,maxSkullValue;
+	BOOL	foundScalp,foundSkull;
+	NSPoint	roiPosition;
+	NSPoint	offsetShift;
+	
+	// initialize values
+	indexDV				= [[myTenTwenty.orientation objectForKey:@"DV"] intValue];
+	foundScalp			= NO;
+	foundSkull			= NO;
+	currentPixelMean	= -1.0;
+	pixelSpacingX		= [thisSlice pixelSpacingX];
+	pixelSpacingY		= [thisSlice pixelSpacingY];
+	
+	minScalpValue = 45.0;
+	maxSkullValue = 30.0;
+	
+	[thisROI setROIMode: ROI_selected];
+	
+	if (indexDV == 2) {
+		NSLog(@"DV index indicates DV goes across slices... no implementation for this yet\n");
+		return;
+	}
+
+	// drop till we locate the scalp
+	while (!foundScalp) {
+		roiPosition = thisROI.rect.origin;
+		
+		// get DICOM coordinates (in mm)
+		[thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
+		
+		// drop point .1 mm
+		dicomCoords[indexDV] -= .1;
+		
+		// convert back to slice coords
+		[thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+		
+		// determine how coordinates should be shifted
+		offsetShift.x = (sliceCoords[0] / pixelSpacingX) - roiPosition.x;
+		offsetShift.y = (sliceCoords[1] / pixelSpacingY) - roiPosition.y;
+		
+		// shift the ROI
+		[thisROI roiMove:offsetShift :TRUE];
+ 		
+		// determine current pixel mean
+		[thisSlice computeROI:thisROI :&currentPixelMean :NULL :NULL :NULL :NULL];
+		
+		// detect if we have found the scalp
+		if (currentPixelMean > minScalpValue) {
+			foundScalp = YES;
+		}
+		
+		if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+			NSLog(@"%@ falling off slice!!!\n",thisROI.name);
+			break;
+		}
+	}
+	
+	// drop till we locate the skull
+	while (!foundSkull) {
+		roiPosition = thisROI.rect.origin;
+		
+		// get DICOM coordinates (in mm)
+		[thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
+		
+		// drop point .01 mm
+		dicomCoords[indexDV] -= .01;
+		
+		// convert back to slice coords
+		[thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+		
+		// determine how coordinates should be shifted
+		offsetShift.x = (sliceCoords[0] / pixelSpacingX) - roiPosition.x;
+		offsetShift.y = (sliceCoords[1] / pixelSpacingY) - roiPosition.y;
+		
+		// shift the ROI
+		[thisROI roiMove:offsetShift :TRUE];
+ 		
+		// determine current pixel mean
+		[thisSlice computeROI:thisROI :&currentPixelMean :NULL :NULL :NULL :NULL];
+		
+		// detect if we have found the skull
+		if (currentPixelMean < maxSkullValue) {
+			foundSkull = YES;
+		}
+		
+		if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+			NSLog(@"%@ falling off slice!!!\n",thisROI.name);
+			break;
+		}
+	}
+	
+	// put this ROI back to sleep
+	[thisROI setROIMode: ROI_sleep];
+
 }
 
 @end

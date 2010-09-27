@@ -14,11 +14,14 @@
 @synthesize nasion,inion,orientation;
 @synthesize electrodes;
 
-- (id) initWithNasion: (StereotaxCoord *) thisNasion
-			 andInion: (StereotaxCoord *) thisInion
+- (id) initFromViewerController: (ViewerController *) thisViewerController
+					 WithNasion: (StereotaxCoord *) thisNasion
+					   andInion: (StereotaxCoord *) thisInion
 {
 	if (self = [super init])
 	{
+		viewerController = thisViewerController;
+		
 		// allocate and init orientation dictionary
 		orientation	= [[NSMutableDictionary alloc] init];
 		
@@ -49,7 +52,16 @@
 		[self shiftCoordinates];
 		
 		// scale the template to the subject
-		[self scaleCoordinates];
+		[self scaleCoordinatesAP];
+		
+// Get user input for M1 and M2		
+		
+		[self getUserM1andM2];
+		
+//		[self scaleCoordinatesML];
+		
+		// move electrodes 20mm above skull before we drop them back down
+		[self shiftElectrodesUp: 20.0];
 	}
 	
 	return self;	
@@ -213,10 +225,9 @@
 	}
 }
 
-- (void) scaleCoordinates
+- (void) scaleCoordinatesAP
 {
 	float			referenceAP,scaleAP;
-	float			referenceDV,scaleDV;
 	StereotaxCoord	*Fpz,*Oz;
 	
 	// populate a temporary dictionary
@@ -234,15 +245,55 @@
 	scaleAP = (fabs(nasion.AP - inion.AP) / fabs(Fpz.AP - Oz.AP));
 	referenceAP = Fpz.AP;
 	
-	scaleDV = (fabs(nasion.DV - inion.DV) / fabs(Fpz.DV - Oz.DV));
-	referenceDV = Fpz.DV;
-	
 	[Fpz release];
 	[Oz release];
 	
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.AP = referenceAP - (scaleAP * (referenceAP - thisElectrode.AP));
-		thisElectrode.DV = referenceDV - (scaleDV * (referenceDV - thisElectrode.DV));
+		if ([thisElectrode.name isEqualToString:@"M1"] || [thisElectrode.name isEqualToString:@"M2"]) {
+			NSLog(@"%@ AP = %f mm\n",thisElectrode.name,thisElectrode.AP);
+			templateM1M2_AP = thisElectrode.AP;
+		}
+	}
+}
+
+- (void) getUserM1andM2
+{
+	// here we need user to place M1 and M2 to get proper coords for scaling
+}
+
+- (void) scaleCoordinatesML
+{
+	float			referenceML,scaleML;
+	StereotaxCoord	*M1,*M2;
+	
+	// populate a temporary dictionary
+	NSMutableDictionary	*tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
+	for (StereotaxCoord *thisElectrode in electrodes) {
+		[tmpElectrodeDict setObject:thisElectrode forKey:[NSString stringWithString:thisElectrode.name]];
+		[thisElectrode retain];
+	}
+	
+	M1	= [[tmpElectrodeDict objectForKey:@"M1"] copy];
+	M2	= [[tmpElectrodeDict objectForKey:@"M2"] copy];
+	
+	[tmpElectrodeDict release];
+	
+	scaleML = (fabs(userM1.ML - userM2.ML) / fabs(M1.ML - M2.ML));
+	referenceML = M1.ML;
+	
+	[M1 release];
+	[M2 release];
+	
+	for (StereotaxCoord *thisElectrode in electrodes) {
+		thisElectrode.ML = referenceML - (scaleML * (referenceML - thisElectrode.ML));
+	}
+}
+
+- (void) shiftElectrodesUp: (double) mmDistance
+{
+	for (StereotaxCoord *thisElectrode in electrodes) {
+		thisElectrode.DV += mmDistance;
 	}
 }
 
