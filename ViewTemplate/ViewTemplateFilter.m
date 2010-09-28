@@ -2,7 +2,8 @@
 //  ViewTemplateFilter.m
 //  ViewTemplate
 //
-//  Copyright (c) 2010 John. All rights reserved.
+//  Created by John Haitas.
+//  Copyright 2010 Vanderbilt University. All rights reserved.
 //
 
 #import "ViewTemplateFilter.h"
@@ -46,11 +47,14 @@
 	pixList = [viewerController pixList];
 	roiList = [viewerController roiList];
 	
+	// step through each ROI list
 	for (i = 0; i < [roiList count]; i++) {
 		thisRoiList = [roiList objectAtIndex:i];
 		thisPix = [pixList objectAtIndex:i];
+		// step through each ROI in the current ROI list
 		for (ii = 0; ii < [thisRoiList count]; ii++) {
 			selectedROI = [thisRoiList objectAtIndex:ii];
+			// check if this ROI is named 'nasion'
 			if ([selectedROI.name isEqualToString:@"nasion"]) {
 				[self getROI:selectedROI fromPix:thisPix toCoords:location];
 				nasion = [[StereotaxCoord alloc] initWithName:selectedROI.name
@@ -59,6 +63,7 @@
 													   withDV:location[2]			];
 				foundNasion = TRUE;
 			}
+			// check if this ROI is named 'inion'
 			if ([selectedROI.name isEqualToString:@"inion"]) {
 				[self getROI:selectedROI fromPix:thisPix toCoords:location];
 				inion = [[StereotaxCoord alloc] initWithName:selectedROI.name
@@ -70,6 +75,7 @@
 		}
 	}
 	
+	// make sure that both 'nasion' and 'inion' were located
 	if (!foundNasion || !foundInion) {
 		// notify the user through the NSRunAlertPanel		
 		NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
@@ -121,8 +127,6 @@
 		// get DICOM coords which we will convert to slice coords
 		[thisElectrode returnDICOMCoords:dicomCoords withOrientation:myTenTwenty.orientation];
 		
-//		NSLog(@"DICOM coords = (%.3f,%.3f,%.3f)\n",dicomCoords[0],dicomCoords[1],dicomCoords[2]);
-		
 		// find nearest slice
 		bestSlice = [DCMPix nearestSliceInPixelList:[[viewerController imageView] dcmPixList]
 									withDICOMCoords:dicomCoords
@@ -134,15 +138,16 @@
 										   :pixelSpacingY
 										   :NSMakePoint(0.0, 0.0)];
 		
-		
+		// move the ROI to the correct location
 		thisROI.rect = NSOffsetRect(thisROI.rect, sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
 		
+		// give the ROI the correct name
 		thisROI.name = [NSString stringWithString:thisElectrode.name];
 				
 		// add the new ROI to the correct ROI list
 		[[[[viewerController imageView] dcmRoiList] objectAtIndex:bestSlice] addObject:thisROI];
-		[viewerController updateImage:self];
 		
+		// lower the electrode to the surface of the skull
 		[self lowerElectrode:thisROI inSlice:[[[viewerController imageView] dcmPixList] objectAtIndex:bestSlice]];
 		
 		[thisROI release];
@@ -170,9 +175,11 @@
 	pixelSpacingX		= [thisSlice pixelSpacingX];
 	pixelSpacingY		= [thisSlice pixelSpacingY];
 	
+	// these values should be made user configurable in the future
 	minScalpValue = 45.0;
 	maxSkullValue = 30.0;
 	
+	// select this ROI (prerequisite for [ROI roiMove: :] method)
 	[thisROI setROIMode: ROI_selected];
 	
 	if (indexDV == 2) {
@@ -187,7 +194,7 @@
 		// get DICOM coordinates (in mm)
 		[thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
 		
-		// drop point .1 mm
+		// drop point .1 mm on DV plane
 		dicomCoords[indexDV] -= .1;
 		
 		// convert back to slice coords
@@ -208,6 +215,7 @@
 			foundScalp = YES;
 		}
 		
+		// be sure we haven't fallen to the bottom of the slice
 		if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
 			NSLog(@"%@ falling off slice!!!\n",thisROI.name);
 			break;
@@ -221,7 +229,7 @@
 		// get DICOM coordinates (in mm)
 		[thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
 		
-		// drop point .01 mm
+		// drop point .01 mm on DV plane
 		dicomCoords[indexDV] -= .01;
 		
 		// convert back to slice coords
@@ -242,6 +250,7 @@
 			foundSkull = YES;
 		}
 		
+		// be sure we haven't fallen to the bottom of the slice
 		if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
 			NSLog(@"%@ falling off slice!!!\n",thisROI.name);
 			break;

@@ -2,7 +2,8 @@
 //  ViewTemplateFilter.h
 //  ViewTemplate
 //
-//  Copyright (c) 2010 John. All rights reserved.
+//  Created by John Haitas.
+//  Copyright 2010 Vanderbilt University. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

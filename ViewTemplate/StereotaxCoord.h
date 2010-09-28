@@ -2,7 +2,7 @@
 //  StereotaxCoord.h
 //  ViewTemplate
 //
-//  Created by John Haitas on 9/22/10.
+//  Created by John Haitas.
 //  Copyright 2010 Vanderbilt University. All rights reserved.
 //
 
