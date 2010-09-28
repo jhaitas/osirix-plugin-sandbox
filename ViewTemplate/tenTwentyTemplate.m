@@ -14,14 +14,11 @@
 @synthesize nasion,inion,orientation;
 @synthesize electrodes;
 
-- (id) initFromViewerController: (ViewerController *) thisViewerController
-					 WithNasion: (StereotaxCoord *) thisNasion
-					   andInion: (StereotaxCoord *) thisInion
+- (id) initWithNasion: (StereotaxCoord *) thisNasion
+			 andInion: (StereotaxCoord *) thisInion
 {
 	if (self = [super init])
-	{
-		viewerController = thisViewerController;
-		
+	{		
 		// allocate and init orientation dictionary
 		orientation	= [[NSMutableDictionary alloc] init];
 		
@@ -54,14 +51,8 @@
 		// scale the template to the subject
 		[self scaleCoordinatesAP];
 		
-// Get user input for M1 and M2		
-		
-		[self getUserM1andM2];
-		
-//		[self scaleCoordinatesML];
-		
 		// move electrodes 20mm above skull before we drop them back down
-		[self shiftElectrodesUp: 20.0];
+//		[self shiftElectrodesUp: 20.0];
 	}
 	
 	return self;	
@@ -166,11 +157,11 @@
 	NSMutableArray	*parsedElectrodes;
 	[myCSVParser setDelimiter:','];
 	if ([myCSVParser openFile:fullFilename]) {
-		NSLog(@"Success opening %@\n",fullFilename);
+		DLog(@"Success opening %@\n",fullFilename);
 		parsedElectrodes = [[myCSVParser parseFile] retain];
-		NSLog(@"%d csv lines parsed.\n",[parsedElectrodes count]);
+		DLog(@"%d csv lines parsed.\n",[parsedElectrodes count]);
 	} else {
-		NSLog(@"Failed to open %@\n",fullFilename);
+		DLog(@"Failed to open %@\n",fullFilename);
 		[myCSVParser release];
 		[fullFilename release];
 		[path release];
@@ -202,6 +193,24 @@
 	[parsedElectrodes release];
 }
 
+- (StereotaxCoord *) getElectrodeWithName: (NSString *) theName
+{
+	StereotaxCoord		*theElectrode;
+	NSMutableDictionary	*tmpElectrodeDict;
+						  
+	// populate a temporary dictionary
+	tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
+	for (StereotaxCoord *thisElectrode in electrodes) {
+		[tmpElectrodeDict setObject:thisElectrode forKey:[NSString stringWithString:thisElectrode.name]];
+		[thisElectrode retain];
+	}
+	
+	theElectrode = [[tmpElectrodeDict objectForKey:theName] copy];
+	
+	[tmpElectrodeDict release];
+	return theElectrode;
+}
+
 - (void) shiftCoordinates
 {
 	float	diffAP,diffML,diffDV;
@@ -230,19 +239,13 @@
 	float			referenceAP,scaleAP;
 	StereotaxCoord	*Fpz,*Oz;
 	
-	// populate a temporary dictionary
-	NSMutableDictionary	*tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
-	for (StereotaxCoord *thisElectrode in electrodes) {
-		[tmpElectrodeDict setObject:thisElectrode forKey:[NSString stringWithString:thisElectrode.name]];
-		[thisElectrode retain];
-	}
+	Fpz	= [self getElectrodeWithName:@"Fpz"];
+	Oz	= [self getElectrodeWithName:@"Oz"];
 	
-	Fpz	= [[tmpElectrodeDict objectForKey:@"Fpz"] copy];
-	Oz	= [[tmpElectrodeDict objectForKey:@"Oz"] copy];
-	
-	[tmpElectrodeDict release];
-	
+	// compute the scale using absolute values in differences
 	scaleAP = (fabs(nasion.AP - inion.AP) / fabs(Fpz.AP - Oz.AP));
+	
+	// set reference AP coordinate
 	referenceAP = Fpz.AP;
 	
 	[Fpz release];
@@ -251,33 +254,20 @@
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.AP = referenceAP - (scaleAP * (referenceAP - thisElectrode.AP));
 		if ([thisElectrode.name isEqualToString:@"M1"] || [thisElectrode.name isEqualToString:@"M2"]) {
-			NSLog(@"%@ AP = %f mm\n",thisElectrode.name,thisElectrode.AP);
+			DLog(@"%@ AP = %f mm\n",thisElectrode.name,thisElectrode.AP);
 			templateM1M2_AP = thisElectrode.AP;
 		}
 	}
 }
 
-- (void) getUserM1andM2
-{
-	// here we need user to place M1 and M2 to get proper coords for scaling
-}
-
-- (void) scaleCoordinatesML
+- (void) scaleCoordinatesMLwithM1: (StereotaxCoord *) userM1
+							andM2: (StereotaxCoord *) userM2
 {
 	float			referenceML,scaleML;
 	StereotaxCoord	*M1,*M2;
 	
-	// populate a temporary dictionary
-	NSMutableDictionary	*tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
-	for (StereotaxCoord *thisElectrode in electrodes) {
-		[tmpElectrodeDict setObject:thisElectrode forKey:[NSString stringWithString:thisElectrode.name]];
-		[thisElectrode retain];
-	}
-	
-	M1	= [[tmpElectrodeDict objectForKey:@"M1"] copy];
-	M2	= [[tmpElectrodeDict objectForKey:@"M2"] copy];
-	
-	[tmpElectrodeDict release];
+	M1	= [self getElectrodeWithName:@"M1"];
+	M2	= [self getElectrodeWithName:@"M2"];
 	
 	scaleML = (fabs(userM1.ML - userM2.ML) / fabs(M1.ML - M2.ML));
 	referenceML = M1.ML;

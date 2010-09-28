@@ -61,7 +61,7 @@
 			AP = tmpDV;
 			break;
 		default:
-			NSLog(@"WARNING: unknown value for AP key\n");
+			DLog(@"WARNING: unknown value for AP key\n");
 			break;
 	}
 	
@@ -76,7 +76,7 @@
 			ML = tmpDV;
 			break;
 		default:
-			NSLog(@"WARNING: unknown value for ML key\n");
+			DLog(@"WARNING: unknown value for ML key\n");
 			break;
 	}
 	
@@ -91,7 +91,7 @@
 			DV = tmpDV;
 			break;
 		default:
-			NSLog(@"WARNING: unknown value for DV key\n");
+			DLog(@"WARNING: unknown value for DV key\n");
 			break;
 	}
 }

@@ -16,20 +16,29 @@
 
 - (long) filterImage:(NSString*) menuName
 {
-	NSLog(@"Starting Plugin\n");
+	DLog(@"Starting Plugin\n");
 	
 	// there should be an ROI named 'nasion' and 'inion'
 	[self findUserInput];
 	
 	// pass the nasion and inion to the tenTwentyTemplate
-	myTenTwenty = [[tenTwentyTemplate alloc] initFromViewerController:viewerController
-														   WithNasion:nasion
-															 andInion:inion				];
+	myTenTwenty = [[tenTwentyTemplate alloc] initWithNasion:nasion
+												   andInion:inion				];
+	
+	// tenTwentyTemplate has been allocated and populated ...
+	// ... we need user to input M1 and M2 ...
+	// ... we will the scale coordinates
+//	[self getUserM1andM2];
+	
+//	[myTenTwenty scaleCoordinatesMLwithM1: userM1 andM2: userM2];
+	
+	
+	[myTenTwenty shiftElectrodesUp: 20.0];
 	
 	// place electrodes on MRI
 	[self addElectrodes];
 	
-	NSLog(@"executed method\n");
+	DLog(@"executed method\n");
 	return 0;
 }
 
@@ -103,7 +112,42 @@
 	[thisPix convertPixDoubleX:roiCenterPoint.x
 						  pixY:roiCenterPoint.y
 				 toDICOMCoords:location			];
-	NSLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
+	DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
+}
+
+
+
+- (void) getUserM1andM2
+{
+	
+	int				indexML,bestSlice;
+	float			dicomCoords[3],sliceCoords[3];
+	StereotaxCoord	*M1;
+	
+	indexML = [[myTenTwenty.orientation objectForKey:@"ML"] intValue];
+	
+	// get M1 electrode to locate best slice
+	M1 = [myTenTwenty getElectrodeWithName:@"M1"];
+	
+	// get DICOM coordinates for M1 electrode
+	[M1 returnDICOMCoords:dicomCoords withOrientation:myTenTwenty.orientation];
+	
+	// reslice DICOM on ML plane
+	[viewerController processReslice: indexML :FALSE];
+	
+	// get best slice to see M1	
+	bestSlice = [DCMPix nearestSliceInPixelList:[[viewerController imageView] dcmPixList]
+								withDICOMCoords:dicomCoords
+									sliceCoords:sliceCoords									];
+	
+	// View slice for placing M1 and M2
+	[[viewerController imageView] setIndex: bestSlice];
+	
+	// update screen
+	[viewerController updateImage:self];
+	
+	// TODO here we need user to place M1 and M2 to get proper coords for scaling
+	
 }
 
 - (void) addElectrodes
@@ -183,7 +227,7 @@
 	[thisROI setROIMode: ROI_selected];
 	
 	if (indexDV == 2) {
-		NSLog(@"DV index indicates DV goes across slices... no implementation for this yet\n");
+		DLog(@"DV index indicates DV goes across slices... no implementation for this yet\n");
 		return;
 	}
 
@@ -217,7 +261,7 @@
 		
 		// be sure we haven't fallen to the bottom of the slice
 		if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
-			NSLog(@"%@ falling off slice!!!\n",thisROI.name);
+			DLog(@"%@ falling off slice!!!\n",thisROI.name);
 			break;
 		}
 	}
@@ -252,7 +296,7 @@
 		
 		// be sure we haven't fallen to the bottom of the slice
 		if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
-			NSLog(@"%@ falling off slice!!!\n",thisROI.name);
+			DLog(@"%@ falling off slice!!!\n",thisROI.name);
 			break;
 		}
 	}

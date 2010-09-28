@@ -8,14 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ViewerController.h"
+#import	"DCMPix.h"
 #import "StereotaxCoord.h"
 #import "parseCSV.h"
 
 
 @interface tenTwentyTemplate : NSObject {
-	ViewerController	*viewerController;
 	StereotaxCoord		*nasion,*inion;
-	StereotaxCoord		*userM1,*userM2;
 	double				templateM1M2_AP;
 	NSMutableDictionary	*orientation;
 	
@@ -28,16 +27,17 @@
 @property (assign)	NSMutableArray		*electrodes;
 
 
-- (id) initFromViewerController: (ViewerController *) thisViewerController
-					 WithNasion: (StereotaxCoord *) thisNasion
-					   andInion: (StereotaxCoord *) thisInion;
+- (id) initWithNasion: (StereotaxCoord *) thisNasion
+			 andInion: (StereotaxCoord *) thisInion;
 
 - (void) computeOrientation;
 - (void) populateTemplate;
+
+- (StereotaxCoord *) getElectrodeWithName: (NSString *) theName;
 - (void) shiftCoordinates;
 - (void) scaleCoordinatesAP;
-- (void) getUserM1andM2;
-- (void) scaleCoordinatesML;
+- (void) scaleCoordinatesMLwithM1: (StereotaxCoord *) userM1
+							andM2: (StereotaxCoord *) userM2;
 - (void) shiftElectrodesUp: (double) mmDistance;
 
 @end

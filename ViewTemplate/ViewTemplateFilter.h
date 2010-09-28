@@ -13,8 +13,8 @@
 
 @interface ViewTemplateFilter : PluginFilter {
 	BOOL				foundNasion,foundInion;
-	StereotaxCoord		*nasion;
-	StereotaxCoord		*inion;
+	StereotaxCoord		*nasion,*inion;
+	StereotaxCoord		*userM1,*userM2;
 	tenTwentyTemplate	*myTenTwenty;
 }
 
@@ -23,6 +23,10 @@
 - (void) getROI: (ROI *) thisROI 
 		fromPix: (DCMPix *) thisPix 
 	   toCoords:(double *) location;
+
+
+- (void) getUserM1andM2;
+
 - (void) addElectrodes;
 - (void) lowerElectrode: (ROI *) thisROI 
 				inSlice: (DCMPix *) thisSlice;
