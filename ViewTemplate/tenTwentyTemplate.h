@@ -7,8 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "ViewerController.h"
-#import	"DCMPix.h"
 #import "StereotaxCoord.h"
 #import "parseCSV.h"
 

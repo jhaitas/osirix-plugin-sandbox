@@ -50,9 +50,6 @@
 		
 		// scale the template to the subject
 		[self scaleCoordinatesAP];
-		
-		// move electrodes 20mm above skull before we drop them back down
-//		[self shiftElectrodesUp: 20.0];
 	}
 	
 	return self;	
@@ -103,7 +100,7 @@
 		return;
 	}
 	
-	// initialize values that aren't acceptable after the following routine
+	// initialize values that won't be acceptable after the following routine
 	firstIndex		= -1;
 	secondIndex		= -1;
 	firstDouble		= 0.0;
@@ -208,7 +205,7 @@
 	theElectrode = [[tmpElectrodeDict objectForKey:theName] copy];
 	
 	[tmpElectrodeDict release];
-	return theElectrode;
+	return [theElectrode autorelease];
 }
 
 - (void) shiftCoordinates
@@ -248,9 +245,6 @@
 	// set reference AP coordinate
 	referenceAP = Fpz.AP;
 	
-	[Fpz release];
-	[Oz release];
-	
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.AP = referenceAP - (scaleAP * (referenceAP - thisElectrode.AP));
 		if ([thisElectrode.name isEqualToString:@"M1"] || [thisElectrode.name isEqualToString:@"M2"]) {
@@ -269,11 +263,11 @@
 	M1	= [self getElectrodeWithName:@"M1"];
 	M2	= [self getElectrodeWithName:@"M2"];
 	
+	// compute the scale using absolute values in differences
 	scaleML = (fabs(userM1.ML - userM2.ML) / fabs(M1.ML - M2.ML));
-	referenceML = M1.ML;
 	
-	[M1 release];
-	[M2 release];
+	// set reference AP coordinate
+	referenceML = M1.ML;
 	
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.ML = referenceML - (scaleML * (referenceML - thisElectrode.ML));
