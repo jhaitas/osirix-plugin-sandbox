@@ -19,12 +19,12 @@
 
 
 // Initializes an instance of this class
--(id) initWithName: (NSString *) inName
+- (id) initWithName: (NSString *) inName
 			 withAP: (float) inAP 
 			 withML: (float) inML
 			 withDV: (float) inDV;
 
--(StereotaxCoord *) copy;
+- (StereotaxCoord *) copy;
 
 
 // for remapping orientation of stereotaxic coordinates
@@ -35,6 +35,6 @@
 		   withOrientation: (NSMutableDictionary *) theOrientation;
 
 // Returns a string describing an instance
--(NSString *)description;
+- (NSString *) description;
 
 @end

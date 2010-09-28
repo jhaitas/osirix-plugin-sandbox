@@ -15,10 +15,10 @@
 @synthesize AP,ML,DV;
 
 
--(id) initWithName: (NSString *) inName
-			withAP: (float) inAP 
-			withML: (float) inML
-			withDV: (float) inDV
+- (id) initWithName: (NSString *) inName
+			 withAP: (float) inAP 
+			 withML: (float) inML
+			 withDV: (float) inDV
 {
     if ((self = [super init])) {
 		[name autorelease];
@@ -33,7 +33,7 @@
 	return self;
 }
 
--(StereotaxCoord *) copy
+- (StereotaxCoord *) copy
 {
 	return [[StereotaxCoord alloc] initWithName:[NSString stringWithString:name]
 										 withAP:AP
@@ -94,8 +94,6 @@
 			NSLog(@"WARNING: unknown value for DV key\n");
 			break;
 	}
-	
-//	NSLog(@"coordinates (%f,%f,%f) remapped to (%f,%f,%f)\n",tmpAP,tmpML,tmpDV,AP,ML,DV);
 }
 
 // return is contained in 3 element double array named here 'dicomCoords'
