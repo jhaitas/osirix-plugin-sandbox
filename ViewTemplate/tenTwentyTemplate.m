@@ -189,23 +189,24 @@
 	[parsedElectrodes release];
 }
 
-- (StereotaxCoord *) getElectrodeWithName: (NSString *) theName
+- (NSMutableDictionary *) generateElectrodeDict
 {
-	StereotaxCoord		*theElectrode;
 	NSMutableDictionary	*tmpElectrodeDict;
-						  
+	
 	// populate a temporary dictionary
-	tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
+	tmpElectrodeDict = [NSMutableDictionary dictionary];
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		[tmpElectrodeDict setObject:thisElectrode 
 							 forKey:[NSString stringWithString:thisElectrode.name]];
 	}
-	
-	// find the electrode in the temporary dictionary
-	theElectrode = [[tmpElectrodeDict objectForKey:theName] copy];
-	
-	// we are done with the dictionary - we can release it
-	[tmpElectrodeDict release];
+	return tmpElectrodeDict;
+}
+
+
+- (StereotaxCoord *) getElectrodeWithName: (NSString *) theName
+{
+	StereotaxCoord		*theElectrode;	
+	theElectrode = [[[self generateElectrodeDict] objectForKey:theName] copy];
 	
 	return [theElectrode autorelease];
 }
@@ -262,21 +263,29 @@
 							andM2: (StereotaxCoord *) userM2
 {
 	float			referenceML,scaleML;
-	StereotaxCoord	*M1,*M2;
+	StereotaxCoord	*M1,*M2,*Fpz;
 	
-	// locate M1 and M2 which are used to scale on ML plane
+	// locate M1 and M2 which are used to scale on ML planes
 	M1	= [self getElectrodeWithName:@"M1"];
 	M2	= [self getElectrodeWithName:@"M2"];
+	
+	// locate Fpz which is used to reference all electrodes
+	Fpz = [self getElectrodeWithName:@"Fpz"];
 	
 	// compute the scale using absolute values in differences
 	scaleML = (fabs(userM1.ML - userM2.ML) / fabs(M1.ML - M2.ML));
 	
-	// set reference AP coordinate
-	referenceML = M1.ML;
+	// set reference ML coordinate
+	referenceML = Fpz.ML;
+	
+	DLog(@"scaleML = %f\n",scaleML);
+	DLog(@"referenceML = %f\n",referenceML);
 	
 	// apply scale to each electrode in template
 	for (StereotaxCoord *thisElectrode in electrodes) {
+		DLog(@"%@\n",thisElectrode);
 		thisElectrode.ML = referenceML - (scaleML * (referenceML - thisElectrode.ML));
+		DLog(@"%@\n",thisElectrode);
 	}
 }
 

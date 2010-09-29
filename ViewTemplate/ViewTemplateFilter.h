@@ -16,6 +16,7 @@
 	StereotaxCoord		*nasion,*inion;
 	StereotaxCoord		*userM1,*userM2;
 	tenTwentyTemplate	*myTenTwenty;
+	ViewerController	*viewerML;
 }
 
 - (long) filterImage:(NSString*) menuName;
@@ -26,7 +27,7 @@
 
 
 - (void) getUserM1andM2;
-
+- (void) watchViewerML: (NSTimer *) theTimer;
 - (void) addElectrodes;
 - (void) lowerElectrode: (ROI *) thisROI 
 				inSlice: (DCMPix *) thisSlice;

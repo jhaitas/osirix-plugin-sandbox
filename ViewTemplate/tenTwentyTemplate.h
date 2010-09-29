@@ -16,7 +16,7 @@
 	double				templateM1M2_AP;
 	NSMutableDictionary	*orientation;
 	
-	// electrodes is an array of ROImm objects
+	// electrodes is an array of StereotaxCoord objects
 	NSMutableArray	*electrodes;
 }
 @property (assign)	StereotaxCoord		*nasion;
@@ -30,7 +30,7 @@
 
 - (void) computeOrientation;
 - (void) populateTemplate;
-
+- (NSMutableDictionary *) generateElectrodeDict;
 - (StereotaxCoord *) getElectrodeWithName: (NSString *) theName;
 - (void) shiftCoordinates;
 - (void) scaleCoordinatesAP;

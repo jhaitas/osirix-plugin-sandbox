@@ -28,15 +28,15 @@
 	// tenTwentyTemplate has been allocated and populated ...
 	// ... we need user to input M1 and M2 ...
 	// ... we will the scale coordinates
-//	[self getUserM1andM2];
+	[self getUserM1andM2];
 	
 //	[myTenTwenty scaleCoordinatesMLwithM1: userM1 andM2: userM2];
 	
 	
-	[myTenTwenty shiftElectrodesUp: 20.0];
+//	[myTenTwenty shiftElectrodesUp: 20.0];
 	
 	// place electrodes on MRI
-	[self addElectrodes];
+//	[self addElectrodes];
 	
 	DLog(@"executed method\n");
 	return 0;
@@ -120,9 +120,13 @@
 - (void) getUserM1andM2
 {
 	
-	int				indexML,bestSlice;
-	float			dicomCoords[3],sliceCoords[3];
-	StereotaxCoord	*M1;
+	int					indexML,bestSlice;
+	float				dicomCoords[3],sliceCoords[3];
+	StereotaxCoord		*M1;
+	
+	// In this plugin, we will simply duplicate the current 2D window!
+	
+	viewerML = [self duplicateCurrent2DViewerWindow];
 	
 	indexML = [[myTenTwenty.orientation objectForKey:@"ML"] intValue];
 	
@@ -133,21 +137,65 @@
 	[M1 returnDICOMCoords:dicomCoords withOrientation:myTenTwenty.orientation];
 	
 	// reslice DICOM on ML plane
-	[viewerController processReslice: indexML :FALSE];
+	[viewerML processReslice: indexML :FALSE];
 	
 	// get best slice to see M1	
-	bestSlice = [DCMPix nearestSliceInPixelList:[[viewerController imageView] dcmPixList]
+	bestSlice = [DCMPix nearestSliceInPixelList:[[viewerML imageView] dcmPixList]
 								withDICOMCoords:dicomCoords
 									sliceCoords:sliceCoords									];
 	
 	// View slice for placing M1 and M2
-	[[viewerController imageView] setIndex: bestSlice];
+	[[viewerML imageView] setIndex: bestSlice];
 	
 	// update screen
-	[viewerController updateImage:self];
+	[viewerML updateImage:self];
 	
-	// TODO here we need user to place M1 and M2 to get proper coords for scaling
+	// make the new viewer key window and bring it to the front
+	[[viewerML window] makeKeyAndOrderFront:self];
 	
+	// give the user 2D point tool
+	[[viewerML imageView] setCurrentTool:t2DPoint];
+	
+	// start a timer to wait for user to place 2 ROIs
+	[NSTimer scheduledTimerWithTimeInterval:2
+									 target:self
+								   selector:@selector(watchViewerML:)
+								   userInfo:nil
+									repeats:YES];	
+}
+
+- (void) watchViewerML: (NSTimer *) theTimer
+{
+	double	location[3];
+	DCMPix	*thisPix;
+	ROI		*selectedROI;
+	
+	thisPix = [[viewerML imageView] curDCM];
+	
+	if ([[[viewerML imageView] curRoiList] count] >= 2) {
+		[theTimer invalidate];
+		selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:0];
+		[self getROI:selectedROI fromPix:thisPix toCoords:location];
+		userM1 = [[StereotaxCoord alloc] initWithName:selectedROI.name
+											   withAP:location[0] 
+											   withML:location[1] 
+											   withDV:location[2]			];
+		selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:1];
+		[self getROI:selectedROI fromPix:thisPix toCoords:location];
+		userM2 = [[StereotaxCoord alloc] initWithName:selectedROI.name
+											   withAP:location[0] 
+											   withML:location[1] 
+											   withDV:location[2]			];
+		
+		[userM1 remapWithOrientation:myTenTwenty.orientation];
+		[userM2 remapWithOrientation:myTenTwenty.orientation];
+		
+		[[viewerML window] performClose:self];
+		
+		[myTenTwenty scaleCoordinatesMLwithM1: userM1 andM2: userM2];
+		[myTenTwenty shiftElectrodesUp: 20.0];
+		[self addElectrodes];
+	}
 }
 
 - (void) addElectrodes
