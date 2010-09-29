@@ -146,7 +146,7 @@
 {
 	// Identify plugin Bundle
 	NSString *path			= [[[NSBundle bundleWithIdentifier:@"edu.vanderbilt.viewtemplate"] resourcePath] retain];
-	NSString *fullFilename	= [[NSString stringWithFormat:@"%@/zeroedTemplate.csv",path,@"zeroedTemplate.csv"] retain];
+	NSString *fullFilename	= [[NSString stringWithFormat:@"%@/zeroedTemplate.csv",path] retain];
 
 	// parse the csv file included in plugin bundle ...
 	// each parsed line goes into parsedElectrodes array
@@ -172,16 +172,15 @@
 	[fullFilename release];
 	[path release];
 	
-	// remove first two objects ...
-	// ... index 0 contains headers ...
-	// ... index 1 contains origin
-	[parsedElectrodes removeObjectAtIndex:1];
-	[parsedElectrodes removeObjectAtIndex:0];
+	// remove first two objects from array (header line and origin)
+	[parsedElectrodes removeObjectsInRange:NSMakeRange(0, 2)];
+	
+	// convert each parsed line to a StereotaxCoord
 	for (id thisParsedLine in parsedElectrodes) {
 		StereotaxCoord *tmpElectrode = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:[thisParsedLine objectAtIndex:0]]
 																	 withAP:[[thisParsedLine objectAtIndex:1] doubleValue]
 																	 withML:[[thisParsedLine objectAtIndex:2] doubleValue]
-																	 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]						];
+																	 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]				];
 		[electrodes addObject: tmpElectrode];
 		[tmpElectrode release];
 	}
@@ -198,13 +197,16 @@
 	// populate a temporary dictionary
 	tmpElectrodeDict = [[NSMutableDictionary alloc] init];;
 	for (StereotaxCoord *thisElectrode in electrodes) {
-		[tmpElectrodeDict setObject:thisElectrode forKey:[NSString stringWithString:thisElectrode.name]];
-		[thisElectrode retain];
+		[tmpElectrodeDict setObject:thisElectrode 
+							 forKey:[NSString stringWithString:thisElectrode.name]];
 	}
 	
+	// find the electrode in the temporary dictionary
 	theElectrode = [[tmpElectrodeDict objectForKey:theName] copy];
 	
+	// we are done with the dictionary - we can release it
 	[tmpElectrodeDict release];
+	
 	return [theElectrode autorelease];
 }
 
@@ -236,6 +238,7 @@
 	float			referenceAP,scaleAP;
 	StereotaxCoord	*Fpz,*Oz;
 	
+	// locate Fpz and Oz which are used to scale on AP plane
 	Fpz	= [self getElectrodeWithName:@"Fpz"];
 	Oz	= [self getElectrodeWithName:@"Oz"];
 	
@@ -245,6 +248,7 @@
 	// set reference AP coordinate
 	referenceAP = Fpz.AP;
 	
+	// apply scale to each electrode in template
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.AP = referenceAP - (scaleAP * (referenceAP - thisElectrode.AP));
 		if ([thisElectrode.name isEqualToString:@"M1"] || [thisElectrode.name isEqualToString:@"M2"]) {
@@ -260,6 +264,7 @@
 	float			referenceML,scaleML;
 	StereotaxCoord	*M1,*M2;
 	
+	// locate M1 and M2 which are used to scale on ML plane
 	M1	= [self getElectrodeWithName:@"M1"];
 	M2	= [self getElectrodeWithName:@"M2"];
 	
@@ -269,6 +274,7 @@
 	// set reference AP coordinate
 	referenceML = M1.ML;
 	
+	// apply scale to each electrode in template
 	for (StereotaxCoord *thisElectrode in electrodes) {
 		thisElectrode.ML = referenceML - (scaleML * (referenceML - thisElectrode.ML));
 	}
