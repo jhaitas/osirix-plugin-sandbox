@@ -250,8 +250,8 @@
 
 - (void) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice
 {
-	int		indexDV;
-	float	currentPixelMean;
+	int		indexDV,directionDV;
+	float	thisMin,thisMean,thisMax;
 	double	pixelSpacingX,pixelSpacingY;
 	float	dicomCoords[3],sliceCoords[3];
 	float	minScalpValue,maxSkullValue;
@@ -260,16 +260,19 @@
 	NSPoint	offsetShift;
 	
 	// initialize values
-	indexDV				= [[myTenTwenty.orientation objectForKey:@"DV"] intValue];
-	foundScalp			= NO;
-	foundSkull			= NO;
-	currentPixelMean	= -1.0;
-	pixelSpacingX		= [thisSlice pixelSpacingX];
-	pixelSpacingY		= [thisSlice pixelSpacingY];
+	indexDV			= [[myTenTwenty.orientation objectForKey:@"DV"] intValue];
+	directionDV		= [[myTenTwenty.direction objectForKey:@"DV"] intValue];
+	foundScalp		= NO;
+	foundSkull		= NO;
+	thisMin			= -1.0;
+	thisMean		= -1.0;
+	thisMax			= -1.0;
+	pixelSpacingX	= [thisSlice pixelSpacingX];
+	pixelSpacingY	= [thisSlice pixelSpacingY];
 	
 	// these values should be made user configurable in the future
 	minScalpValue = 45.0;
-	maxSkullValue = 30.0;
+	maxSkullValue = 45.0;
 	
 	// select this ROI (prerequisite for [ROI roiMove: :] method)
 	[thisROI setROIMode: ROI_selected];
@@ -287,7 +290,7 @@
 		[thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
 		
 		// drop point .1 mm on DV plane
-		dicomCoords[indexDV] -= .1;
+		dicomCoords[indexDV] -= (directionDV * .1);
 		
 		// convert back to slice coords
 		[thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
@@ -300,10 +303,10 @@
 		[thisROI roiMove:offsetShift :TRUE];
  		
 		// determine current pixel mean
-		[thisSlice computeROI:thisROI :&currentPixelMean :NULL :NULL :NULL :NULL];
+		[thisSlice computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
 		
 		// detect if we have found the scalp
-		if (currentPixelMean > minScalpValue) {
+		if (thisMax > minScalpValue) {
 			foundScalp = YES;
 		}
 		
@@ -322,7 +325,7 @@
 		[thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
 		
 		// drop point .01 mm on DV plane
-		dicomCoords[indexDV] -= .01;
+		dicomCoords[indexDV] -= (directionDV * .01);
 		
 		// convert back to slice coords
 		[thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
@@ -335,10 +338,10 @@
 		[thisROI roiMove:offsetShift :TRUE];
  		
 		// determine current pixel mean
-		[thisSlice computeROI:thisROI :&currentPixelMean :NULL :NULL :NULL :NULL];
+		[thisSlice computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
 		
 		// detect if we have found the skull
-		if (currentPixelMean < maxSkullValue) {
+		if (thisMin < maxSkullValue) {
 			foundSkull = YES;
 		}
 		

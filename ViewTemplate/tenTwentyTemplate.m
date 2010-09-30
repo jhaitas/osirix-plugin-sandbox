@@ -11,7 +11,7 @@
 
 @implementation tenTwentyTemplate
 
-@synthesize nasion,inion,orientation;
+@synthesize nasion,inion,orientation,direction;
 @synthesize electrodes;
 
 - (id) initWithNasion: (StereotaxCoord *) thisNasion
@@ -19,8 +19,9 @@
 {
 	if (self = [super init])
 	{		
-		// allocate and init orientation dictionary
+		// allocate and init orientation and direction dictionaries
 		orientation	= [[NSMutableDictionary alloc] init];
+		direction	= [[NSMutableDictionary alloc] init];
 		
 		// allocate and inititalize electrodes array
 		electrodes = [[NSMutableArray alloc] init];
@@ -64,6 +65,7 @@
 	int					i,firstIndex,secondIndex;
 	int					indexAP,indexML,indexDV;
 	double				thisDouble,firstDouble,secondDouble;
+	int					dir[3];
 	NSNumber			*diffAP,*diffML,*diffDV;
 	NSMutableArray		*diff;
 	
@@ -72,7 +74,14 @@
 	diffML	= [[NSNumber alloc] initWithDouble:(nasion.ML - inion.ML)];
 	diffDV	= [[NSNumber alloc] initWithDouble:(nasion.DV - inion.DV)];
 	
+	// set directions based on difference between nasion and inion ...
+	// ... ML is assumed to be zero and will be given a direction of 1
+	dir[0]	= ([diffAP doubleValue] >= 0 ? 1 : -1);
+	dir[1]	= ([diffML doubleValue] >= 0 ? 1 : -1);
+	dir[2]	= ([diffDV doubleValue] >= 0 ? 1 : -1);
+	
 	diff	= [[NSMutableArray alloc] initWithObjects:diffAP,diffML,diffDV,nil];
+	
 	
 	// no longer need these objects...
 	// ... they have been incorporated into diff array
@@ -136,10 +145,17 @@
 		indexDV = firstIndex;
 	}
 	
+	DLog(@"dirAP ,dirML ,dirDV  = %d,%d,%d\n",dir[indexAP],dir[indexML],dir[indexDV]);
+	
 	// set orientation dictionary objects
 	[orientation setObject:[NSNumber numberWithInt:indexAP] forKey:@"AP"];
 	[orientation setObject:[NSNumber numberWithInt:indexML] forKey:@"ML"];
 	[orientation setObject:[NSNumber numberWithInt:indexDV] forKey:@"DV"];
+	
+	// set direction dictionary objects
+	[direction setObject:[NSNumber numberWithInt:dir[indexAP]] forKey:@"AP"];
+	[direction setObject:[NSNumber numberWithInt:dir[indexML]] forKey:@"ML"];
+	[direction setObject:[NSNumber numberWithInt:dir[indexDV]] forKey:@"DV"];
 }
 
 - (void) populateTemplate
@@ -177,10 +193,19 @@
 	
 	// convert each parsed line to a StereotaxCoord
 	for (id thisParsedLine in parsedElectrodes) {
-		StereotaxCoord *tmpElectrode = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:[thisParsedLine objectAtIndex:0]]
-																	 withAP:[[thisParsedLine objectAtIndex:1] doubleValue]
-																	 withML:[[thisParsedLine objectAtIndex:2] doubleValue]
-																	 withDV:[[thisParsedLine objectAtIndex:3] doubleValue]				];
+		NSString *thisName;
+		float thisAP,thisML,thisDV;
+		
+		thisName = [NSString stringWithString:[thisParsedLine objectAtIndex:0]];
+		// adjust values according to DICOM directions
+		thisAP = [[thisParsedLine objectAtIndex:1] doubleValue] * [[direction objectForKey:@"AP"] intValue];
+		thisML = [[thisParsedLine objectAtIndex:2] doubleValue] * [[direction objectForKey:@"ML"] intValue];
+		thisDV = [[thisParsedLine objectAtIndex:3] doubleValue] * [[direction objectForKey:@"DV"] intValue];
+
+		StereotaxCoord *tmpElectrode = [[StereotaxCoord alloc] initWithName:thisName
+																	 withAP:thisAP
+																	 withML:thisML
+																	 withDV:thisDV		];
 		[electrodes addObject: tmpElectrode];
 		[tmpElectrode release];
 	}
@@ -265,12 +290,19 @@
 	float			referenceML,scaleML;
 	StereotaxCoord	*M1,*M2,*Fpz;
 	
+	float			scaleM1,scaleM2;
+	
 	// locate M1 and M2 which are used to scale on ML planes
 	M1	= [self getElectrodeWithName:@"M1"];
 	M2	= [self getElectrodeWithName:@"M2"];
 	
 	// locate Fpz which is used to reference all electrodes
 	Fpz = [self getElectrodeWithName:@"Fpz"];
+	
+	// the following three lines are to examine the difference in scale between sides	
+	scaleM1 = (fabs(Fpz.ML - userM1.ML) / fabs(Fpz.ML - M1.ML));
+	scaleM2 = (fabs(Fpz.ML - userM2.ML) / fabs(Fpz.ML - M2.ML));
+	DLog(@"scaleM1 : scaleM2 = %f : %f\n",scaleM1,scaleM2);
 	
 	// compute the scale using absolute values in differences
 	scaleML = (fabs(userM1.ML - userM2.ML) / fabs(M1.ML - M2.ML));
@@ -292,7 +324,7 @@
 - (void) shiftElectrodesUp: (double) mmDistance
 {
 	for (StereotaxCoord *thisElectrode in electrodes) {
-		thisElectrode.DV += mmDistance;
+		thisElectrode.DV += (mmDistance * [[direction objectForKey:@"DV"] intValue]);
 	}
 }
 

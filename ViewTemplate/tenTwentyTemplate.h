@@ -14,7 +14,7 @@
 @interface tenTwentyTemplate : NSObject {
 	StereotaxCoord		*nasion,*inion;
 	double				templateM1M2_AP;
-	NSMutableDictionary	*orientation;
+	NSMutableDictionary	*orientation,*direction;
 	
 	// electrodes is an array of StereotaxCoord objects
 	NSMutableArray	*electrodes;
@@ -22,6 +22,7 @@
 @property (assign)	StereotaxCoord		*nasion;
 @property (assign)	StereotaxCoord		*inion;
 @property (assign)	NSMutableDictionary	*orientation;
+@property (assign)	NSMutableDictionary	*direction;
 @property (assign)	NSMutableArray		*electrodes;
 
 
