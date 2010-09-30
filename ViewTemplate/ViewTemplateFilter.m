@@ -21,22 +21,22 @@
 	// there should be an ROI named 'nasion' and 'inion'
 	[self findUserInput];
 	
-	// pass the nasion and inion to the tenTwentyTemplate
-	myTenTwenty = [[tenTwentyTemplate alloc] initWithNasion:nasion
-												   andInion:inion				];
-	
-	// tenTwentyTemplate has been allocated and populated ...
-	// ... we need user to input M1 and M2 ...
-	// ... we will the scale coordinates
-	[self getUserM1andM2];
-	
-//	[myTenTwenty scaleCoordinatesMLwithM1: userM1 andM2: userM2];
-	
-	
-//	[myTenTwenty shiftElectrodesUp: 20.0];
-	
-	// place electrodes on MRI
-//	[self addElectrodes];
+    if (foundNasion && foundInion) {
+        // pass the nasion and inion to the tenTwentyTemplate
+        myTenTwenty = [[tenTwentyTemplate alloc] initWithNasion:nasion
+                                                       andInion:inion				];
+        
+        // tenTwentyTemplate has been allocated and populated ...
+        // ... we need user to input M1 and M2 ...
+        // ... we will the scale coordinates
+        [self getUserM1andM2];
+    } else {
+		// notify the user through the NSRunAlertPanel		
+		NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
+						NSLocalizedString(@"Unable to locate 'nasion' and 'inion'!", nil), 
+						nil, nil, nil);
+    }
+
 	
 	DLog(@"executed method\n");
 	return 0;
@@ -83,15 +83,6 @@
 			}
 		}
 	}
-	
-	// make sure that both 'nasion' and 'inion' were located
-	if (!foundNasion || !foundInion) {
-		// notify the user through the NSRunAlertPanel		
-		NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
-						NSLocalizedString(@"Unable to locate 'nasion' and 'inion'!", nil), 
-						nil, nil, nil);
-	}
-	
 }
 
 
