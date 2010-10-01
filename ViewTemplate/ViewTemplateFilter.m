@@ -17,7 +17,23 @@
 - (long) filterImage:(NSString*) menuName
 {
 	DLog(@"Starting Plugin\n");
+    
+    // these values should be made user configurable in the future
+	minScalpValue = 45.0;
+	maxSkullValue = 45.0;
+    
+    if ([NSBundle loadNibNamed:@"scalpSkullSheet.nib" owner:self]) {
+        DLog(@"successfully loaded nib");
+    } else {
+        DLog(@"failed to load nib");
+    }
+
+    // set default values for the fields
+    [minScalpField setFloatValue:minScalpValue];
+    [maxSkullField setFloatValue:maxSkullValue];
 	
+	
+    
 	// there should be an ROI named 'nasion' and 'inion'
 	[self findUserInput];
 	
@@ -185,8 +201,26 @@
 		
 		[myTenTwenty scaleCoordinatesMLwithM1: userM1 andM2: userM2];
 		[myTenTwenty shiftElectrodesUp: 20.0];
-		[self addElectrodes];
+        
+        [NSApp          beginSheet: scalpSkullSheet
+                    modalForWindow: [viewerController window]
+                     modalDelegate: self
+                    didEndSelector: nil
+                       contextInfo: nil                         ];
+        
+        
 	}
+}
+
+- (IBAction) scalpSkullSheetOK: (id) sender
+{
+    minScalpValue = [minScalpField floatValue];
+    maxSkullValue = [maxSkullField floatValue];
+    
+    [scalpSkullSheet orderOut:nil];
+    [NSApp endSheet:scalpSkullSheet];
+    
+    [self addElectrodes];
 }
 
 - (void) addElectrodes
@@ -245,7 +279,6 @@
 	float	thisMin,thisMean,thisMax;
 	double	pixelSpacingX,pixelSpacingY;
 	float	dicomCoords[3],sliceCoords[3];
-	float	minScalpValue,maxSkullValue;
 	BOOL	foundScalp,foundSkull;
 	NSPoint	roiPosition;
 	NSPoint	offsetShift;
@@ -260,10 +293,6 @@
 	thisMax			= -1.0;
 	pixelSpacingX	= [thisSlice pixelSpacingX];
 	pixelSpacingY	= [thisSlice pixelSpacingY];
-	
-	// these values should be made user configurable in the future
-	minScalpValue = 45.0;
-	maxSkullValue = 45.0;
 	
 	// select this ROI (prerequisite for [ROI roiMove: :] method)
 	[thisROI setROIMode: ROI_selected];

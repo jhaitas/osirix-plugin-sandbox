@@ -13,11 +13,18 @@
 
 @interface ViewTemplateFilter : PluginFilter {
 	BOOL				foundNasion,foundInion;
+	float               minScalpValue,maxSkullValue;
 	StereotaxCoord		*nasion,*inion;
 	StereotaxCoord		*userM1,*userM2;
 	tenTwentyTemplate	*myTenTwenty;
 	ViewerController	*viewerML;
+    
+    IBOutlet NSWindow       *scalpSkullSheet;
+    IBOutlet NSTextField    *minScalpField;
+    IBOutlet NSTextField    *maxSkullField;
 }
+
+- (IBAction) scalpSkullSheetOK: (id) sender;
 
 - (long) filterImage:(NSString*) menuName;
 - (void) findUserInput;
@@ -30,6 +37,6 @@
 - (void) watchViewerML: (NSTimer *) theTimer;
 - (void) addElectrodes;
 - (void) lowerElectrode: (ROI *) thisROI 
-				inSlice: (DCMPix *) thisSlice;
+                inSlice: (DCMPix *) thisSlice;
 
 @end
