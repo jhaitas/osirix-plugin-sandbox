@@ -12,22 +12,22 @@
 
 
 @interface tenTwentyTemplate : NSObject {
-	StereotaxCoord		*nasion,*inion;
-	double				templateM1M2_AP;
-	NSMutableDictionary	*orientation,*direction;
-	
-	// electrodes is an array of StereotaxCoord objects
-	NSMutableArray	*electrodes;
+    StereotaxCoord          *nasion,*inion;
+    double                  templateM1M2_AP;
+    NSMutableDictionary     *orientation,*direction;
+    
+    // electrodes is an array of StereotaxCoord objects
+    NSMutableArray    *electrodes;
 }
-@property (assign)	StereotaxCoord		*nasion;
-@property (assign)	StereotaxCoord		*inion;
-@property (assign)	NSMutableDictionary	*orientation;
-@property (assign)	NSMutableDictionary	*direction;
-@property (assign)	NSMutableArray		*electrodes;
+@property (assign)    StereotaxCoord        *nasion;
+@property (assign)    StereotaxCoord        *inion;
+@property (assign)    NSMutableDictionary   *orientation;
+@property (assign)    NSMutableDictionary   *direction;
+@property (assign)    NSMutableArray        *electrodes;
 
 
 - (id) initWithNasion: (StereotaxCoord *) thisNasion
-			 andInion: (StereotaxCoord *) thisInion;
+             andInion: (StereotaxCoord *) thisInion;
 
 - (void) computeOrientation;
 - (void) populateTemplate;
@@ -36,7 +36,7 @@
 - (void) shiftCoordinates;
 - (void) scaleCoordinatesAP;
 - (void) scaleCoordinatesMLwithM1: (StereotaxCoord *) userM1
-							andM2: (StereotaxCoord *) userM2;
+                            andM2: (StereotaxCoord *) userM2;
 - (void) shiftElectrodesUp: (double) mmDistance;
 
 @end

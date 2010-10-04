@@ -12,12 +12,12 @@
 #import "tenTwentyTemplate.h"
 
 @interface ViewTemplateFilter : PluginFilter {
-	BOOL				foundNasion,foundInion;
-	float               minScalpValue,maxSkullValue;
-	StereotaxCoord		*nasion,*inion;
-	StereotaxCoord		*userM1,*userM2;
-	tenTwentyTemplate	*myTenTwenty;
-	ViewerController	*viewerML;
+    BOOL                foundNasion,foundInion;
+    float               minScalpValue,maxSkullValue;
+    StereotaxCoord      *nasion,*inion;
+    StereotaxCoord      *userM1,*userM2;
+    tenTwentyTemplate   *myTenTwenty;
+    ViewerController    *viewerML;
     
     IBOutlet NSWindow       *scalpSkullSheet;
     IBOutlet NSTextField    *minScalpField;
@@ -28,9 +28,9 @@
 
 - (long) filterImage:(NSString*) menuName;
 - (void) findUserInput;
-- (void) getROI: (ROI *) thisROI 
-		fromPix: (DCMPix *) thisPix 
-	   toCoords:(double *) location;
+- (void) getROI: (ROI *)    thisROI 
+        fromPix: (DCMPix *) thisPix 
+       toCoords: (double *) location;
 
 
 - (void) getUserM1andM2;

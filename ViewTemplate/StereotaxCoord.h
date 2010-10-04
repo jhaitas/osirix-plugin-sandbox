@@ -14,15 +14,15 @@
 	float		AP,ML,DV;
 }
 
-@property(assign) NSString *name;
-@property float AP,ML,DV;
+@property (assign)  NSString *name;
+@property           float AP,ML,DV;
 
 
 // Initializes an instance of this class
-- (id) initWithName: (NSString *) inName
-			 withAP: (float) inAP 
-			 withML: (float) inML
-			 withDV: (float) inDV;
+- (id) initWithName: (NSString *)   inName
+			 withAP: (float)        inAP 
+			 withML: (float)        inML
+			 withDV: (float)        inDV;
 
 - (StereotaxCoord *) copy;
 

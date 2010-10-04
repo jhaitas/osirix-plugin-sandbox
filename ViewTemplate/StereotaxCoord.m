@@ -22,7 +22,7 @@
 {
     if ((self = [super init])) {		
 		// assign values to variables
-		name	= [NSString stringWithString:inName];
+		name    = [NSString stringWithString:inName];
 		AP		= inAP;
 		ML		= inML;
 		DV		= inDV;
