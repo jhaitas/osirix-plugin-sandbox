@@ -299,13 +299,13 @@
 
 - (void) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice
 {
-    int        indexDV,directionDV;
-    float    thisMin,thisMean,thisMax;
-    double    pixelSpacingX,pixelSpacingY;
-    float    dicomCoords[3],sliceCoords[3];
+    int     indexDV,directionDV;
+    float   thisMin,thisMean,thisMax;
+    double  pixelSpacingX,pixelSpacingY;
+    float   dicomCoords[3],sliceCoords[3];
     BOOL    foundScalp,foundSkull;
-    NSPoint    roiPosition;
-    NSPoint    offsetShift;
+    NSPoint roiPosition;
+    NSPoint offsetShift;
     
     // initialize values
     indexDV         = [[myTenTwenty.orientation objectForKey:@"DV"] intValue];
