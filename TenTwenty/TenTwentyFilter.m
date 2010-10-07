@@ -15,7 +15,7 @@
 }
 
 - (long) filterImage:(NSString*) menuName
-{   
+{
     foundNasion = NO;
     foundInion  = NO;
     
@@ -38,8 +38,13 @@
         [nasion remapWithOrientation:orientation];
         [inion remapWithOrientation:orientation];
         
-        
+        // trace the skull from 'nasion' to 'inion'
         [self traceSkull];
+        
+        ld = [[LineDividerController alloc] initWithViewerController:viewerController];
+        [ld divideLine:midlineSkullTrace];
+        
+        
     } else {
         // notify the user through the NSRunAlertPanel        
         NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
@@ -50,8 +55,6 @@
     
     return 0;
 }
-
-
 
 - (void) findUserInput
 {
@@ -244,7 +247,7 @@
     indexML = [[orientation objectForKey:@"ML"] intValue];
     indexDV = [[orientation objectForKey:@"DV"] intValue];
     
-    numIntermediatePoints   = 10;
+    numIntermediatePoints   = 20;
     displacement            = nasion.AP - inion.AP;
     stepSize                = displacement / (numIntermediatePoints -1);
     stepDir                 = [[direction objectForKey:@"AP"] intValue];
@@ -286,7 +289,7 @@
         thisPoint = [self lowerElectrode:thisROI inSlice:midlineSlice];
         
         [intermediatePoints addObject:[MyPoint point:thisPoint]];
-         
+
         // add the new ROI to the correct ROI list
 //        [[[[viewerController imageView] dcmRoiList] objectAtIndex:sliceIndex] addObject:thisROI];
     }
@@ -306,6 +309,8 @@
     // add the new ROI to the correct ROI list
     [[[[viewerController imageView] dcmRoiList] objectAtIndex:sliceIndex] addObject:thisROI];
 
+    midlineSkullTrace = thisROI;
+    
     // update screen
     [viewerController updateImage:self];
 }
