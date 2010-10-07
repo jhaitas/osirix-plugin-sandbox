@@ -40,21 +40,21 @@
 
 - (void) divideLine:(ROI *) roiOPoly
 {
-	long			i,ii;
+	long			i;
 	NSMutableArray	*percentLength;
 		
     currentSpline		= [roiOPoly splinePoints: scaleValue];
     currentInterPoints	= [NSMutableArray arrayWithCapacity:0];
     percentLength		= [self computePercentLength:roiOPoly];
     
-    NSLog(@"oPoly %d length = %f mm",i,[self measureOPolyLength:roiOPoly]);
+    DLog(@"oPoly length = %f mm",[self measureOPolyLength:roiOPoly]);
     
     // declare pointIndex outside of scope of following for-loop
     long pointIndex = 0;
     
-    for (ii = 0; ii < [tenTwentyIntervals count]; ii++) {
+    for (i = 0; i < [tenTwentyIntervals count]; i++) {
         // determine where on the spline we want to be
-        float accumulatedInterval = [self accumulatedIntervalAtIndex:ii];
+        float accumulatedInterval = [self accumulatedIntervalAtIndex:i];
         
         // walk the line to next point
         while ([[percentLength objectAtIndex:(pointIndex+1)] floatValue] < accumulatedInterval) {				
@@ -63,8 +63,8 @@
         
         
         // print information out to console
-        NSLog(@"Section %d length = %f is %f%% of total length",
-              ii,
+        DLog(@"Section %d length = %f is %f%% of total length",
+              i,
               [self measureOPolyLength:roiOPoly fromPointAtIndex:0 toPointAtIndex:pointIndex],
               [[percentLength objectAtIndex:pointIndex] floatValue]*100.0);
         

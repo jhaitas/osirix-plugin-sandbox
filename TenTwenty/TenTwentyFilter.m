@@ -247,7 +247,7 @@
     indexML = [[orientation objectForKey:@"ML"] intValue];
     indexDV = [[orientation objectForKey:@"DV"] intValue];
     
-    numIntermediatePoints   = 20;
+    numIntermediatePoints   = 15;
     displacement            = nasion.AP - inion.AP;
     stepSize                = displacement / (numIntermediatePoints -1);
     stepDir                 = [[direction objectForKey:@"AP"] intValue];
