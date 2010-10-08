@@ -8,7 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface StereotaxCoord : NSObject {
 	NSString	*name;
 	float		AP,ML,DV;

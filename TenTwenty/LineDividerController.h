@@ -24,7 +24,8 @@
 }
 
 - (id) init;
-- (id) initWithViewerController:(ViewerController *) vc;
+- (id) initWithViewerController:(ViewerController *) vc
+andDistanceDict:(NSDictionary *) distDict;
 
 - (void) divideLine:(ROI *) roiOPoly;
 
