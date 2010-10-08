@@ -26,6 +26,12 @@
         // allocate and init orientation and direction dictionaries
         orientation = [[NSMutableDictionary alloc] init];
         direction   = [[NSMutableDictionary alloc] init];
+        
+        midlineElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"Fp1",
+                                                                         FBOX(.3),@"Fz",
+                                                                         FBOX(.5),@"Cz",
+                                                                         FBOX(.7),@"Pz",
+                                                                         FBOX(.9),@"O1", nil ];
     }
     return self;
 }
@@ -217,7 +223,11 @@
     [self traceSkull];
     
     ld = [[LineDividerController alloc] initWithViewerController:viewerController];
+    [ld setDistanceDict:midlineElectrodes];
     [ld divideLine:midlineSkullTrace];
+    
+    // remove the skull trace
+    [self removeSkullTrace];
 }
 
 - (void) traceSkull
@@ -305,6 +315,16 @@
     
     // update screen
     [viewerController updateImage:self];
+}
+
+- (void) removeSkullTrace
+{
+    NSMutableArray *thisRoiList;
+    for (thisRoiList in [[viewerController imageView] dcmRoiList]) {
+        if ([thisRoiList containsObject:midlineSkullTrace]) {
+            [thisRoiList removeObjectIdenticalTo:midlineSkullTrace];
+        }
+    }
 }
 
 - (NSPoint) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice

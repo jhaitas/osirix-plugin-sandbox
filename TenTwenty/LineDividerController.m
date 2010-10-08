@@ -17,13 +17,11 @@
         // OsiriX default scale is 2.0 ...
         // ... we want to program this so that we may change this if we want
         scaleValue			= 2.0;
-        tenTwentyIntervals	= [[NSArray alloc] initWithObjects:
-                               FBOX(.1),FBOX(.2),FBOX(.2),
-                               FBOX(.2),FBOX(.2),nil];
-        
-        roiSelectedArray	= [[NSMutableArray alloc] initWithCapacity:0];
-        selectedOPolyRois	= [[NSMutableArray alloc] initWithCapacity:0];
-        
+        lineIntervalsDict	= [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"",
+                                                                           FBOX(.3),@"",
+                                                                           FBOX(.5),@"",
+                                                                           FBOX(.7),@"",
+                                                                           FBOX(.9),@"", nil];        
         
         currentSpline		= [[NSMutableArray alloc] initWithCapacity:0];
         currentInterPoints	= [[NSMutableArray alloc] initWithCapacity:0];
@@ -38,38 +36,37 @@
     return self;
 }
 
+- (void) setDistanceDict: (NSDictionary *) inputDict
+{
+    lineIntervalsDict = [NSDictionary dictionaryWithDictionary:inputDict];
+}
+
 - (void) divideLine:(ROI *) roiOPoly
 {
-	long			i;
+    long pointIndex;
 	NSMutableArray	*percentLength;
+    NSEnumerator    *enumerator;
+    
+    enumerator = [lineIntervalsDict keyEnumerator];
+    id key;
 		
     currentSpline		= [roiOPoly splinePoints: scaleValue];
-    currentInterPoints	= [NSMutableArray arrayWithCapacity:0];
+    currentInterPoints	= [[NSMutableDictionary alloc] initWithCapacity:0];
     percentLength		= [self computePercentLength:roiOPoly];
     
     DLog(@"oPoly length = %f mm",[self measureOPolyLength:roiOPoly]);
-    
-    // declare pointIndex outside of scope of following for-loop
-    long pointIndex = 0;
-    
-    for (i = 0; i < [tenTwentyIntervals count]; i++) {
-        // determine where on the spline we want to be
-        float accumulatedInterval = [self accumulatedIntervalAtIndex:i];
+        
+    while (key = [enumerator nextObject]) {
+        pointIndex = 0;
+        float accumulatedInterval = [[lineIntervalsDict objectForKey:key] floatValue];
         
         // walk the line to next point
         while ([[percentLength objectAtIndex:(pointIndex+1)] floatValue] < accumulatedInterval) {				
             pointIndex +=1;
         }
         
-        
-        // print information out to console
-        DLog(@"Section %d length = %f is %f%% of total length",
-              i,
-              [self measureOPolyLength:roiOPoly fromPointAtIndex:0 toPointAtIndex:pointIndex],
-              [[percentLength objectAtIndex:pointIndex] floatValue]*100.0);
-        
         // select indexed point from spline and add it to array
-        [currentInterPoints addObject: [currentSpline objectAtIndex:pointIndex]];
+        [currentInterPoints setObject: [currentSpline objectAtIndex:pointIndex] forKey:key];
     }
     
     // add these intermediate points on line as ROIs
@@ -78,11 +75,12 @@
 
 - (void)addIntermediateROIs
 {
-	
-	int				i;
 	int				thisRoiType;
 	double			pixelSpacingX,pixelSpacingY;
 	NSPoint			thisOrigin;
+    
+    id              key;
+    NSEnumerator    *enumerator;
 	
 	// temporary pointers for creating new ROI
 	MyPoint			*thisPoint;
@@ -97,22 +95,25 @@
 	pixelSpacingY	= [thisDCMPix pixelSpacingY];
 	thisOrigin		= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
 	
-	for (i = 0; i < [currentInterPoints count]; i++) {
-		// point to appropriate selected intermediate point
-		thisPoint = [[MyPoint alloc] initWithPoint: [[currentInterPoints objectAtIndex:i] point]];
+    enumerator = [currentInterPoints keyEnumerator];
+    while (key = [enumerator nextObject]) {
+        thisPoint = [[MyPoint alloc] initWithPoint:[[currentInterPoints objectForKey:key] point]];
 		
 		// allocate and initialize a new ROI
 		thisROI = [[ROI alloc] initWithType: thisRoiType :pixelSpacingX :pixelSpacingY :thisOrigin];
 		
+        // name the ROI
+        thisROI.name = [NSString stringWithString:key];
+        
 		// move the ROI from the 0,0 to correct coordinates
 		thisROI.rect = NSOffsetRect(thisROI.rect, thisPoint.x, thisPoint.y);
-		
+        
 		[thisPoint release];
 		
 		// add the new ROI to the current ROI list
 		[[[viewerController imageView] curRoiList] addObject:thisROI];
 		[thisROI release];
-	}
+    }
 }
 
 - (NSMutableArray *)computePercentLength:(ROI *)thisROI
@@ -183,17 +184,4 @@
 	return [self measureOPolyLength: thisROI fromPointAtIndex: 0 toPointAtIndex: lastIndex];
 }
 
-
-- (float)accumulatedIntervalAtIndex:(int)index
-{
-	// instanciate iterator
-	int i;
-	float accumulator = 0;
-	// make sure given index exists
-	assert(index <= ([tenTwentyIntervals count] - 1));
-	for (i = 0; i <= index; i++) {
-		accumulator += [[tenTwentyIntervals objectAtIndex:i] floatValue];
-	}
-	return accumulator;	
-}
 @end

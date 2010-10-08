@@ -15,26 +15,24 @@
     ViewerController    *viewerController;
     
 	float			scaleValue;
-	NSArray			*tenTwentyIntervals;
-	NSMutableArray	*roiSelectedArray;
-	NSMutableArray	*selectedOPolyRois;
+    NSDictionary    *lineIntervalsDict;
 	
-	NSMutableArray	*currentSpline;
-	NSMutableArray	*currentInterPoints;
+	NSMutableArray      *currentSpline;
+	NSMutableDictionary *currentInterPoints;
 }
 
 - (id) init;
-- (id) initWithViewerController:(ViewerController *) vc
-andDistanceDict:(NSDictionary *) distDict;
+- (id) initWithViewerController:(ViewerController *) vc;
+- (void) setDistanceDict: (NSDictionary *) inputDict;
 
 - (void) divideLine:(ROI *) roiOPoly;
 
 - (void) addIntermediateROIs;
-- (NSMutableArray *)computePercentLength:(ROI *)thisROI;
+- (NSMutableArray *) computePercentLength:(ROI *)thisROI;
+
 - (float) measureOPolyLength:(ROI *)thisROI 
             fromPointAtIndex:(long)indexPointA 
               toPointAtIndex:(long)indexPointB;
 - (float) measureOPolyLength:(ROI *)thisROI;
-- (float) accumulatedIntervalAtIndex:(int) index;
 
 @end

@@ -11,6 +11,7 @@
 #import "LineDividerController.h"
 #import "StereotaxCoord.h"
 
+#define FBOX(x) [NSNumber numberWithFloat:x]
 
 @interface TenTwentyController : NSObject {
     ViewerController    *viewerController;
@@ -23,6 +24,8 @@
     
     DCMPix              *midlineSlice;
     ROI                 *midlineSkullTrace;
+    
+    NSDictionary        *midlineElectrodes;
     
     LineDividerController *ld;
 }
@@ -42,6 +45,8 @@
 
 - (void) placeMidlineElectrodes;
 - (void) traceSkull;
+- (void) removeSkullTrace;
+
 - (NSPoint) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice;
 
 @end
