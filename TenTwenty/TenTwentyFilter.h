@@ -11,9 +11,10 @@
 #import "TenTwentyController.h"
 
 @interface TenTwentyFilter : PluginFilter {
-    TenTwentyController     *tenTwenty;
 }
 
 - (long) filterImage:(NSString*) menuName;
+
+- (ViewerController *) getViewerController;
 
 @end

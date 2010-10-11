@@ -106,7 +106,7 @@
 
 -(NSString *)description
 {
-	return [NSString stringWithFormat:@"%@\tAP: %0.3fmm\tML: %0.3fmm\tDV: %0.3fmm",name,AP,ML,DV];
+	return [NSString stringWithFormat:@"%@%*s\tAP: %0.3fmm\tML: %0.3fmm\tDV: %0.3fmm",name,8," ",AP,ML,DV];
 }
 
 @end

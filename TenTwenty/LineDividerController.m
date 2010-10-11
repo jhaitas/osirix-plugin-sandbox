@@ -76,7 +76,7 @@
 - (void)addIntermediateROIs
 {
 	int				thisRoiType;
-	double			pixelSpacingX,pixelSpacingY;
+	float			pixelSpacingX,pixelSpacingY;
 	NSPoint			thisOrigin;
     
     id              key;
@@ -182,6 +182,29 @@
 	lastIndex = [splinePoints count] - 1;
 	
 	return [self measureOPolyLength: thisROI fromPointAtIndex: 0 toPointAtIndex: lastIndex];
+}
+
+
+
+
+- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location
+{                
+    NSMutableArray *roiPoints = [ thisROI points ];
+    NSPoint roiCenterPoint;
+    
+    // calc center of the ROI
+    if ( [ thisROI type ] == t2DPoint ) {
+        // ROI has a bug which causes miss-calculating center of 2DPoint roi
+        roiCenterPoint = [ [ roiPoints objectAtIndex: 0 ] point ];
+    } else {
+        roiCenterPoint = [ thisROI centroid ];
+    }
+    
+    // convert pixel values to mm values
+    [thisPix convertPixDoubleX:roiCenterPoint.x
+                          pixY:roiCenterPoint.y
+                 toDICOMCoords:location            ];
+    DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
 }
 
 @end

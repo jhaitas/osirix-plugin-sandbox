@@ -32,21 +32,29 @@
                                                                          FBOX(.5),@"Cz",
                                                                          FBOX(.7),@"Pz",
                                                                          FBOX(.9),@"O1", nil ];
+        
+        coronalElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"T3",
+                                                                         FBOX(.3),@"C3",
+                                                                         FBOX(.7),@"C4",
+                                                                         FBOX(.9),@"T4", nil ];
+        
+        allElectrodes = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
-- (id) initWithViewerController:(ViewerController *) vc
+- (id) initWithOwner:(id *) theOwner
 {
     [self init];
-    viewerController = vc;
+    owner = theOwner;
+    viewerController = [owner getViewerController];
     return self;
 }
 
 - (void) findUserInput
 {
     int     i,ii;
-    double  location[3];
+    float  location[3];
     ROI     *selectedROI;    
     
     NSArray *pixList;
@@ -66,7 +74,7 @@
             selectedROI = [thisRoiList objectAtIndex:ii];
             // check if this ROI is named 'nasion'
             if ([selectedROI.name isEqualToString:@"nasion"]) {
-                [self getROI:selectedROI fromPix:thisPix toCoords:location];
+                [self getROI:selectedROI fromPix:thisPix toDicomCoords:location];
                 nasion = [[StereotaxCoord alloc] initWithName:selectedROI.name
                                                        withAP:location[0] 
                                                        withML:location[1] 
@@ -78,7 +86,7 @@
             }
             // check if this ROI is named 'inion'
             if ([selectedROI.name isEqualToString:@"inion"]) {
-                [self getROI:selectedROI fromPix:thisPix toCoords:location];
+                [self getROI:selectedROI fromPix:thisPix toDicomCoords:location];
                 inion = [[StereotaxCoord alloc] initWithName:selectedROI.name
                                                       withAP:location[0] 
                                                       withML:location[1] 
@@ -89,7 +97,7 @@
     }
 }
 
-- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location
+- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toDicomCoords:(float *) location
 {                
     NSMutableArray *roiPoints = [ thisROI points ];
     NSPoint roiCenterPoint;
@@ -103,9 +111,9 @@
     }
     
     // convert pixel values to mm values
-    [thisPix convertPixDoubleX:roiCenterPoint.x
-                          pixY:roiCenterPoint.y
-                 toDICOMCoords:location            ];
+    [thisPix convertPixX:roiCenterPoint.x
+                    pixY:roiCenterPoint.y
+           toDICOMCoords:location            ];
     DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
 }
 
@@ -218,19 +226,21 @@
 }
 
 - (void) placeMidlineElectrodes
-{
+{    
     // trace the skull from 'nasion' to 'inion'
-    [self traceSkull];
+    [self traceSkullMidline];
     
     ld = [[LineDividerController alloc] initWithViewerController:viewerController];
     [ld setDistanceDict:midlineElectrodes];
     [ld divideLine:midlineSkullTrace];
     
+    [self storeElectrodesWithNames:[midlineElectrodes allKeys]];
+    
     // remove the skull trace
-    [self removeSkullTrace];
+    [self removeSkullTrace:midlineSkullTrace inViewerController:viewerController];
 }
 
-- (void) traceSkull
+- (void) traceSkullMidline
 {
     int             i,numIntermediatePoints,stepDir;
     int             indexAP,indexML,indexDV;
@@ -317,14 +327,313 @@
     [viewerController updateImage:self];
 }
 
-- (void) removeSkullTrace
+- (void) removeSkullTrace: (ROI *) thisSkullTrace inViewerController: (ViewerController *) vc
 {
     NSMutableArray *thisRoiList;
-    for (thisRoiList in [[viewerController imageView] dcmRoiList]) {
-        if ([thisRoiList containsObject:midlineSkullTrace]) {
-            [thisRoiList removeObjectIdenticalTo:midlineSkullTrace];
+    for (thisRoiList in [[vc imageView] dcmRoiList]) {
+        if ([thisRoiList containsObject:thisSkullTrace]) {
+            [thisRoiList removeObjectIdenticalTo:thisSkullTrace];
         }
     }
+}
+
+- (void) removeSkullTrace: (ROI *) thisSkullTrace
+{
+    [self removeSkullTrace:thisSkullTrace inViewerController:viewerController];
+}
+
+- (void) resliceCoronalAtCz
+{
+    int     indexML,bestSlice;
+    float   dicomCoords[3],sliceCoords[3];
+    ROI     *tmpCz,*thisROI;
+    DCMPix  *thisPix;
+    
+    // identify Cz and store it in stereotax coords for later computations
+    tmpCz = [self findRoiWithName:@"Cz"];
+    
+    // determine dicom coords from Cz electrode
+    [self getROI:tmpCz fromPix:midlineSlice toDicomCoords:dicomCoords];
+    
+    // create stereotax coord for Cz
+    Cz = [[StereotaxCoord alloc] initWithName:@"Cz"
+                                       withAP:dicomCoords[0]
+                                       withML:dicomCoords[1]
+                                       withDV:dicomCoords[2]    ];
+    
+    // remap coords to orientation
+    [Cz remapWithOrientation:orientation];
+    
+    // Now we have Cz from which we will 
+    
+    indexML = [[orientation objectForKey:@"ML"] intValue];
+    
+    thisROI = [self findRoiWithName:@"Cz"];
+    thisPix = [self findPixWithROI:thisROI];
+    
+    // get the DICOM coords of this ROI
+    [self getROI:thisROI fromPix:thisPix toDicomCoords:dicomCoords];
+    
+    viewerML = [owner duplicateCurrent2DViewerWindow];
+    
+    // reslice DICOM on ML plane
+    [viewerML processReslice: indexML :FALSE];
+    
+    // get best slice to see Cz    
+    bestSlice = [DCMPix nearestSliceInPixelList:[[viewerML imageView] dcmPixList]
+                                withDICOMCoords:dicomCoords
+                                    sliceCoords:sliceCoords                                    ];
+    
+    
+    // View slice with Cz
+    [[viewerML imageView] setIndex: bestSlice];
+    
+    // store this slice for later computations
+    coronalCzSlice = [[viewerML imageView] curDCM];
+    
+    // update screen
+    [viewerML updateImage:self];
+    
+    // make the new viewer key window and bring it to the front
+    [[viewerML window] makeKeyAndOrderFront:self];
+    
+    // give the user 2D point tool
+    [[viewerML imageView] setCurrentTool:t2DPoint];
+    
+    // start a timer to wait for user to place 2 ROIs
+    [NSTimer scheduledTimerWithTimeInterval:2
+                                     target:self
+                                   selector:@selector(watchViewerML:)
+                                   userInfo:nil
+                                    repeats:YES];   
+    
+    DLog(@"%@ at location %f,%f,%f\n",thisROI.name,dicomCoords[0],dicomCoords[1],dicomCoords[2]);
+}
+
+- (void) watchViewerML: (NSTimer *) theTimer
+{
+    float   location[3];
+    ROI     *selectedROI;
+        
+    if ([[[viewerML imageView] curRoiList] count] >= 2) {
+        // we have located 2 ROIs
+        [theTimer invalidate];
+        
+        // get the first ROI and store it in StereotaxCoord object
+        selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:1];
+        [self getROI:selectedROI fromPix:coronalCzSlice toDicomCoords:location];
+        userP1 = [[StereotaxCoord alloc] initWithName:selectedROI.name
+                                               withAP:location[0] 
+                                               withML:location[1] 
+                                               withDV:location[2]            ];
+        
+        // get the second ROI and store it in StereotaxCoord object
+        selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:0];
+        [self getROI:selectedROI fromPix:coronalCzSlice toDicomCoords:location];
+        userP2 = [[StereotaxCoord alloc] initWithName:selectedROI.name
+                                               withAP:location[0] 
+                                               withML:location[1] 
+                                               withDV:location[2]            ];
+        
+        // remap coordinates according to previously calculated orientation        
+        [userP1 remapWithOrientation:orientation];
+        [userP2 remapWithOrientation:orientation];
+        
+        [self traceSkullCzCoronal];
+        
+        ld = [[LineDividerController alloc] initWithViewerController:viewerML];
+        [ld setDistanceDict:coronalElectrodes];
+        [ld divideLine:coronalSkullTrace];
+        
+        // remove the skull trace
+        [self removeSkullTrace:coronalSkullTrace inViewerController:viewerML];
+        
+        // update screen
+        [[viewerML imageView] setNeedsDisplay:YES];
+        
+        // store the stereotax coords of new electrodes
+        [self storeElectrodesWithNames:[coronalElectrodes allKeys]
+                    inViewerController:viewerML                     ];
+        
+        // close the ML slice window
+        [[viewerML window] performClose:self];
+        
+        // delete all existing ROI before we place new ROIs
+        [viewerController roiDeleteAll:self];
+        
+        [self printAllElectrodesInStereotax];
+        
+        [self placeElectrodesInViewerController:viewerController];
+    }
+}
+
+- (void) traceSkullCzCoronal
+{
+    int             i,numIntermediatePoints;
+    int             stepDirML,stepDirDV;
+    int             indexAP,indexML,indexDV;
+    int             thisRoiType,sliceIndex;
+    float           thisAP,thisML,thisDV;
+    float           displacementML,displacementDV;
+    float           stepSizeML,stepSizeDV;
+    float           dicomCoords[3],sliceCoords[3];
+    float           pixelSpacingX,pixelSpacingY;
+    ROI             *thisROI;
+    NSPoint         thisPoint;
+    NSMutableArray  *oPolyPoints;
+    NSMutableArray  *intermediatePoints;
+    
+    DLog(@"%@\n",Cz);
+    DLog(@"%@\n",userP1);
+    DLog(@"%@\n",userP2);
+    
+    intermediatePoints      = [[NSMutableArray alloc] init];
+    
+    indexAP = [[orientation objectForKey:@"AP"] intValue];
+    indexML = [[orientation objectForKey:@"ML"] intValue];
+    indexDV = [[orientation objectForKey:@"DV"] intValue];
+    
+    numIntermediatePoints   = 10;
+    
+    // determine displacement step-size and step direction for ML
+    displacementML          = userP1.ML - Cz.ML;
+    stepSizeML              = displacementML / (numIntermediatePoints - 1);
+    stepDirML               = [[direction objectForKey:@"ML"] intValue];
+    
+    // determine displacement step-size and step direction for DV
+    displacementDV          = userP1.DV - Cz.DV;
+    stepSizeDV              = displacementDV / (numIntermediatePoints - 1);
+    stepDirDV               = [[direction objectForKey:@"DV"] intValue];
+    
+    // AP is going to be constant for this operation
+    thisAP = userP1.AP;
+    dicomCoords[indexAP] = thisAP;
+    
+    // parameters necessary for initializting a new ROI
+    thisRoiType     = t2DPoint;
+    pixelSpacingX   = [coronalCzSlice pixelSpacingX];
+    pixelSpacingY   = [coronalCzSlice pixelSpacingY];
+    
+    sliceIndex = [[[viewerML imageView] dcmPixList] indexOfObject:coronalCzSlice];
+        
+    // first go from userP1 to Cz
+    for (i = 1; i < (numIntermediatePoints - 1); i++) {
+        thisML = userP1.ML - (stepDirML * (stepSizeML * i));
+        thisDV = userP1.DV - (stepDirDV * (stepSizeDV * i));
+        
+        dicomCoords[indexML] = thisML;
+        dicomCoords[indexDV] = thisDV;
+        
+        [coronalCzSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+        
+        // allocate and initialize a new ROI
+        thisROI = [[ROI alloc] initWithType:thisRoiType
+                                           :pixelSpacingX
+                                           :pixelSpacingY
+                                           :NSMakePoint(0.0, 0.0)];
+        
+        // move the ROI to the correct location
+        thisROI.rect = NSOffsetRect(thisROI.rect, sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
+        
+        // give the ROI the correct name
+        thisROI.name = [NSString stringWithFormat:@"i%d",i];
+ 
+        // lower the electrode to the surface of the skull
+        thisPoint = [self extendPoint:thisROI 
+                              inSlice:coronalCzSlice
+                            withDirML:-stepDirML
+                            withDirDV:stepDirDV         ];
+        
+        [intermediatePoints addObject:[MyPoint point:thisPoint]];
+    }
+    
+    oPolyPoints = [NSMutableArray arrayWithArray:intermediatePoints];
+    [intermediatePoints removeAllObjects];
+    
+    // determine displacement step-size and step direction for ML
+    displacementML          = Cz.ML - userP2.ML;
+    stepSizeML              = displacementML / (numIntermediatePoints - 1);
+    stepDirML               = [[direction objectForKey:@"ML"] intValue];
+    
+    // determine displacement step-size and step direction for DV
+    displacementDV          = Cz.DV - userP2.DV;
+    stepSizeDV              = displacementDV / (numIntermediatePoints - 1);
+    stepDirDV               = [[direction objectForKey:@"DV"] intValue];
+    
+    // continue from Cz to userP2
+    for (i = 1; i < (numIntermediatePoints - 1); i++) {
+        thisML = Cz.ML - (stepDirML * (stepSizeML * i));
+        thisDV = Cz.DV - (stepDirDV * (stepSizeDV * i));
+        
+        dicomCoords[indexML] = thisML;
+        dicomCoords[indexDV] = thisDV;
+        
+        [coronalCzSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+        
+        // allocate and initialize a new ROI
+        thisROI = [[ROI alloc] initWithType:thisRoiType
+                                           :pixelSpacingX
+                                           :pixelSpacingY
+                                           :NSMakePoint(0.0, 0.0)];
+        
+        // move the ROI to the correct location
+        thisROI.rect = NSOffsetRect(thisROI.rect, sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
+        
+        // give the ROI the correct name
+        thisROI.name = [NSString stringWithFormat:@"i%d",i];
+       
+         // lower the electrode to the surface of the skull
+        thisPoint = [self extendPoint:thisROI 
+                              inSlice:coronalCzSlice
+                            withDirML:stepDirML
+                            withDirDV:stepDirDV         ];
+        
+        [intermediatePoints addObject:[MyPoint point:thisPoint]];
+    }
+    
+    // add second set of intermediat points to oPolyPoints array
+    [oPolyPoints addObjectsFromArray:intermediatePoints];
+    
+    // put userP1 at beginning of array
+    dicomCoords[indexAP] = userP1.AP;
+    dicomCoords[indexML] = userP1.ML;
+    dicomCoords[indexDV] = userP1.DV;
+    
+    [coronalCzSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+
+    [oPolyPoints insertObject:[MyPoint point:NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY)]
+                      atIndex:0                                                                                         ];
+
+    // put userP2 at end of array
+    dicomCoords[indexAP] = userP2.AP;
+    dicomCoords[indexML] = userP2.ML;
+    dicomCoords[indexDV] = userP2.DV;
+    
+    [coronalCzSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+    
+    [oPolyPoints addObject:[MyPoint point:NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY)]];
+    
+    // allocate and initialize a new 'Open Polygon' ROI
+    thisROI = [[ROI alloc] initWithType:tOPolygon
+                                       :pixelSpacingX
+                                       :pixelSpacingY
+                                       :NSMakePoint(0.0, 0.0)];
+    
+    thisROI.name = [NSString stringWithString:@"coronal skull trace"];
+    
+    // set points for spline
+    [thisROI setPoints:oPolyPoints];
+    
+    // add the new ROI to the correct ROI list
+    [[[[viewerML imageView] dcmRoiList] objectAtIndex:sliceIndex] addObject:thisROI];
+    
+    coronalSkullTrace = thisROI;
+    
+//    [intermediatePoints release];
+//    [oPolyPoints release];
+    
+    // update screen
+    [viewerController updateImage:self];
 }
 
 - (NSPoint) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice
@@ -432,5 +741,310 @@
     return NSMakePoint(thisROI.rect.origin.x, thisROI.rect.origin.y);
 }
 
+- (NSPoint) extendPoint: (ROI *) thisROI
+                inSlice: (DCMPix *) thisSlice
+              withDirML: (int) directionML
+              withDirDV: (int) directionDV
+{
+    int     indexML,indexDV;
+    float   thisMin,thisMean,thisMax;
+    double  pixelSpacingX,pixelSpacingY;
+    float   dicomCoords[3],sliceCoords[3];
+    BOOL    foundScalp,foundSkull;
+    NSPoint roiPosition;
+    NSPoint offsetShift;
+    
+    // initialize values
+    indexML         = [[orientation objectForKey:@"ML"] intValue];
+    indexDV         = [[orientation objectForKey:@"DV"] intValue];
+    foundScalp      = NO;
+    foundSkull      = NO;
+    thisMin         = -1.0;
+    thisMean        = -1.0;
+    thisMax         = -1.0;
+    pixelSpacingX   = [thisSlice pixelSpacingX];
+    pixelSpacingY   = [thisSlice pixelSpacingY];
+    
+    // select this ROI (prerequisite for [ROI roiMove: :] method)
+    [thisROI setROIMode: ROI_selected];
+    
+    if (indexDV == 2) {
+        DLog(@"DV index indicates DV goes across slices... no implementation for this yet\n");
+        return NSMakePoint(0, 0);
+    }
+    
+    // extend till we locate the skull
+    while (!foundSkull) {
+        roiPosition = thisROI.rect.origin;
+        
+        // get DICOM coordinates (in mm)
+        [thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
+        
+        // drop point .01 mm on ML and DV plane
+        dicomCoords[indexML] += (directionML * .01);
+        dicomCoords[indexDV] += (directionDV * .01);
+        
+        // convert back to slice coords
+        [thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+        
+        // determine how coordinates should be shifted
+        offsetShift.x = (sliceCoords[0] / pixelSpacingX) - roiPosition.x;
+        offsetShift.y = (sliceCoords[1] / pixelSpacingY) - roiPosition.y;
+        
+        // shift the ROI
+        [thisROI roiMove:offsetShift :TRUE];
+        
+        // determine current pixel mean
+        [thisSlice computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
+        
+        // detect if we have found the skull
+        if (thisMin < maxSkullValue) {
+            foundSkull = YES;
+        }
+        
+        // be sure we haven't fallen to the bottom of the slice
+        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+            DLog(@"%@ falling off slice!!!\n",thisROI.name);
+            break;
+        }
+    }
+    
+    // extend till we locate the scalp
+    while (!foundScalp) {
+        roiPosition = thisROI.rect.origin;
+        
+        // get DICOM coordinates (in mm)
+        [thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
+        
+        // drop point .1 mm on ML and DV plane
+        dicomCoords[indexML] += (directionML * .01);
+        dicomCoords[indexDV] += (directionDV * .01);
+        
+        // convert back to slice coords
+        [thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+        
+        // determine how coordinates should be shifted
+        offsetShift.x = (sliceCoords[0] / pixelSpacingX) - roiPosition.x;
+        offsetShift.y = (sliceCoords[1] / pixelSpacingY) - roiPosition.y;
+        
+        // shift the ROI
+        [thisROI roiMove:offsetShift :TRUE];
+        
+        // determine current pixel mean
+        [thisSlice computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
+        
+        // detect if we have found the scalp
+        if (thisMax > minScalpValue) {
+            foundScalp = YES;
+        }
+        
+        // be sure we haven't fallen to the bottom of the slice
+        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+            DLog(@"%@ falling off slice!!!\n",thisROI.name);
+            break;
+        }
+    }
+    
+    // now backup until we are back on skull
+    foundSkull = NO;
+    
+    // extend till we locate the skull
+    while (!foundSkull) {
+        roiPosition = thisROI.rect.origin;
+        
+        // get DICOM coordinates (in mm)
+        [thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
+        
+        // drop point .01 mm on ML and DV plane
+        dicomCoords[indexML] -= (directionML * .01);
+        dicomCoords[indexDV] -= (directionDV * .01);
+        
+        // convert back to slice coords
+        [thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
+        
+        // determine how coordinates should be shifted
+        offsetShift.x = (sliceCoords[0] / pixelSpacingX) - roiPosition.x;
+        offsetShift.y = (sliceCoords[1] / pixelSpacingY) - roiPosition.y;
+        
+        // shift the ROI
+        [thisROI roiMove:offsetShift :TRUE];
+        
+        // determine current pixel mean
+        [thisSlice computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
+        
+        // detect if we have found the skull
+        if (thisMin < maxSkullValue) {
+            foundSkull = YES;
+        }
+        
+        // be sure we haven't fallen to the bottom of the slice
+        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+            DLog(@"%@ falling off slice!!!\n",thisROI.name);
+            break;
+        }
+    }
+ 
+    // put this ROI back to sleep
+    [thisROI setROIMode: ROI_sleep];
+    
+    return NSMakePoint(thisROI.rect.origin.x, thisROI.rect.origin.y); 
+}
+
+- (void) storeElectrodesWithNames: (NSArray *) electrodeNames
+               inViewerController: (ViewerController *) vc
+{
+    float           dicomCoords[3];
+    NSString        *thisName;
+    ROI             *thisElectrode;
+    DCMPix          *thisPix;
+    StereotaxCoord  *thisStereotax;
+    
+    for (thisName in electrodeNames) {
+        thisElectrode   = [self findRoiWithName:thisName inViewerController:vc];
+        thisPix         = [self findPixWithROI:thisElectrode inViewerController:vc];
+        
+        // determine the DICOM coordinates for this electrode
+        [self getROI:thisElectrode fromPix:thisPix toDicomCoords:dicomCoords];
+        
+        // convert to stereotax coords
+        thisStereotax = [[StereotaxCoord alloc] initWithName:thisName
+                                                      withAP:dicomCoords[0]
+                                                      withML:dicomCoords[1]
+                                                      withDV:dicomCoords[2] ];
+        
+        // remap with correct orientation
+        [thisStereotax remapWithOrientation:orientation];
+        
+        // store this stereotax coord
+        [allElectrodes setObject:thisStereotax forKey:thisName];
+        [thisStereotax release];
+        
+        [self printAllElectrodesInStereotax];
+    }
+    
+}
+
+- (void) storeElectrodesWithNames: (NSArray *) electrodeNames
+{
+    [self storeElectrodesWithNames:electrodeNames inViewerController:viewerController];
+}
+
+- (ROI *) findRoiWithName: (NSString *) thisName
+       inViewerController: (ViewerController *)vc
+{
+    NSArray *thisRoiList;
+    ROI     *thisROI;
+    
+    for (thisRoiList in [[vc imageView] dcmRoiList]) {
+        for (thisROI in thisRoiList) {
+            if ([thisROI.name isEqualToString:thisName]) {
+                return thisROI;
+            }
+        }
+    }
+    
+    // if we don't find the ROI return nil
+    return nil;
+}
+
+- (ROI *) findRoiWithName: (NSString *) thisName
+{
+    return [self findRoiWithName:thisName inViewerController:viewerController];
+}
+
+- (DCMPix *) findPixWithROI: (ROI *) thisROI
+         inViewerController: (ViewerController *) vc
+{
+    int     thisIndex;
+    NSArray *thisRoiList;
+    
+    thisIndex = -1;
+    
+    for (thisRoiList in [[vc imageView] dcmRoiList]) {
+        if ([thisRoiList containsObject:thisROI]) {
+            thisIndex = [[[vc imageView] dcmRoiList] indexOfObjectIdenticalTo:thisRoiList];
+        }
+    }
+    
+    if (thisIndex == -1) {
+        return nil;
+    }
+    
+    return [[[vc imageView] dcmPixList] objectAtIndex:thisIndex];
+}
+
+- (DCMPix *) findPixWithROI: (ROI *) thisROI
+{
+    return [self findPixWithROI:thisROI inViewerController:viewerController];
+}
+
+- (void) printAllElectrodesInStereotax
+{
+    NSEnumerator    *enumerator;
+    NSString        *key;
+    
+    enumerator = [allElectrodes keyEnumerator];
+    DLog(@"Electrode list\n");
+    DLog(@"==============\n");
+    for (key in enumerator) {
+        DLog(@"%@\n",[allElectrodes objectForKey:key]);
+    }
+    DLog(@"\n\n\n");
+}
+
+- (void) placeElectrodesInViewerController: (ViewerController *) vc
+{
+    int             thisRoiType,bestSlice;
+    float           pixelSpacingX,pixelSpacingY;
+    float           dicomCoords[3],sliceCoords[3];
+    NSEnumerator    *enumerator;
+    NSString        *key;
+    
+    enumerator = [allElectrodes keyEnumerator];
+    
+    // temporary pointers for creating new ROI
+    ROI     *thisROI;
+    
+    // pointer to current DCMPix in OsiriX
+    DCMPix  *thisDCMPix    = [[vc imageView] curDCM];
+    
+    // parameters necessary for initializting a new ROI
+    thisRoiType     = t2DPoint;
+    pixelSpacingX   = [thisDCMPix pixelSpacingX];
+    pixelSpacingY   = [thisDCMPix pixelSpacingY];
+    
+    for (key in enumerator) {
+        StereotaxCoord *thisElectrode = [allElectrodes objectForKey:key];
+        
+        DLog(@"%@\n",thisElectrode);
+        
+        // get DICOM coords which we will convert to slice coords
+        [thisElectrode returnDICOMCoords:dicomCoords withOrientation:orientation];
+        
+        // find nearest slice
+        bestSlice = [DCMPix nearestSliceInPixelList:[[vc imageView] dcmPixList]
+                                    withDICOMCoords:dicomCoords
+                                        sliceCoords:sliceCoords                                    ];
+        
+        // allocate and initialize a new ROI
+        thisROI = [[ROI alloc] initWithType:thisRoiType
+                                           :pixelSpacingX
+                                           :pixelSpacingY
+                                           :NSMakePoint(0.0, 0.0)];
+        
+        // move the ROI to the correct location
+        thisROI.rect = NSOffsetRect(thisROI.rect, sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
+        
+        // give the ROI the correct name
+        thisROI.name = [NSString stringWithString:thisElectrode.name];
+        
+        // add the new ROI to the correct ROI list
+        [[[[vc imageView] dcmRoiList] objectAtIndex:bestSlice] addObject:thisROI];
+        
+        [thisROI release];
+    }
+    // update screen
+    [vc updateImage:self];
+}
 
 @end

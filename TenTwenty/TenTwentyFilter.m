@@ -7,6 +7,7 @@
 //
 
 #import "TenTwentyFilter.h"
+#import "TenTwentyController.h"
 
 @implementation TenTwentyFilter
 
@@ -16,7 +17,8 @@
 
 - (long) filterImage:(NSString*) menuName
 {
-    tenTwenty = [[TenTwentyController alloc] initWithViewerController:viewerController]; 
+    TenTwentyController *tenTwenty;
+    tenTwenty = [[TenTwentyController alloc] initWithOwner:(id *)self]; 
 
     // there should be an ROI named 'nasion' and 'inion'
     [tenTwenty findUserInput];
@@ -29,7 +31,12 @@
         [tenTwenty remapNasionAndInion];
         
         [tenTwenty placeMidlineElectrodes];
+        
+        [tenTwenty resliceCoronalAtCz];
     } else {
+        // failed to locate 'nasion' and 'inion'
+        [tenTwenty release];
+        
         // notify the user through the NSRunAlertPanel        
         NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
                         NSLocalizedString(@"Unable to locate 'nasion' and 'inion'!", nil), 
@@ -37,7 +44,14 @@
         return -1;
     }
     
+    // release ten twenty controller
+    [tenTwenty release];
     return 0;
+}
+
+- (ViewerController *) getViewerController
+{
+    return viewerController;
 }
 
 @end

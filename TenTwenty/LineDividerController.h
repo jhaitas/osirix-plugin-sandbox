@@ -29,7 +29,6 @@
 
 - (void) addIntermediateROIs;
 - (NSMutableArray *) computePercentLength:(ROI *)thisROI;
-
 - (float) measureOPolyLength:(ROI *)thisROI 
             fromPointAtIndex:(long)indexPointA 
               toPointAtIndex:(long)indexPointB;
