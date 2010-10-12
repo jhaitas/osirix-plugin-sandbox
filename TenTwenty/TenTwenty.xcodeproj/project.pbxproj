@@ -11,6 +11,7 @@
 		585B6A39125E5BC400D42896 /* LineDividerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B6A37125E5BC400D42896 /* LineDividerController.m */; };
 		585B6AE4125F662300D42896 /* TenTwentyController.h in Headers */ = {isa = PBXBuildFile; fileRef = 585B6AE2125F662300D42896 /* TenTwentyController.h */; };
 		585B6AE5125F662300D42896 /* TenTwentyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B6AE3125F662300D42896 /* TenTwentyController.m */; };
+		585B740E1264B64F00D42896 /* TenTwentyHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 585B740D1264B64F00D42896 /* TenTwentyHUD.xib */; };
 		5875E335125CE0320026F150 /* StereotaxCoord.h in Headers */ = {isa = PBXBuildFile; fileRef = 5875E333125CE0320026F150 /* StereotaxCoord.h */; };
 		5875E336125CE0320026F150 /* StereotaxCoord.m in Sources */ = {isa = PBXBuildFile; fileRef = 5875E334125CE0320026F150 /* StereotaxCoord.m */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
@@ -38,6 +39,7 @@
 		585B6A37125E5BC400D42896 /* LineDividerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineDividerController.m; sourceTree = "<group>"; };
 		585B6AE2125F662300D42896 /* TenTwentyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TenTwentyController.h; sourceTree = "<group>"; };
 		585B6AE3125F662300D42896 /* TenTwentyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TenTwentyController.m; sourceTree = "<group>"; };
+		585B740D1264B64F00D42896 /* TenTwentyHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TenTwentyHUD.xib; sourceTree = "<group>"; };
 		5875E333125CE0320026F150 /* StereotaxCoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxCoord.h; sourceTree = "<group>"; };
 		5875E334125CE0320026F150 /* StereotaxCoord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxCoord.m; sourceTree = "<group>"; };
 		59C2B9280FF0ED7100B50385 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				585B740D1264B64F00D42896 /* TenTwentyHUD.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 			);
@@ -244,6 +247,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
+				585B740E1264B64F00D42896 /* TenTwentyHUD.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

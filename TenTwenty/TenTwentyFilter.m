@@ -30,9 +30,9 @@
         // remap coordinates per computed orientation
         [tenTwenty remapNasionAndInion];
         
-        [tenTwenty placeMidlineElectrodes];
+//        [tenTwenty placeMidlineElectrodes];
         
-        [tenTwenty resliceCoronalAtCz];
+//        [tenTwenty resliceCoronalAtCz];
     } else {
         // failed to locate 'nasion' and 'inion'
         [tenTwenty release];
@@ -43,9 +43,10 @@
                         nil, nil, nil);
         return -1;
     }
-    
+
+    // *** DO NOT Release the controller or it will not be responsive
     // release ten twenty controller
-    [tenTwenty release];
+//    [tenTwenty release];
     return 0;
 }
 

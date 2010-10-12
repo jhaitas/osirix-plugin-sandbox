@@ -23,6 +23,11 @@
         minScalpValue = 45.0;
         maxSkullValue = 45.0;
         
+        [NSBundle loadNibNamed:@"TenTwentyHUD.nib" owner:self];
+        [minScalpTextField setFloatValue:minScalpValue];
+        [maxSkullTextField setFloatValue:maxSkullValue];
+        
+        
         // allocate and init orientation and direction dictionaries
         orientation = [[NSMutableDictionary alloc] init];
         direction   = [[NSMutableDictionary alloc] init];
@@ -49,6 +54,34 @@
     owner = theOwner;
     viewerController = [owner getViewerController];
     return self;
+}
+
+- (IBAction) placeMidlineElectrodesButtonClick: (id) sender
+{
+    // get values from HUD
+    minScalpValue = [minScalpTextField floatValue];
+    maxSkullValue = [maxSkullTextField floatValue];
+    
+    // lock the text fields
+    [minScalpTextField setEditable:NO];
+    [maxSkullTextField setEditable:NO];
+    
+    // disable the text fields
+    [minScalpTextField setEnabled:NO];
+    [maxSkullTextField setEnabled:NO];
+    
+    
+    // place the electrodes
+    [self placeMidlineElectrodes];
+    
+    // enable 'Place Coronal Electrodes' button
+    [placeCoronalElectrodesButton setEnabled:YES];
+}
+
+- (IBAction) placeCoronalElectrodesButtonClick: (id) sender
+{
+    // coronal reslice at 'Cz' electrode
+    [self resliceCoronalAtCz];
 }
 
 - (void) findUserInput

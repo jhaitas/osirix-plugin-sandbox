@@ -39,12 +39,21 @@
     LineDividerController *ld;
     
     NSMutableDictionary *allElectrodes;
+    
+    IBOutlet NSPanel        *tenTwentyHUDPanel;
+    IBOutlet NSTextField    *minScalpTextField;
+    IBOutlet NSTextField    *maxSkullTextField;
+    IBOutlet NSButton       *placeMidlineElectrodesButton;
+    IBOutlet NSButton       *placeCoronalElectrodesButton;
 }
 
 @property (assign) BOOL foundNasion,foundInion;
 
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
+
+- (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
+- (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
 
 - (void) findUserInput;
 - (void) getROI: (ROI *)    thisROI 
@@ -62,7 +71,8 @@
 - (void) watchViewerML: (NSTimer *) theTimer;
 - (void) traceSkullCzCoronal;
 
-- (NSPoint) lowerElectrode: (ROI *) thisROI inSlice: (DCMPix *) thisSlice;
+- (NSPoint) lowerElectrode: (ROI *) thisROI
+                   inSlice: (DCMPix *) thisSlice;
 - (NSPoint) extendPoint: (ROI *) thisROI
                 inSlice: (DCMPix *) thisSlice
               withDirML: (int) directionML
