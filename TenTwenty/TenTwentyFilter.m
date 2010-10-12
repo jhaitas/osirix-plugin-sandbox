@@ -45,6 +45,8 @@
     }
 
     // *** DO NOT Release the controller or it will not be responsive
+    // FIXME - need a mechanism to know when the TenTwenty plugin is finished ...
+    // ... we can then release this instance
     // release ten twenty controller
 //    [tenTwenty release];
     return 0;

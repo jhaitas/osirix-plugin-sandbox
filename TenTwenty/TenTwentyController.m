@@ -659,8 +659,10 @@
     dicomCoords[indexML] = userP2.ML;
     dicomCoords[indexDV] = userP2.DV;
     
+    // convert DICOM coords to slice coords
     [coronalCzSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
     
+    // add this point to the oPolyPoints array
     [oPolyPoints addObject:[MyPoint point:NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY)]];
     
     // allocate and initialize a new 'Open Polygon' ROI
@@ -677,10 +679,8 @@
     // add the new ROI to the correct ROI list
     [[[[viewerML imageView] dcmRoiList] objectAtIndex:sliceIndex] addObject:thisROI];
     
+    // reference this skull trace so it may be added or removed later
     coronalSkullTrace = thisROI;
-    
-//    [intermediatePoints release];
-//    [oPolyPoints release];
     
     // update screen
     [viewerController updateImage:self];
