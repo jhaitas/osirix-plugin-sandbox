@@ -30,6 +30,7 @@
     
     DCMPix              *midlineSlice;
     DCMPix              *coronalCzSlice;
+    
     ROI                 *midlineSkullTrace;
     ROI                 *coronalSkullTrace;
     
@@ -69,6 +70,7 @@
 
 - (void) resliceCoronalAtCz;
 - (void) watchViewerML: (NSTimer *) theTimer;
+- (void) placeCoronalElectrodes;
 - (void) traceSkullCzCoronal;
 
 - (NSPoint) lowerElectrode: (ROI *) thisROI

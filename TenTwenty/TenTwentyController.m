@@ -58,6 +58,9 @@
 
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender
 {
+    // disable 'Place Midline Electrodes' button
+    [placeMidlineElectrodesButton setEnabled:NO];
+    
     // get values from HUD
     minScalpValue = [minScalpTextField floatValue];
     maxSkullValue = [maxSkullTextField floatValue];
@@ -70,7 +73,6 @@
     [minScalpTextField setEnabled:NO];
     [maxSkullTextField setEnabled:NO];
     
-    
     // place the electrodes
     [self placeMidlineElectrodes];
     
@@ -80,6 +82,9 @@
 
 - (IBAction) placeCoronalElectrodesButtonClick: (id) sender
 {
+    // enable 'Place Coronal Electrodes' button
+    [placeCoronalElectrodesButton setEnabled:NO];
+
     // coronal reslice at 'Cz' electrode
     [self resliceCoronalAtCz];
 }
@@ -407,6 +412,7 @@
     // get the DICOM coords of this ROI
     [self getROI:thisROI fromPix:thisPix toDicomCoords:dicomCoords];
     
+    // create a new viewer window that will display the new slice
     viewerML = [owner duplicateCurrent2DViewerWindow];
     
     // reslice DICOM on ML plane
@@ -472,32 +478,43 @@
         [userP1 remapWithOrientation:orientation];
         [userP2 remapWithOrientation:orientation];
         
-        [self traceSkullCzCoronal];
-        
-        ld = [[LineDividerController alloc] initWithViewerController:viewerML];
-        [ld setDistanceDict:coronalElectrodes];
-        [ld divideLine:coronalSkullTrace];
-        
-        // remove the skull trace
-        [self removeSkullTrace:coronalSkullTrace inViewerController:viewerML];
-        
-        // update screen
-        [[viewerML imageView] setNeedsDisplay:YES];
-        
-        // store the stereotax coords of new electrodes
-        [self storeElectrodesWithNames:[coronalElectrodes allKeys]
-                    inViewerController:viewerML                     ];
-        
-        // close the ML slice window
-        [[viewerML window] performClose:self];
-        
-        // delete all existing ROI before we place new ROIs
-        [viewerController roiDeleteAll:self];
-        
-        [self printAllElectrodesInStereotax];
-        
-        [self placeElectrodesInViewerController:viewerController];
+        [self placeCoronalElectrodes];
     }
+}
+
+- (void) placeCoronalElectrodes
+{
+    // produce the skull trace that will later be 
+    [self traceSkullCzCoronal];
+    
+    ld = [[LineDividerController alloc] initWithViewerController:viewerML];
+    [ld setDistanceDict:coronalElectrodes];
+    [ld divideLine:coronalSkullTrace];
+    
+    // remove the skull trace
+    [self removeSkullTrace:coronalSkullTrace inViewerController:viewerML];
+    
+    // update screen
+    [[viewerML imageView] setNeedsDisplay:YES];
+    
+    // store the stereotax coords of new electrodes
+    [self storeElectrodesWithNames:[coronalElectrodes allKeys]
+                inViewerController:viewerML                     ];
+    
+    // close the ML slice window
+    [[viewerML window] performClose:self];
+    
+    // delete all existing ROI before we place new ROIs
+    [viewerController roiDeleteAll:self];
+    
+    // this is here for debugging purposes right now
+    [self printAllElectrodesInStereotax];
+    
+    // place electrodes in viewer
+    [self placeElectrodesInViewerController:viewerController];
+    
+    // we no longer need Ten Twenty HUD ... close it
+    [tenTwentyHUDPanel performClose:self];
 }
 
 - (void) traceSkullCzCoronal
