@@ -17,7 +17,6 @@
 
 - (long) filterImage:(NSString*) menuName
 {
-    TenTwentyController *tenTwenty;
     tenTwenty = [[TenTwentyController alloc] initWithOwner:(id *)self]; 
 
     // there should be an ROI named 'nasion' and 'inion'
@@ -29,10 +28,6 @@
         
         // remap coordinates per computed orientation
         [tenTwenty remapNasionAndInion];
-        
-//        [tenTwenty placeMidlineElectrodes];
-        
-//        [tenTwenty resliceCoronalAtCz];
     } else {
         // failed to locate 'nasion' and 'inion'
         [tenTwenty release];
@@ -43,12 +38,6 @@
                         nil, nil, nil);
         return -1;
     }
-
-    // *** DO NOT Release the controller or it will not be responsive
-    // FIXME - need a mechanism to know when the TenTwenty plugin is finished ...
-    // ... we can then release this instance
-    // release ten twenty controller
-//    [tenTwenty release];
     return 0;
 }
 

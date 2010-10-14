@@ -32,6 +32,12 @@
 	return self;
 }
 
+- (id) initWithName: (NSString *) inName
+    withDicomCoords: (float *) dicomCoords
+{
+    return [self initWithName:inName withAP:dicomCoords[0] withML:dicomCoords[1] withDV:dicomCoords[2]];
+}
+
 - (StereotaxCoord *) copy
 {
 	return [[StereotaxCoord alloc] initWithName:[NSString stringWithString:name]

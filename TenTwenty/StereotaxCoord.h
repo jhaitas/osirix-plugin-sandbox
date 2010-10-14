@@ -23,6 +23,9 @@
 			 withML: (float)        inML
 			 withDV: (float)        inDV;
 
+- (id) initWithName: (NSString *) inName
+    withDicomCoords: (float *) dicomCoords;
+
 - (StereotaxCoord *) copy;
 
 

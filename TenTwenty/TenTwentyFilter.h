@@ -8,9 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import "PluginFilter.h"
-#import "TenTwentyController.h"
 
+@class TenTwentyController;
 @interface TenTwentyFilter : PluginFilter {
+    TenTwentyController *tenTwenty;
 }
 
 - (long) filterImage:(NSString*) menuName;

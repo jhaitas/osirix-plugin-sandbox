@@ -30,7 +30,7 @@
 - (void) findUserInput;
 - (void) getROI: (ROI *)    thisROI 
         fromPix: (DCMPix *) thisPix 
-       toCoords: (double *) location;
+       toCoords: (float *) location;
 
 
 - (void) getUserM1andM2;

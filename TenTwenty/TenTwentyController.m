@@ -92,7 +92,7 @@
 - (void) findUserInput
 {
     int     i,ii;
-    float  location[3];
+    float   location[3];
     ROI     *selectedROI;    
     
     NSArray *pixList;
@@ -114,9 +114,7 @@
             if ([selectedROI.name isEqualToString:@"nasion"]) {
                 [self getROI:selectedROI fromPix:thisPix toDicomCoords:location];
                 nasion = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                                       withAP:location[0] 
-                                                       withML:location[1] 
-                                                       withDV:location[2]            ];
+                                                       withDicomCoords:location ];
                 foundNasion = YES;
                 
                 // FIXME ... need to verify this
@@ -126,9 +124,7 @@
             if ([selectedROI.name isEqualToString:@"inion"]) {
                 [self getROI:selectedROI fromPix:thisPix toDicomCoords:location];
                 inion = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                                      withAP:location[0] 
-                                                      withML:location[1] 
-                                                      withDV:location[2]            ];
+                                             withDicomCoords:location ];
                 foundInion = YES;
             }
         }
@@ -395,9 +391,7 @@
     
     // create stereotax coord for Cz
     Cz = [[StereotaxCoord alloc] initWithName:@"Cz"
-                                       withAP:dicomCoords[0]
-                                       withML:dicomCoords[1]
-                                       withDV:dicomCoords[2]    ];
+                              withDicomCoords:dicomCoords ];
     
     // remap coords to orientation
     [Cz remapWithOrientation:orientation];
@@ -416,7 +410,7 @@
     viewerML = [owner duplicateCurrent2DViewerWindow];
     
     // reslice DICOM on ML plane
-    [viewerML processReslice: indexML :FALSE];
+    [viewerML processReslice: indexML :NO];
     
     // get best slice to see Cz    
     bestSlice = [DCMPix nearestSliceInPixelList:[[viewerML imageView] dcmPixList]
@@ -462,17 +456,13 @@
         selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:1];
         [self getROI:selectedROI fromPix:coronalCzSlice toDicomCoords:location];
         userP1 = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                               withAP:location[0] 
-                                               withML:location[1] 
-                                               withDV:location[2]            ];
+                                      withDicomCoords:location          ];
         
         // get the second ROI and store it in StereotaxCoord object
         selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:0];
         [self getROI:selectedROI fromPix:coronalCzSlice toDicomCoords:location];
         userP2 = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                               withAP:location[0] 
-                                               withML:location[1] 
-                                               withDV:location[2]            ];
+                                      withDicomCoords:location          ];
         
         // remap coordinates according to previously calculated orientation        
         [userP1 remapWithOrientation:orientation];
@@ -958,9 +948,7 @@
         
         // convert to stereotax coords
         thisStereotax = [[StereotaxCoord alloc] initWithName:thisName
-                                                      withAP:dicomCoords[0]
-                                                      withML:dicomCoords[1]
-                                                      withDV:dicomCoords[2] ];
+                                             withDicomCoords:dicomCoords ];
         
         // remap with correct orientation
         [thisStereotax remapWithOrientation:orientation];

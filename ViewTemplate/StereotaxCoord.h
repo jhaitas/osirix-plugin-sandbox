@@ -8,7 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 @interface StereotaxCoord : NSObject {
 	NSString	*name;
 	float		AP,ML,DV;
@@ -23,6 +22,9 @@
 			 withAP: (float)        inAP 
 			 withML: (float)        inML
 			 withDV: (float)        inDV;
+
+- (id) initWithName: (NSString *) inName
+    withDicomCoords: (float *) dicomCoords;
 
 - (StereotaxCoord *) copy;
 

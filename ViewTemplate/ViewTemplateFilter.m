@@ -58,7 +58,7 @@
 - (void) findUserInput
 {
     int     i,ii;
-    double  location[3];
+    float   location[3];
     ROI     *selectedROI;    
     
     NSArray *pixList;
@@ -80,18 +80,14 @@
             if ([selectedROI.name isEqualToString:@"nasion"]) {
                 [self getROI:selectedROI fromPix:thisPix toCoords:location];
                 nasion = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                                       withAP:location[0] 
-                                                       withML:location[1] 
-                                                       withDV:location[2]            ];
+                                              withDicomCoords:location          ];
                 foundNasion = TRUE;
             }
             // check if this ROI is named 'inion'
             if ([selectedROI.name isEqualToString:@"inion"]) {
                 [self getROI:selectedROI fromPix:thisPix toCoords:location];
                 inion = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                                      withAP:location[0] 
-                                                      withML:location[1] 
-                                                      withDV:location[2]            ];
+                                             withDicomCoords:location          ];
                 foundInion = TRUE;
             }
         }
@@ -99,7 +95,7 @@
 }
 
 
-- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location
+- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(float *) location
 {                
     NSMutableArray *roiPoints = [ thisROI points ];
     NSPoint roiCenterPoint;
@@ -113,9 +109,9 @@
     }
     
     // convert pixel values to mm values
-    [thisPix convertPixDoubleX:roiCenterPoint.x
-                          pixY:roiCenterPoint.y
-                 toDICOMCoords:location            ];
+    [thisPix convertPixX:roiCenterPoint.x
+                    pixY:roiCenterPoint.y
+                 toDICOMCoords:location     ];
     DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
 }
 
@@ -176,7 +172,7 @@
 
 - (void) watchViewerML: (NSTimer *) theTimer
 {
-    double  location[3];
+    float  location[3];
     DCMPix  *thisPix;
     ROI     *selectedROI;
     
@@ -190,17 +186,13 @@
         selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:0];
         [self getROI:selectedROI fromPix:thisPix toCoords:location];
         userM1 = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                               withAP:location[0] 
-                                               withML:location[1] 
-                                               withDV:location[2]            ];
+                                      withDicomCoords:location          ];
         
         // get the second ROI and store it in StereotaxCoord object
         selectedROI = [[[viewerML imageView] curRoiList] objectAtIndex:1];
         [self getROI:selectedROI fromPix:thisPix toCoords:location];
         userM2 = [[StereotaxCoord alloc] initWithName:selectedROI.name
-                                               withAP:location[0] 
-                                               withML:location[1] 
-                                               withDV:location[2]            ];
+                                      withDicomCoords:location          ];
         
         // remap coordinates according to previously calculated orientation        
         [userM1 remapWithOrientation:myTenTwenty.orientation];

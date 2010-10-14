@@ -32,6 +32,12 @@
 	return self;
 }
 
+- (id) initWithName: (NSString *) inName
+    withDicomCoords: (float *) dicomCoords
+{
+    return [self initWithName:inName withAP:dicomCoords[0] withML:dicomCoords[1] withDV:dicomCoords[2]];
+}
+
 - (StereotaxCoord *) copy
 {
 	return [[StereotaxCoord alloc] initWithName:[NSString stringWithString:name]
@@ -106,7 +112,7 @@
 
 -(NSString *)description
 {
-	return [NSString stringWithFormat:@"%@\tAP: %0.3fmm\tML: %0.3fmm\tDV: %0.3fmm",name,AP,ML,DV];
+	return [NSString stringWithFormat:@"%@%*s\tAP: %0.3fmm\tML: %0.3fmm\tDV: %0.3fmm",name,8," ",AP,ML,DV];
 }
 
 @end
