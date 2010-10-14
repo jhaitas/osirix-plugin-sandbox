@@ -14,7 +14,7 @@
 
 #define FBOX(x) [NSNumber numberWithFloat:x]
 
-@interface TenTwentyController : NSObject {
+@interface TenTwentyController : NSWindowController {
     id owner;
     
     ViewerController    *viewerController;
@@ -37,13 +37,14 @@
     NSDictionary        *midlineElectrodes;
     NSDictionary        *coronalElectrodes;
     
-    LineDividerController *ld;
-    
     NSMutableDictionary *allElectrodes;
+    
+    LineDividerController *ld;
     
     IBOutlet NSPanel        *tenTwentyHUDPanel;
     IBOutlet NSTextField    *minScalpTextField;
     IBOutlet NSTextField    *maxSkullTextField;
+    IBOutlet NSButton       *identifyNasionAndInionButton;
     IBOutlet NSButton       *placeMidlineElectrodesButton;
     IBOutlet NSButton       *placeCoronalElectrodesButton;
 }
@@ -53,6 +54,7 @@
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
 
+- (IBAction) identifyNasionAndInionButtonClick: (id) sender;
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
 - (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
 

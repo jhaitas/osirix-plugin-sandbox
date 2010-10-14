@@ -56,6 +56,32 @@
     return self;
 }
 
+- (IBAction) identifyNasionAndInionButtonClick: (id) sender
+{
+    // there should be an ROI named 'nasion' and 'inion'
+    [self findUserInput];
+    
+    // check if 'nasion' and 'inion' were found
+    if (foundNasion && foundInion) {        
+        [self computeOrientation];
+        
+        // remap coordinates per computed orientation
+        [self remapNasionAndInion];
+        
+        // disable this button
+        [identifyNasionAndInionButton setEnabled:NO];
+        
+        // enable next button in sequence
+        [placeMidlineElectrodesButton setEnabled:YES];
+    } else {
+        // failed to locate 'nasion' and 'inion'
+        // notify the user through the NSRunAlertPanel        
+        NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
+                        NSLocalizedString(@"Unable to locate 'nasion' and 'inion'!", nil), 
+                        nil, nil, nil);
+    }
+}
+
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender
 {
     // disable 'Place Midline Electrodes' button
@@ -260,7 +286,10 @@
 }
 
 - (void) placeMidlineElectrodes
-{    
+{
+    // set the current image to the midline slice image
+    [[viewerController imageView] setIndex:[[[viewerController imageView] dcmPixList] indexOfObjectIdenticalTo:midlineSlice]];
+    
     // trace the skull from 'nasion' to 'inion'
     [self traceSkullMidline];
     
@@ -268,6 +297,7 @@
     [ld setDistanceDict:midlineElectrodes];
     [ld divideLine:midlineSkullTrace];
     
+    // store the electrodes
     [self storeElectrodesWithNames:[midlineElectrodes allKeys]];
     
     // remove the skull trace
