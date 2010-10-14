@@ -98,6 +98,8 @@
          inViewerController: (ViewerController *) vc;
 - (DCMPix *) findPixWithROI: (ROI *) thisROI;
 
+- (BOOL) isPoint: (NSPoint) thePoint onSlice: (DCMPix *) thisPix;
+
 - (void) printAllElectrodesInStereotax;
 - (void) placeElectrodesInViewerController: (ViewerController *) vc;
 

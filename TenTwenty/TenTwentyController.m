@@ -385,6 +385,7 @@
     // add the new ROI to the correct ROI list
     [[[[viewerController imageView] dcmRoiList] objectAtIndex:sliceIndex] addObject:thisROI];
     
+    // store the midline skull trace for future reference
     midlineSkullTrace = thisROI;
     
     // update screen
@@ -445,7 +446,7 @@
     // get best slice to see Cz    
     bestSlice = [DCMPix nearestSliceInPixelList:[[viewerML imageView] dcmPixList]
                                 withDICOMCoords:dicomCoords
-                                    sliceCoords:sliceCoords                                    ];
+                                    sliceCoords:sliceCoords                         ];
     
     
     // View slice with Cz
@@ -527,9 +528,6 @@
     // delete all existing ROI before we place new ROIs
     [viewerController roiDeleteAll:self];
     
-    // this is here for debugging purposes right now
-    [self printAllElectrodesInStereotax];
-    
     // place electrodes in viewer
     [self placeElectrodesInViewerController:viewerController];
     
@@ -541,6 +539,7 @@
 {
     int             i,numIntermediatePoints;
     int             stepDirML,stepDirDV;
+    int             expandDirML,expandDirDV;
     int             indexAP,indexML,indexDV;
     int             thisRoiType,sliceIndex;
     float           thisAP,thisML,thisDV;
@@ -588,8 +587,8 @@
         
     // first go from userP1 to Cz
     for (i = 1; i < (numIntermediatePoints - 1); i++) {
-        thisML = userP1.ML - (stepDirML * (stepSizeML * i));
-        thisDV = userP1.DV - (stepDirDV * (stepSizeDV * i));
+        thisML = userP1.ML - (stepSizeML * i);
+        thisDV = userP1.DV - (stepSizeDV * i);
         
         dicomCoords[indexML] = thisML;
         dicomCoords[indexDV] = thisDV;
@@ -608,12 +607,16 @@
         // give the ROI the correct name
         thisROI.name = [NSString stringWithFormat:@"i%d",i];
  
+        // logic to identify direction of expansion
+        expandDirML = stepSizeML > 0 ? 1 : -1;
+        expandDirDV = stepSizeDV > 0 ? -1 : 1;
+        
         // lower the electrode to the surface of the skull
         thisPoint = [self extendPoint:thisROI 
                               inSlice:coronalCzSlice
-                            withDirML:-stepDirML
-                            withDirDV:stepDirDV         ];
-        
+                            withDirML:expandDirML
+                            withDirDV:expandDirDV       ];
+ 
         [intermediatePoints addObject:[MyPoint point:thisPoint]];
     }
     
@@ -632,8 +635,8 @@
     
     // continue from Cz to userP2
     for (i = 1; i < (numIntermediatePoints - 1); i++) {
-        thisML = Cz.ML - (stepDirML * (stepSizeML * i));
-        thisDV = Cz.DV - (stepDirDV * (stepSizeDV * i));
+        thisML = Cz.ML - (stepSizeML * i);
+        thisDV = Cz.DV - (stepSizeDV * i);
         
         dicomCoords[indexML] = thisML;
         dicomCoords[indexDV] = thisDV;
@@ -651,13 +654,17 @@
         
         // give the ROI the correct name
         thisROI.name = [NSString stringWithFormat:@"i%d",i];
-       
+                
+        // logic to identify direction of expansion
+        expandDirML = stepSizeML > 0 ? -1 : 1;
+        expandDirDV = stepSizeDV > 0 ? 1 : -1;
+        
          // lower the electrode to the surface of the skull
         thisPoint = [self extendPoint:thisROI 
                               inSlice:coronalCzSlice
-                            withDirML:stepDirML
-                            withDirDV:stepDirDV         ];
-        
+                            withDirML:expandDirML
+                            withDirDV:expandDirDV       ];
+ 
         [intermediatePoints addObject:[MyPoint point:thisPoint]];
     }
     
@@ -764,7 +771,7 @@
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+        if (![self isPoint:thisROI.rect.origin onSlice:thisSlice]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
@@ -799,7 +806,7 @@
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+        if (![self isPoint:thisROI.rect.origin onSlice:thisSlice]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
@@ -823,6 +830,9 @@
     BOOL    foundScalp,foundSkull;
     NSPoint roiPosition;
     NSPoint offsetShift;
+    
+    DLog(@"directionML = %d\n",directionML);
+    DLog(@"directionDV = %d\n",directionDV);
     
     // initialize values
     indexML         = [[orientation objectForKey:@"ML"] intValue];
@@ -873,7 +883,7 @@
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+        if (![self isPoint:thisROI.rect.origin onSlice:thisSlice]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
@@ -909,7 +919,7 @@
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+        if (![self isPoint:thisROI.rect.origin onSlice:thisSlice]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
@@ -948,7 +958,7 @@
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (!(thisROI.rect.origin.x >= 0) || !(thisROI.rect.origin.y >= 0)) {
+        if (![self isPoint:thisROI.rect.origin onSlice:thisSlice]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
@@ -986,10 +996,10 @@
         // store this stereotax coord
         [allElectrodes setObject:thisStereotax forKey:thisName];
         [thisStereotax release];
-        
-        [self printAllElectrodesInStereotax];
     }
     
+    // print list of all electrodes with stereotax coords
+    [self printAllElectrodesInStereotax];
 }
 
 - (void) storeElectrodesWithNames: (NSArray *) electrodeNames
@@ -1044,6 +1054,14 @@
 - (DCMPix *) findPixWithROI: (ROI *) thisROI
 {
     return [self findPixWithROI:thisROI inViewerController:viewerController];
+}
+
+- (BOOL) isPoint: (NSPoint) thePoint onSlice: (DCMPix *) thisPix
+{
+    if (thePoint.x >= 0 && thePoint.y >= 0 && thePoint.x < thisPix.pwidth && thePoint.y < thisPix.pheight) {
+        return YES;
+    }
+    return NO;
 }
 
 - (void) printAllElectrodesInStereotax
