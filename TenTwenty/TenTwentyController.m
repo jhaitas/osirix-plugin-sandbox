@@ -185,7 +185,7 @@
 {
     int             i,firstIndex,secondIndex;
     int             indexAP,indexML,indexDV;
-    double          thisDouble,firstDouble,secondDouble;
+    float          thisFloat,firstFloat,secondFloat;
     int             dir[3];
     NSNumber        *diffAP,*diffML,*diffDV;
     NSMutableArray  *diff;
@@ -197,9 +197,9 @@
     
     // set directions based on difference between nasion and inion ...
     // ... ML is assumed to be zero and will be given a direction of 1
-    dir[0]  = ([diffAP doubleValue] >= 0 ? 1 : -1);
-    dir[1]  = ([diffML doubleValue] >= 0 ? 1 : -1);
-    dir[2]  = ([diffDV doubleValue] >= 0 ? 1 : -1);
+    dir[0]  = ([diffAP floatValue] >= 0 ? 1 : -1);
+    dir[1]  = ([diffML floatValue] >= 0 ? 1 : -1);
+    dir[2]  = ([diffDV floatValue] >= 0 ? 1 : -1);
     
     diff    = [[NSMutableArray alloc] initWithObjects:diffAP,diffML,diffDV,nil];
     
@@ -217,8 +217,8 @@
     // first we identify and eliminate ML ...
     // ... there should be only one plane with no difference
     for (i = 0; i < [diff count]; i++) {
-        thisDouble = [[diff objectAtIndex:i] doubleValue];
-        if (thisDouble == 0.0) {
+        thisFloat = [[diff objectAtIndex:i] floatValue];
+        if (thisFloat == 0.0) {
             // found ML ... store its index
             indexML = i;
         }
@@ -233,8 +233,8 @@
     // initialize values that won't be acceptable after the following routine
     firstIndex      = -1;
     secondIndex     = -1;
-    firstDouble     = 0.0;
-    secondDouble    = 0.0;
+    firstFloat     = 0.0;
+    secondFloat    = 0.0;
     
     // now find which magnitude is greater between remaining diffs
     // [diff count] should equal 3
@@ -242,7 +242,7 @@
     for (i = 0; i < ([diff count] - 1); i++) {
         // ignore item identified as ML
         if (i == indexML) continue;
-        firstDouble = [[diff objectAtIndex:i] doubleValue];
+        firstFloat = [[diff objectAtIndex:i] floatValue];
         firstIndex = i;
     }
     
@@ -250,7 +250,7 @@
     for (i = firstIndex + 1; i < [diff count]; i++) {
         // ignore item identified as ML
         if (i == indexML) continue;
-        secondDouble = [[diff objectAtIndex:i] doubleValue];
+        secondFloat = [[diff objectAtIndex:i] floatValue];
         secondIndex = i;
     }
     
@@ -258,7 +258,7 @@
     [diff release];
     
     // set appropriate indices based on magnitude comparison
-    if (fabs(firstDouble) > fabs(secondDouble)) {
+    if (fabs(firstFloat) > fabs(secondFloat)) {
         indexAP = firstIndex;
         indexDV = secondIndex;
     } else {
@@ -538,7 +538,6 @@
 - (void) traceSkullCzCoronal
 {
     int             i,numIntermediatePoints;
-    int             stepDirML,stepDirDV;
     int             expandDirML,expandDirDV;
     int             indexAP,indexML,indexDV;
     int             thisRoiType,sliceIndex;
@@ -564,15 +563,13 @@
     
     numIntermediatePoints   = 10;
     
-    // determine displacement step-size and step direction for ML
+    // determine displacement and step-size for ML
     displacementML          = userP1.ML - Cz.ML;
     stepSizeML              = displacementML / (numIntermediatePoints - 1);
-    stepDirML               = [[direction objectForKey:@"ML"] intValue];
     
-    // determine displacement step-size and step direction for DV
+    // determine displacement and step-size for DV
     displacementDV          = userP1.DV - Cz.DV;
     stepSizeDV              = displacementDV / (numIntermediatePoints - 1);
-    stepDirDV               = [[direction objectForKey:@"DV"] intValue];
     
     // AP is going to be constant for this operation
     thisAP = userP1.AP;
@@ -623,15 +620,13 @@
     oPolyPoints = [NSMutableArray arrayWithArray:intermediatePoints];
     [intermediatePoints removeAllObjects];
     
-    // determine displacement step-size and step direction for ML
+    // determine displacement and step-size for ML
     displacementML          = Cz.ML - userP2.ML;
     stepSizeML              = displacementML / (numIntermediatePoints - 1);
-    stepDirML               = [[direction objectForKey:@"ML"] intValue];
     
-    // determine displacement step-size and step direction for DV
+    // determine displacement and step-size for DV
     displacementDV          = Cz.DV - userP2.DV;
     stepSizeDV              = displacementDV / (numIntermediatePoints - 1);
-    stepDirDV               = [[direction objectForKey:@"DV"] intValue];
     
     // continue from Cz to userP2
     for (i = 1; i < (numIntermediatePoints - 1); i++) {

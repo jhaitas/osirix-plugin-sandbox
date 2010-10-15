@@ -49,7 +49,7 @@
 // method for remapping coordinates after orientation has been determined
 - (void) remapWithOrientation: (NSMutableDictionary *) theOrientation
 {
-	double tmpAP,tmpML,tmpDV;
+	float tmpAP,tmpML,tmpDV;
 	
 	tmpAP = AP;
 	tmpML = ML;

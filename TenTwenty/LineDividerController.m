@@ -187,7 +187,7 @@
 
 
 
-- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(double *) location
+- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(float *) location
 {                
     NSMutableArray *roiPoints = [ thisROI points ];
     NSPoint roiCenterPoint;
@@ -201,9 +201,10 @@
     }
     
     // convert pixel values to mm values
-    [thisPix convertPixDoubleX:roiCenterPoint.x
-                          pixY:roiCenterPoint.y
-                 toDICOMCoords:location            ];
+    [thisPix convertPixX:roiCenterPoint.x
+                    pixY:roiCenterPoint.y
+           toDICOMCoords:location           ];
+    
     DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
 }
 
