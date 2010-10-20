@@ -3,7 +3,7 @@
 
   Copyright (c) OsiriX Team
   All rights reserved.
-  Distributed under GNU - GPL
+  Distributed under GNU - LGPL
   
   See http://www.osirix-viewer.com/copyright.html for details.
 
@@ -263,7 +263,7 @@ typedef enum {DCMViewTextAlignLeft, DCMViewTextAlignCenter, DCMViewTextAlignRigh
 	GLuint			iChatCursorTextureName;
 	NSSize			iChatCursorImageSize;
 	NSPoint			iChatCursorHotSpot;
-	
+	BOOL			iChatDrawing;
 	GLuint			iChatFontListGL;
 	NSFont			*iChatFontGL;
 	long			iChatFontListGLSize[ 256];
@@ -327,9 +327,11 @@ typedef enum {DCMViewTextAlignLeft, DCMViewTextAlignCenter, DCMViewTextAlignRigh
 @property BOOL volumicSeries;
 @property(readonly) BOOL isKeyView, mouseDragging;
 
++ (BOOL) noPropagateSettingsInSeriesForModality: (NSString*) m;
++ (void) purgeStringTextureCache;
 + (void) setDefaults;
 + (void) setCLUTBARS:(int) c ANNOTATIONS:(int) a;
-+ (void)setPluginOverridesMouse: (BOOL)override;
++ (void)setPluginOverridesMouse: (BOOL)override DEPRECATED_ATTRIBUTE;
 + (void) computePETBlendingCLUT;
 + (NSString*) findWLWWPreset: (float) wl :(float) ww :(DCMPix*) pix;
 + (NSSize)sizeOfString:(NSString *)string forFont:(NSFont *)font;
@@ -338,6 +340,8 @@ typedef enum {DCMViewTextAlignLeft, DCMViewTextAlignCenter, DCMViewTextAlignRigh
 + (float) Magnitude:( NSPoint) Point1 :(NSPoint) Point2;
 + (int) DistancePointLine: (NSPoint) Point :(NSPoint) startPoint :(NSPoint) endPoint :(float*) Distance;
 + (float) pbase_Plane: (float*) point :(float*) planeOrigin :(float*) planeVector :(float*) pointProjection;
++ (short)syncro;
++ (void)setSyncro:(short) s;
 - (BOOL) softwareInterpolation;
 - (void) applyImageTransformation;
 - (void) initFont;
@@ -384,6 +388,7 @@ typedef enum {DCMViewTextAlignLeft, DCMViewTextAlignCenter, DCMViewTextAlignRigh
 - (void) setIndex:(short) index;
 - (void) setIndexWithReset:(short) index :(BOOL)sizeToFit;
 - (void) setDCM:(NSMutableArray*) c :(NSArray*)d :(NSMutableArray*)e :(short) firstImage :(char) type :(BOOL) reset;
+- (void) setPixels: (NSMutableArray*) pixels files: (NSArray*) files rois: (NSMutableArray*) rois firstImage: (short) firstImage level: (char) level reset: (BOOL) reset;
 - (void) sendSyncMessage:(short) inc;
 - (void) loadTextures;
 - (void)loadTexturesCompute;
@@ -400,6 +405,7 @@ typedef enum {DCMViewTextAlignLeft, DCMViewTextAlignCenter, DCMViewTextAlignRigh
 - (void) setBlendingFactor:(float) f;
 - (void) sliderAction:(id) sender;
 - (void) roiSet;
+- (void) sync3DPosition;
 - (void) roiSet:(ROI*) aRoi;
 - (void) colorTables:(unsigned char **) a :(unsigned char **) r :(unsigned char **)g :(unsigned char **) b;
 - (void) blendingColorTables:(unsigned char **) a :(unsigned char **) r :(unsigned char **)g :(unsigned char **) b;
@@ -473,6 +479,7 @@ typedef enum {DCMViewTextAlignLeft, DCMViewTextAlignCenter, DCMViewTextAlignRigh
 - (void) roiLoadFromFilesArray: (NSArray*) filenames;
 - (id)windowController;
 - (BOOL)is2DViewer;
+- (void) setCOPYSETTINGSINSERIESdirectly: (BOOL) b;
 -(BOOL)actionForHotKey:(NSString *)hotKey;
 +(NSDictionary*) hotKeyDictionary;
 +(NSDictionary*) hotKeyModifiersDictionary;

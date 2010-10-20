@@ -15,24 +15,24 @@
 
 
 
-#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 
-/** \brief Wrapper for NSPoint */
 
-@interface MyPoint : NSObject<NSCoding> {
-	NSPoint pt;
+@interface OpacityTransferView : NSView
+{
+
+	IBOutlet		NSTextField *position;
+	
+	NSMutableArray  *points;
+	
+	NSInteger		curIndex;
+	
+	unsigned char   red[256], green[256], blue[256];
 }
 
-@property(assign) NSPoint point;
-@property(readonly) float x, y;
-
-+ (MyPoint*)point:(NSPoint)a;
-- (id)initWithPoint:(NSPoint)a;
-
-- (void)setPoint:(NSPoint)a;
-- (void)move:(float)x :(float)y;
-
-- (BOOL)isEqualToPoint:(NSPoint)a;
-- (BOOL)isNearToPoint:(NSPoint)a :(float)scale :(float)ratio;
-
+- (NSMutableArray*) getPoints;
+- (void) setCurrentCLUT :( unsigned char*) r : (unsigned char*) g : (unsigned char*) b;
+- (IBAction) renderButton:(id) sender;
++ (NSData*) tableWith256Entries: (NSArray*) pointsArray;
++ (NSData*) tableWith4096Entries: (NSArray*) pointsArray;
 @end

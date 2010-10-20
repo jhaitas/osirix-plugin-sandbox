@@ -3,7 +3,7 @@
 
   Copyright (c) OsiriX Team
   All rights reserved.
-  Distributed under GNU - GPL
+  Distributed under GNU - LGPL
   
   See http://www.osirix-viewer.com/copyright.html for details.
 
@@ -15,7 +15,6 @@
 
 
 #import <Cocoa/Cocoa.h>
-
 #import "DCMPix.h"				// An object containing an image, including pixels values
 #import "ViewerController.h"	// An object representing a 2D Viewer window
 #import "DCMView.h"				// An object representing the 2D pane, contained in a 2D Viewer window
@@ -26,7 +25,7 @@
 /** \brief Base class for plugins */
 @interface PluginFilter : NSObject
 {
-	ViewerController*   viewerController;   // Current (frontmost and active) 2D viewer containing an image serie
+	ViewerController* viewerController;   // Current (frontmost and active) 2D viewer containing an image serie
 }
 
 + (PluginFilter *)filter;
@@ -75,3 +74,10 @@
 /** PRIVATE FUNCTIONS - DON'T SUBCLASS OR MODIFY */
 - (long) prepareFilter:(ViewerController*) vC;
 @end
+
+@interface PluginFilter (Optional)
+
+/** Called to pass the plugin all sorts of events sent to a DCMView.  */
+-(BOOL)handleEvent:(NSEvent*)event forViewer:(id)controller;
+
+@end;

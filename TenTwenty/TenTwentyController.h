@@ -8,6 +8,11 @@
 
 #import <Cocoa/Cocoa.h>
 #import "PluginFilter.h"
+
+// @class directive is insufficient for our needs ...
+// ... MPRHeaders.h contains imports needed for MPR
+#import "MPRHeaders.h"
+
 #import "TenTwentyFilter.h"
 #import "LineDividerController.h"
 #import "StereotaxCoord.h"
@@ -41,12 +46,16 @@
     
     LineDividerController *ld;
     
+    MPRController       *mprViewer;
+    
+    // HUD Outlets
     IBOutlet NSPanel        *tenTwentyHUDPanel;
     IBOutlet NSTextField    *minScalpTextField;
     IBOutlet NSTextField    *maxSkullTextField;
     IBOutlet NSButton       *identifyNasionAndInionButton;
     IBOutlet NSButton       *placeMidlineElectrodesButton;
     IBOutlet NSButton       *placeCoronalElectrodesButton;
+    IBOutlet NSButton       *openMPRViewerButton;
 }
 
 @property (assign) BOOL foundNasion,foundInion;
@@ -54,9 +63,11 @@
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
 
+// HUD Actions
 - (IBAction) identifyNasionAndInionButtonClick: (id) sender;
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
 - (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
+- (IBAction) openMPRViewerButtonClick: (id) sender;
 
 - (void) findUserInput;
 - (void) getROI: (ROI *)    thisROI 

@@ -115,6 +115,14 @@
     [self resliceCoronalAtCz];
 }
 
+- (IBAction) openMPRViewerButtonClick: (id) sender
+{    
+    mprViewer = [viewerController openMPRViewer];
+    [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
+    [mprViewer showWindow:self];
+    [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
+}
+
 - (void) findUserInput
 {
     int     i,ii;
@@ -185,7 +193,7 @@
 {
     int             i,firstIndex,secondIndex;
     int             indexAP,indexML,indexDV;
-    float          thisFloat,firstFloat,secondFloat;
+    float           thisFloat,firstFloat,secondFloat;
     int             dir[3];
     NSNumber        *diffAP,*diffML,*diffDV;
     NSMutableArray  *diff;
@@ -427,7 +435,7 @@
     // remap coords to orientation
     [Cz remapWithOrientation:orientation];
     
-    // Now we have Cz from which we will 
+    // Now we have Cz from which we will reslice on coronal plane
     
     indexML = [[orientation objectForKey:@"ML"] intValue];
     
@@ -530,9 +538,6 @@
     
     // place electrodes in viewer
     [self placeElectrodesInViewerController:viewerController];
-    
-    // we no longer need Ten Twenty HUD ... close it
-    [tenTwentyHUDPanel performClose:self];
 }
 
 - (void) traceSkullCzCoronal

@@ -13,10 +13,22 @@
 =========================================================================*/
 
 
-#import <Foundation/Foundation.h>
-#import "Scheduler.h"
 
-/** \brief Protocol for multithreading scheduling*/
-@protocol Schedulable 
--(void)performWorkUnits:(NSSet *)workUnits forScheduler:(Scheduler *)scheduler;
+
+#import <Cocoa/Cocoa.h>
+#import "FlyThruAdapter.h"
+
+@class VRController;
+
+/** \brief FlyThruAdapter for Volume Rendering
+*
+* Volume Rendering FlyThruAdapter
+*/
+
+@interface VRFlyThruAdapter : FlyThruAdapter {
+}
+
+- (id) initWithVRController: (VRController*) aVRController;
+- (NSImage*) getCurrentCameraImage: (BOOL) highQuality;
+
 @end

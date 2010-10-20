@@ -3,7 +3,7 @@
 
   Copyright (c) OsiriX Team
   All rights reserved.
-  Distributed under GNU - GPL
+  Distributed under GNU - LGPL
   
   See http://www.osirix-viewer.com/copyright.html for details.
 
@@ -68,6 +68,7 @@ enum
 	NSMutableArray  *points;
 	NSMutableArray  *zPositions;
 	NSRect			rect;
+	BOOL			_hasIsSpline, _isSpline;
 	
 	long			type;
 	long			mode;
@@ -111,7 +112,7 @@ enum
 	
 	float			offsetTextBox_x, offsetTextBox_y;
 	
-	char			line1[ 256], line2[ 256], line3[ 256], line4[ 256], line5[ 256], line6[ 256];
+	char			line1[ 1024], line2[ 1024], line3[ 1024], line4[ 1024], line5[ 1024], line6[ 1024];
 	NSString		*textualBoxLine1, *textualBoxLine2, *textualBoxLine3, *textualBoxLine4, *textualBoxLine5, *textualBoxLine6;
 	
 	BOOL			_displayCalciumScoring;
@@ -161,7 +162,10 @@ enum
 @property(retain) ROI *parentROI;
 @property double sliceThickness, pixelSpacingX, pixelSpacingY;
 @property float min, max, mean;
+@property(assign) NSColor* NSColor;
+@property(assign) BOOL isSpline;
 
+- (void) setNSColor:(NSColor*)color globally:(BOOL)g;
 - (void) setColor:(RGBColor) a globally: (BOOL) g;
 - (void) setThickness:(float) a globally: (BOOL) g;
 - (void) setOpacity:(float)newOpacity globally: (BOOL) g;
@@ -248,6 +252,11 @@ enum
 
 - (float*) dataValuesAsFloatPointer :(long*) no;
 - (NSMutableArray*) dataValues;
+
+
+-(NSPoint)pointAtIndex:(NSUInteger)index;
+-(void)setPoint:(NSPoint)point atIndex:(NSUInteger)index;
+-(void)addPoint:(NSPoint)point;
 
 /** Find a point between two points 
 *  @param a First point

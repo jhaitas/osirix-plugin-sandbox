@@ -3,7 +3,7 @@
 
   Copyright (c) OsiriX Team
   All rights reserved.
-  Distributed under GNU - GPL
+  Distributed under GNU - LGPL
   
   See http://www.osirix-viewer.com/copyright.html for details.
 
@@ -11,6 +11,8 @@
      the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.
 =========================================================================*/
+
+#define MAX4D 500
 
 #import <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
@@ -20,6 +22,7 @@
 @class ColorTransferView;
 @class MyPoint;
 @class ROI;
+@class DCMPix;
 @class ThickSlabController;
 @class StudyView;
 @class SeriesView;
@@ -32,9 +35,9 @@
 @class OrthogonalMPRPETCTViewer;
 @class SRController;
 @class EndoscopyViewer;
-//@class VRPROController;
-@class ViewerController;
 @class MPRController;
+@class ViewerController;
+
 
 @interface NSObject(OsiriXPluginDraggingDestination)
 - (BOOL)performPluginDragOperation:(id <NSDraggingInfo>)sender destination:(ViewerController*)vc;
@@ -57,11 +60,16 @@ enum
 
 /** \brief Window Controller for 2D Viewer*/
 
+#ifndef OSIRIX_LIGHT
 @interface ViewerController : OSIWindowController  <Schedulable>
+#else
+@interface ViewerController : OSIWindowController
+#endif
 {
 	NSLock	*ThreadLoadImageLock;
 	NSLock	*roiLock;
-	NSConditionLock *subLoadingThread;
+	NSConditionLock *subLoadingThread, *flipDataThread;
+	NSThread *loadingThread;
 	
 	IBOutlet StudyView		*studyView;
 			SeriesView		*seriesView;
@@ -238,9 +246,9 @@ enum
 	
 	IBOutlet NSMatrix		*buttonToolMatrix;
 	
-	NSMutableArray			*fileList[200];
-    NSMutableArray          *pixList[200], *roiList[200];
-	NSData					*volumeData[200];
+	NSMutableArray			*fileList[ MAX4D];
+    NSMutableArray          *pixList[ MAX4D], *roiList[ MAX4D], *copyRoiList[ MAX4D];
+	NSData					*volumeData[ MAX4D];
 	short					curMovieIndex, maxMovieIndex, orientationVector;
     NSToolbar               *toolbar;
 	
@@ -284,7 +292,7 @@ enum
 	BOOL					morphoFunctionPreviewApplied;
 	IBOutlet NSPopUpButton	*keyImagePopUpButton;
 	
-	KeyObjectPopupController *keyObjectPopupController;
+//	KeyObjectPopupController *keyObjectPopupController;
 	BOOL					displayOnlyKeyImages;
 	
 	int						qt_to, qt_from, qt_interval, qt_dimension, current_qt_interval, qt_allViewers;
@@ -327,13 +335,17 @@ enum
 	IBOutlet NSView			*display12bitToolbarItemView;
 	IBOutlet NSMatrix		*display12bitToolbarItemMatrix;
 	NSTimer					*t12BitTimer;
+	
+	NSCalendarDate			*injectionDateTime;
+	IBOutlet NSWindow		*injectionTimeWindow;
 }
-
+@property(retain) NSCalendarDate *injectionDateTime;
 @property(readonly) short currentOrientationTool;
 @property(readonly) volatile float loadingPercentage;
-
+@property NSTimeInterval loadingPauseDelay;
 @property(readonly) NSTimer	*timer;
 @property(readonly) NSButton *keyImageCheck;
+@property(readonly) NSSlider *speedSlider;
 
 /** Accessors for plugins using blending window */
 @property(readonly) NSWindow *blendingTypeWindow;
@@ -416,7 +428,7 @@ enum
 - (NSMutableArray*) pixList;
 - (NSMutableArray*) pixList: (long) i;
 
-/** Return the array of DicomFile objects */
+/** Return the array of DicomImage objects */
 - (NSMutableArray*) fileList;
 - (NSMutableArray*) fileList: (long) i;
 
@@ -435,22 +447,17 @@ enum
 - (BOOL) containsROI:(ROI*)roi;
 
 /** Are the data volumic: same height same width same orientation */
+- (BOOL) isDataVolumic;
 - (BOOL) isDataVolumicIn4D:(BOOL) check4D checkEverythingLoaded:(BOOL) c;
 - (BOOL) isDataVolumicIn4D:(BOOL) check4D;
+- (BOOL) isDataVolumicIn4D: (BOOL) check4D checkEverythingLoaded:(BOOL) c tryToCorrect: (BOOL) tryToCorrect;
 - (void) displayAWarningIfNonTrueVolumicData;
-
-/** ReSort the images displayed according to this group/element */
-- (BOOL) sortSeriesByDICOMGroup: (int) gr element: (int) el;
 
 /** Delete ALL ROI objects for  current series */
 - (IBAction) roiDeleteAll:(id) sender;
 
 /**  methods to access global variables */
 + (int) numberOf2DViewer;
-
-// UNDOCUMENTED FUNCTIONS
-// For more informations: rossetantoine@bluewin.ch
-
 
 /** Adds to undo queue
 *  @param string  The type of undo
@@ -486,6 +493,7 @@ enum
 * @param roi The ROI that should be up front
 */
 - (void)bringToFrontROI:(ROI*)roi;
+- (void)sendToBackROI:(ROI*) roi;
 
 /** Change fusion status
 * Called by an action.
@@ -531,7 +539,6 @@ enum
 - (void)addPlainRoiToCurrentSliceFromBuffer:(unsigned char*)buff withName:(NSString*)name;
 - (void)addPlainRoiToCurrentSliceFromBuffer:(unsigned char*)buff forSpecificValue:(unsigned char)value withColor:(RGBColor)aColor withName:(NSString*)name;
 - (ROI*)addLayerRoiToCurrentSliceWithImage:(NSImage*)image referenceFilePath:(NSString*)path layerPixelSpacingX:(float)layerPixelSpacingX layerPixelSpacingY:(float)layerPixelSpacingY;
-- (ROI*)createLayerROIFromROI:(ROI*)roi splineScale:(float)splineScale;
 - (ROI*)createLayerROIFromROI:(ROI*)roi;
 - (void)createLayerROIFromSelectedROI;
 - (IBAction)createLayerROIFromSelectedROI:(id)sender;
@@ -541,12 +548,17 @@ enum
 - (IBAction) shutterOnOff:(id) sender;
 - (void) setLoadingPause:(BOOL) lp;
 - (void) setImageIndex:(long) i;
+- (void) setImage:(NSManagedObject*) image;
 - (long) imageIndex;
+- (IBAction) editSUVinjectionTime:(id)sender;
+- (IBAction) ok:(id)sender;
+- (IBAction) cancel:(id)sender;
 - (void) viewerControllerInit;
 - (IBAction) ConvertToRGBMenu:(id) sender;
 - (BOOL) updateTilingViewsValue;
 - (void) setUpdateTilingViewsValue:(BOOL) v;
 - (IBAction) ConvertToBWMenu:(id) sender;
+- (NSScreen*) get3DViewerScreen: (ViewerController*) v;
 - (void) place3DViewerWindow:(NSWindowController*) viewer;
 - (IBAction) export2PACS:(id) sender;
 - (void) print:(id) sender;
@@ -583,6 +595,7 @@ enum
 - (IBAction) reSyncOrigin:(id) sender;
 - (void) loadROI:(long) mIndex;
 - (void) saveROI:(long) mIndex;
+- (void) setMatrixVisible: (BOOL) visible;
 - (id) findPlayStopButton;
 - (IBAction)setKeyImage:(id)sender;
 - (IBAction) roiSelectDeselectAll:(id) sender;
@@ -654,7 +667,8 @@ enum
 - (ViewerController*) blendingController;
 - (void)blendWithViewer:(ViewerController *)bc blendingType:(int)blendingType;
 - (void)blendingSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
-- (void) computeContextualMenu;
+- (void)computeContextualMenu;
+- (void)computeContextualMenuForROI:(ROI*)roi;
 
 /** Modality of the study */
 - (NSString*) modality;
@@ -678,30 +692,37 @@ enum
 - (IBAction) roiPropagate:(id) sender;
 - (void) showWindowTransition;
 - (float) computeInterval;
++ (float) computeIntervalForDCMPix: (DCMPix*) p1 And: (DCMPix*) p2;
 - (float) computeIntervalFlipNow: (NSNumber*) flipNowNumber;
 - (void) computeIntervalAsync;
 - (IBAction) endThicknessInterval:(id) sender;
 - (void) SetThicknessInterval:(id) constructionType;
-//- (IBAction) MPRViewer:(id) sender;
-- (IBAction) VRVPROViewer:(id) sender;
-- (IBAction) VRViewer:(id) sender;
 - (IBAction) blendWindows:(id) sender;
 
 /** Action to open the OrthogonalMPRViewer */
 - (IBAction) orthogonalMPRViewer:(id) sender;
-
-/** Action to open the EndoscopyViewer */
-- (IBAction) endoscopyViewer:(id) sender;
 
 /** Action to open the CurvedMPRViewer */
 - (IBAction) CurvedMPR:(id) sender;
 
 - (void) showCurrentThumbnail:(id) sender;
 
+#ifndef OSIRIX_LIGHT
+/** ReSort the images displayed according to IMAGE Table field */
+- (BOOL) sortSeriesByValue: (NSString*) key ascending: (BOOL) ascending;
+
+/** ReSort the images displayed according to this group/element */
+- (BOOL) sortSeriesByDICOMGroup: (int) gr element: (int) el;
+
+/** Action to open the EndoscopyViewer */
+- (IBAction) endoscopyViewer:(id) sender;
+
+/** Action to open VRViewer (Volume Rendering) */
+- (IBAction) VRViewer:(id) sender;
+
 /** Action to open SRViewer (Surface Rendering) */
 - (IBAction) SRViewer:(id) sender;
-
-- (NSMenu *)contextualMenu;
+#endif
 
 /** Action to export as JPEG */
 - (void) exportJPEG:(id) sender;
@@ -732,7 +753,12 @@ enum
 - (IBAction) resetImage:(id) sender;
 + (NSArray*) defaultROINames;
 + (void) setDefaultROINames: (NSArray*) names;
+#ifndef OSIRIX_LIGHT
 - (IBAction) endExportDICOMFileSettings:(id) sender;
+- (float) computeVolume:(ROI*) selectedRoi points:(NSMutableArray**) pts error:(NSString**) error;
+- (float) computeVolume:(ROI*) selectedRoi points:(NSMutableArray**) pts generateMissingROIs:(BOOL) generateMissingROIs error:(NSString**) error;
+- (float) computeVolume:(ROI*) selectedRoi points:(NSMutableArray**) pts generateMissingROIs:(BOOL) generateMissingROIs generatedROIs:(NSMutableArray*) generatedROIs computeData:(NSMutableDictionary*) data error:(NSString**) error;
+#endif
 - (IBAction) keyImageCheckBox:(id) sender;
 - (IBAction) keyImageDisplayButton:(id) sender;
 - (void) adjustKeyImage;
@@ -753,9 +779,6 @@ enum
 - (IBAction) endRoiRename:(id) sender;
 - (IBAction) roiRename:(id) sender;
 - (void) SyncSeries:(id) sender;
-- (float) computeVolume:(ROI*) selectedRoi points:(NSMutableArray**) pts error:(NSString**) error;
-- (float) computeVolume:(ROI*) selectedRoi points:(NSMutableArray**) pts generateMissingROIs:(BOOL) generateMissingROIs error:(NSString**) error;
-- (float) computeVolume:(ROI*) selectedRoi points:(NSMutableArray**) pts generateMissingROIs:(BOOL) generateMissingROIs generatedROIs:(NSMutableArray*) generatedROIs computeData:(NSMutableDictionary*) data error:(NSString**) error;
 
 - (NSArray*)roisWithName:(NSString*)name;
 - (NSArray*)roisWithName:(NSString*)name in4D:(BOOL)in4D;
@@ -770,14 +793,17 @@ enum
 - (void)setWindowFrame:(NSRect)rect;
 - (void)setWindowFrame:(NSRect)rect showWindow:(BOOL) showWindow;
 - (void)setWindowFrame:(NSRect)rect showWindow:(BOOL) showWindow animate: (BOOL) animate;
-- (IBAction) Panel3D:(id) sender;
+
 - (void) revertSeries:(id) sender;
 - (void) executeRevert;
 - (NSImage*) imageForROI: (int) i;
 - (void) ActivateBlending:(ViewerController*) bC;
 - (void) setFusionMode:(long) m;
 - (short) curMovieIndex;
+#ifndef OSIRIX_LIGHT
 - (id) findiChatButton;
+- (IBAction) Panel3D:(id) sender;
+#endif
 - (void) convertPETtoSUV;
 - (IBAction) fullScreenMenu:(id) sender;
 -(int) imageIndexOfROI:(ROI*) c;
@@ -828,6 +854,7 @@ enum
 * @param radius structuringElementRadius for the filter
 * @param sendNotification Will post an OsirixROIChangeNotification notification if YES
 */
+#ifndef OSIRIX_LIGHT
 - (void) applyMorphology: (NSArray*) rois action:(NSString*) action	radius: (long) radius sendNotification: (BOOL) sendNotification;
 
 /** Set the structuring radius for the brush ROI morpho filter */
@@ -844,7 +871,7 @@ enum
 *  Filters are: erode, dilate, open, close 
 */
 - (IBAction) morphoSelectedBrushROI: (id) sender;
-
+#endif
 
 /** Create a new ROI between two ROI
 * Converts both ROIs into polygons, after a marching square isocontour
@@ -879,24 +906,28 @@ enum
 *  Each point on the moving viewer needs a twin on the fixed viewer.
 *  Two points are twin brothers if and only if they have the same name.
 */
+#ifndef OSIRIX_LIGHT
 - (void) computeRegistrationWithMovingViewer:(ViewerController*) movingViewer;
+#endif
 
 /** Returns a new viewer with the current series resampled to match the Orientation of series in the other viewer
 *  Both series must be from the same study to insure matching imageOrientationPatient and imagePositionPatient
 *  @param movingViewer  The ViewerController to resample the series to match
 */
+#ifndef OSIRIX_LIGHT
 - (ViewerController*) resampleSeries:(ViewerController*) movingViewer;
+#endif
 
 #pragma mark-
 #pragma mark Key Objects
 
-/** Creates a Key Object note for the current key Images */
-- (IBAction)createKeyObjectNote:(id)sender;
-
-/** End sheet method for creating key Object notes
-* Called internally 
-*/
-- (void)keyObjectSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode  contextInfo:(id)contextInfo;
+///** Creates a Key Object note for the current key Images */
+//- (IBAction)createKeyObjectNote:(id)sender;
+//
+///** End sheet method for creating key Object notes
+//* Called internally 
+//*/
+//- (void)keyObjectSheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode  contextInfo:(id)contextInfo;
 
 
 /**  return flag indicating whether only the key images are being displayed */
@@ -953,18 +984,15 @@ enum
 // Opening 3D Viewers
 #pragma mark-
 #pragma mark 3D Viewers
+/** Returns the OrthogonalMPRViewer for this ViewerController; creating one if necessary */
+- (OrthogonalMPRViewer *)openOrthogonalMPRViewer;
+
+#ifndef OSIRIX_LIGHT
+
 /** Returns the VRController for this ViewerController; creating one if necessary
 * See VRController for modes
  */
 - (VRController *)openVRViewerForMode:(NSString *)mode;
-
-/** Returns the VRPROController for this ViewerController; creating one if necessary 
-* See VRController for modes
-*/
-//- (VRPROController*)openVRVPROViewerForMode:(NSString *)mode;
-
-/** Returns the OrthogonalMPRViewer for this ViewerController; creating one if necessary */
-- (OrthogonalMPRViewer *)openOrthogonalMPRViewer;
 
 /** Returns the OrthogonalMPRPETCTViewer for this ViewerController; creating one if necessary */
 - (OrthogonalMPRPETCTViewer *)openOrthogonalMPRPETCTViewer;
@@ -976,8 +1004,10 @@ enum
 - (SRController *)openSRViewer;
 
 /** Returns the MPRController for this ViewerController; creating one if necessary */
+
 - (MPRController *)openMPRViewer;
 - (IBAction)mprViewer:(id)sender;
+#endif
 
 /** Current SeriesView */
 - (SeriesView *) seriesView;
@@ -1003,14 +1033,16 @@ enum
 /** Deprecated
 * Calcium Scoring moved to a plugin
 */
+#ifndef OSIRIX_LIGHT
 - (IBAction)calciumScoring:(id)sender;
+#endif
 
 #pragma mark-
 #pragma mark Centerline
 /** Nonfunctional
 * Centerline only works in Endoscopy Mode 
 */
-- (IBAction)centerline: (id)sender;
+//- (IBAction)centerline: (id)sender;
 
 #pragma mark-
 #pragma mark ROI Grouping
@@ -1028,8 +1060,11 @@ enum
 - (IBAction) makeAllROIsSelectable:(id)sender;
 
 - (void) turnOffSyncSeriesBetweenStudies:(id) sender;
+
+#ifndef OSIRIX_LIGHT
 - (NSDictionary*) exportDICOMFileInt:(int)screenCapture withName:(NSString*)name;
 - (NSDictionary*) exportDICOMFileInt:(int)screenCapture withName:(NSString*)name allViewers: (BOOL) allViewers;
+#endif
 
 #pragma mark-
 #pragma mark 12 Bit

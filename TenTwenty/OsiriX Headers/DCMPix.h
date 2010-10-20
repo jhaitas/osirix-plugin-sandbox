@@ -3,7 +3,7 @@
 
   Copyright (c) OsiriX Team
   All rights reserved.
-  Distributed under GNU - GPL
+  Distributed under GNU - LGPL
   
   See http://www.osirix-viewer.com/copyright.html for details.
 
@@ -33,7 +33,7 @@ extern XYZ ArbitraryRotate(XYZ p,double theta,XYZ r);
 {
 //SOURCES
 	NSString            *srcFile;  /**< source File */
-	BOOL				isBonjour;  /**< Flag to indicate if file is accessed over Bonour */
+	BOOL				isBonjour;  /**< Flag to indicate if file is accessed over Bonjour */
 	BOOL				nonDICOM;   /**< Flag to indicate if file is not DICOM */
 
 //BUFFERS	
@@ -74,20 +74,16 @@ extern XYZ ArbitraryRotate(XYZ p,double theta,XYZ r);
 
 // DICOM params needed for SUV calculations
 	float				patientsWeight;
-	NSString			*repetitiontime;
-	NSString			*echotime;
-	NSString			*flipAngle, *laterality;
-	NSString			*protocolName;
-	NSString			*viewPosition;
-	NSString			*patientPosition;
+	NSString			*repetitiontime, *echotime, *flipAngle, *laterality;
+	NSString			*viewPosition, *patientPosition, *acquisitionDate, *SOPClassUID;
 	BOOL				hasSUV, SUVConverted;
 	NSString			*units, *decayCorrection;
-	float				decayFactor;
+	float				decayFactor, factorPET2SUV;
 	float				radionuclideTotalDose;
 	float				radionuclideTotalDoseCorrected;
 	NSCalendarDate		*acquisitionTime;
 	NSCalendarDate		*radiopharmaceuticalStartTime;
-	float				halflife;
+	float				halflife, frameReferenceTime;
     float				philipsFactor;
 	BOOL				displaySUVValue;
 
@@ -160,11 +156,13 @@ extern XYZ ArbitraryRotate(XYZ p,double theta,XYZ r);
 	
 	BOOL				generated;
 	NSString			*generatedName;
-	NSLock				*checking;
+	NSRecursiveLock		*checking;
 	
-	BOOL				useVOILUT;
+	BOOL				useVOILUT, notAbleToLoadImage;
 	int					VOILUT_first;
 	unsigned int		VOILUT_number, VOILUT_depth, *VOILUT_table;
+	
+	unsigned short *shortRed, *shortGreen, *shortBlue;
 	
 	char				blackIndex;
 	
@@ -186,14 +184,15 @@ extern XYZ ArbitraryRotate(XYZ p,double theta,XYZ r);
 	unsigned short		clutEntryR, clutEntryG, clutEntryB;
 	unsigned short		clutDepthR, clutDepthG, clutDepthB;
 	unsigned char		*clutRed, *clutGreen, *clutBlue;
-	int					realwidth;
 	BOOL				fSetClut, fSetClut16;
+	
+	int					savedHeightInDB, savedWidthInDB;
 }
 
 @property long frameNo;
 @property(setter=setID:) long ID;
 
-@property float minValueOfSeries, maxValueOfSeries;
+@property float minValueOfSeries, maxValueOfSeries, factorPET2SUV;
 
 // Dimensions in pixels
 @property long pwidth, pheight;
@@ -207,9 +206,10 @@ Note setter is different to not break existing usage. :-( */
 
 /** WW & WL */
 @property(readonly) float ww, wl, fullww, fullwl;
-@property float savedWW, savedWL, *subtractedfImage;
+@property float slope, offset, savedWW, savedWL, *subtractedfImage;
 
-@property(readonly) float slope, offset;
+@property(readonly) BOOL notAbleToLoadImage;
+@property(readonly) NSPoint *shutterPolygonal;
 
 /**  X/Y ratio - non-square pixels */
 @property double pixelRatio;
@@ -257,7 +257,6 @@ Note setter is different to not break existing usage. :-( */
 @property(retain) NSString *repetitiontime, *echotime;
 @property(readonly) NSString *flipAngle, *laterality;
 
-@property(readonly) NSString *protocolName;
 @property(readonly) NSString *viewPosition;
 @property(readonly) NSString *patientPosition;
 
@@ -281,7 +280,7 @@ Note setter is different to not break existing usage. :-( */
 /** Database links */
 @property(readonly) NSManagedObject *seriesObj;
 @property(retain) NSManagedObject *imageObj;
-@property(retain) NSString *srcFile;
+@property(retain) NSString *srcFile, *SOPClassUID;
 @property(retain) NSMutableDictionary *annotationsDictionary;
 
 // Properties (aka accessors) needed for SUV calculations
@@ -291,6 +290,7 @@ Note setter is different to not break existing usage. :-( */
 @property float radionuclideTotalDose;
 @property float radionuclideTotalDoseCorrected;
 @property(retain) NSCalendarDate *acquisitionTime;
+@property(retain) NSString *acquisitionDate;
 @property(retain) NSCalendarDate *radiopharmaceuticalStartTime;
 @property BOOL SUVConverted, full32bitPipeline, needToCompute8bitRepresentation;
 @property(readonly) BOOL hasSUV;
@@ -300,6 +300,7 @@ Note setter is different to not break existing usage. :-( */
 
 @property BOOL isLUT12Bit;
 
+- (float) appliedFactorPET2SUV;
 - (void) copySUVfrom: (DCMPix*) from;  /**< Copy the SUV from another DCMPic */
 - (float) getPixelValueX: (long) x Y:(long) y;  /**< Get the pixel for a point with x,y coordinates */
 
@@ -391,7 +392,6 @@ Note setter is different to not break existing usage. :-( */
 * Returns a pointer to the pixel locations. Each point has the x position followed by the y position
 * Locations is malloced but not freed
 */
-- (float*) getROIValue :(long*) numberOfValues :(ROI*) roi :(float**) locations :(float)splineScale;
 - (float*) getROIValue :(long*) numberOfValues :(ROI*) roi :(float**) locations;
 
 /** Returns a pointer with all pixels values contained in the current ROI
@@ -465,6 +465,7 @@ Note setter is different to not break existing usage. :-( */
 - (long) maskID;
 - (void) maskTime:(float)newMaskTime;
 - (float) maskTime;
+- (void) getDataFromNSImage:(NSImage*) otherImage;
 - (void) positionerPrimaryAngle:(NSNumber *)newPositionerPrimaryAngle;
 - (NSNumber*) positionerPrimaryAngle;
 - (void) positionerSecondaryAngle:(NSNumber*)newPositionerSecondaryAngle;
@@ -486,6 +487,7 @@ Note setter is different to not break existing usage. :-( */
 - (BOOL) updateToApply;
 - (id) myinitEmpty;  /**< Returns an Empty object */
 - (short*) kernel;
+- (void) applyShutter;
 + (NSPoint) rotatePoint:(NSPoint)pt aroundPoint:(NSPoint)c angle:(float)a;
 - (short) normalization;
 - (short) kernelsize;
@@ -501,6 +503,7 @@ Note setter is different to not break existing usage. :-( */
 * with hello = NO and iO = nil
 */
 - (id) myinit:(NSString*) s :(long) pos :(long) tot :(float*) ptr :(long) f :(long) ss;
+- (id) initWithPath:(NSString*) s :(long) pos :(long) tot :(float*) ptr :(long) f :(long) ss;
 
 /**  Initialize
 * doesn't load pix data, only initializes instance variables
@@ -514,6 +517,7 @@ Note setter is different to not break existing usage. :-( */
 * @param iO  coreData image Entity for image
 */ 
 - (id) myinit:(NSString*) s :(long) pos :(long) tot :(float*) ptr :(long) f :(long) ss isBonjour:(BOOL) hello imageObj: (NSManagedObject*) iO;
+- (id) initWithPath:(NSString*) s :(long) pos :(long) tot :(float*) ptr :(long) f :(long) ss isBonjour:(BOOL) hello imageObj: (NSManagedObject*) iO;
 
 /** init with data pointer
 * @param im  pointer to image data
@@ -527,6 +531,7 @@ Note setter is different to not break existing usage. :-( */
 * @param oZ z position of origin
 */
 - (id) initwithdata :(float*) im :(short) pixelSize :(long) xDim :(long) yDim :(float) xSpace :(float) ySpace :(float) oX :(float) oY :(float) oZ;
+- (id) initWithData :(float*) im :(short) pixelSize :(long) xDim :(long) yDim :(float) xSpace :(float) ySpace :(float) oX :(float) oY :(float) oZ;
 
 /** init with data pointer
 * @param im = pointer to image data
@@ -541,6 +546,8 @@ Note setter is different to not break existing usage. :-( */
 * @param volSize ?
 */
 - (id) initwithdata :(float*) im :(short) pixelSize :(long) xDim :(long) yDim :(float) xSpace :(float) ySpace :(float) oX :(float) oY :(float) oZ :(BOOL) volSize;
+- (id) initWithData :(float*) im :(short) pixelSize :(long) xDim :(long) yDim :(float) xSpace :(float) ySpace :(float) oX :(float) oY :(float) oZ :(BOOL) volSize;
+
 - (id) initWithImageObj: (NSManagedObject *)entity;
 - (id) initWithContentsOfFile: (NSString *)file; 
 /** create an NSImage from the current pix
@@ -570,7 +577,9 @@ Note setter is different to not break existing usage. :-( */
 
 /** Load the DICOM image using the DCMFramework.  
 * There should be no reason to call this. The class will call it when needed. */
+#ifndef OSIRIX_LIGHT
 - (BOOL)loadDICOMDCMFramework;
+#endif
 
 /** Load the DICOM image using Papyrus.
 * There should be no reason to call this. The class will call it when needed.
@@ -606,7 +615,8 @@ Note setter is different to not break existing usage. :-( */
 
 
 /** Releases the fImage and sets all values to nil. */
-- (void)revert;
+- (void) revert;
+- (void) revert:(BOOL) reloadAnnotations;
 
 /** finds the min and max pixel values. 
 * Sets the appropriate values for fullWW and fullWL 
@@ -644,15 +654,20 @@ Note setter is different to not break existing usage. :-( */
 */
 - (void *) getPapyGroup: (int)group;
 
+#ifndef OSIRIX_LIGHT
 /** create ROIs from RTSTRUCT */
 - (void)createROIsFromRTSTRUCT: (DCMObject*)dcmObject;
+#endif
 
 #ifdef OSIRIX_VIEWER
 
 /** Custom Annotations */
 - (void)loadCustomImageAnnotationsPapyLink:(int)fileNb DCMLink:(DCMObject*)dcmObject;
 - (NSString*) getDICOMFieldValueForGroup:(int)group element:(int)element papyLink:(short)fileNb;
+
+#ifndef OSIRIX_LIGHT
 - (NSString*) getDICOMFieldValueForGroup:(int)group element:(int)element DCMLink:(DCMObject*)dcmObject;
+#endif
 
 /** Set flag to anonymize the annotations */
 + (BOOL) setAnonymizedAnnotations: (BOOL) v;

@@ -10,6 +10,7 @@
 #import "PluginFilter.h"
 
 @class TenTwentyController;
+
 @interface TenTwentyFilter : PluginFilter {
     TenTwentyController *tenTwenty;
 }

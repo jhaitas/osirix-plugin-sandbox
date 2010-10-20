@@ -1,3 +1,7 @@
+//
+//  ShadingArrayController.h
+//  OsiriX
+//
 /*=========================================================================
   Program:   OsiriX
 
@@ -12,11 +16,16 @@
      PURPOSE.
 =========================================================================*/
 
+#import <Cocoa/Cocoa.h>
+#import "OSIWindowController.h"
 
-#import <Foundation/Foundation.h>
-#import "Scheduler.h"
+@interface ShadingArrayController : NSArrayController {
+	BOOL				_enableEditing;
+	OSIWindowController	*winController;
+}
 
-/** \brief Protocol for multithreading scheduling*/
-@protocol Schedulable 
--(void)performWorkUnits:(NSSet *)workUnits forScheduler:(Scheduler *)scheduler;
+- (BOOL)enableEditing;
+- (void)setEnableEditing:(BOOL)enable;
+- (void)setWindowController:(OSIWindowController*) ctrl;
+
 @end

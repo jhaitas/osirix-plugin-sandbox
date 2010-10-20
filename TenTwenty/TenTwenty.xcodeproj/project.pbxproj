@@ -14,6 +14,29 @@
 		585B740E1264B64F00D42896 /* TenTwentyHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 585B740D1264B64F00D42896 /* TenTwentyHUD.xib */; };
 		5875E335125CE0320026F150 /* StereotaxCoord.h in Headers */ = {isa = PBXBuildFile; fileRef = 5875E333125CE0320026F150 /* StereotaxCoord.h */; };
 		5875E336125CE0320026F150 /* StereotaxCoord.m in Sources */ = {isa = PBXBuildFile; fileRef = 5875E334125CE0320026F150 /* StereotaxCoord.m */; };
+		58C9B0B0126CF28E00B3959E /* MPRController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0AE126CF28E00B3959E /* MPRController.h */; };
+		58C9B0B1126CF28E00B3959E /* MPRDCMView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0AF126CF28E00B3959E /* MPRDCMView.h */; };
+		58C9B0B3126CF2A100B3959E /* Camera.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0B2126CF2A100B3959E /* Camera.h */; };
+		58C9B0C9126CF4AE00B3959E /* VRController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0C8126CF4AE00B3959E /* VRController.h */; };
+		58C9B0CD126CF4F600B3959E /* ColorTransferView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0CC126CF4F600B3959E /* ColorTransferView.h */; };
+		58C9B0CF126CF50800B3959E /* Window3DController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0CE126CF50800B3959E /* Window3DController.h */; };
+		58C9B0D1126CF52400B3959E /* ShadingArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0D0126CF52400B3959E /* ShadingArrayController.h */; };
+		58C9B0D3126CF53900B3959E /* FlyThruController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0D2126CF53900B3959E /* FlyThruController.h */; };
+		58C9B0D5126CF54800B3959E /* FlyThru.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0D4126CF54800B3959E /* FlyThru.h */; };
+		58C9B0D9126CFAEB00B3959E /* NSFullScreenWindow.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0D8126CFAEB00B3959E /* NSFullScreenWindow.h */; };
+		58C9B0DB126CFAF700B3959E /* OpacityTransferView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0DA126CFAF700B3959E /* OpacityTransferView.h */; };
+		58C9B0DD126CFB1000B3959E /* Point3D.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0DC126CFB1000B3959E /* Point3D.h */; };
+		58C9B0DF126CFB2000B3959E /* Interpolation3D.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0DE126CFB2000B3959E /* Interpolation3D.h */; };
+		58C9B0E1126CFB3200B3959E /* FlyThruAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0E0126CFB3200B3959E /* FlyThruAdapter.h */; };
+		58C9B0E3126CFB5200B3959E /* QuicktimeExport.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0E2126CFB5200B3959E /* QuicktimeExport.h */; };
+		58C9B0E5126CFB6D00B3959E /* FlyThruStepsArrayController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0E4126CFB6D00B3959E /* FlyThruStepsArrayController.h */; };
+		58C9B0E9126CFB9000B3959E /* VRFlyThruAdapter.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0E8126CFB9000B3959E /* VRFlyThruAdapter.h */; };
+		58C9B0EB126CFBA600B3959E /* ColorView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0EA126CFBA600B3959E /* ColorView.h */; };
+		58C9B0F6126CFC8600B3959E /* VRView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0F5126CFC8600B3959E /* VRView.h */; };
+		58C9B247126E1F5C00B3959E /* MPRHeaders.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B245126E1F5C00B3959E /* MPRHeaders.h */; };
+		58C9B24E126E200100B3959E /* CLUTOpacityView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B24D126E200100B3959E /* CLUTOpacityView.h */; };
+		58C9B250126E201700B3959E /* WaitRendering.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B24F126E201700B3959E /* WaitRendering.h */; };
+		58C9B256126E20AB00B3959E /* ViewerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B255126E20AB00B3959E /* ViewerController.h */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* TenTwenty_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* TenTwenty_Prefix.pch */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -26,7 +49,6 @@
 		ABB76343067FB2A8000912C1 /* MyPoint.h in Headers */ = {isa = PBXBuildFile; fileRef = ABB7633C067FB2A8000912C1 /* MyPoint.h */; };
 		ABB76344067FB2A8000912C1 /* PluginFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = ABB7633D067FB2A8000912C1 /* PluginFilter.h */; };
 		ABB76345067FB2A8000912C1 /* ROI.h in Headers */ = {isa = PBXBuildFile; fileRef = ABB7633E067FB2A8000912C1 /* ROI.h */; };
-		ABB76346067FB2A8000912C1 /* ViewerController.h in Headers */ = {isa = PBXBuildFile; fileRef = ABB7633F067FB2A8000912C1 /* ViewerController.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +64,29 @@
 		585B740D1264B64F00D42896 /* TenTwentyHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TenTwentyHUD.xib; sourceTree = "<group>"; };
 		5875E333125CE0320026F150 /* StereotaxCoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxCoord.h; sourceTree = "<group>"; };
 		5875E334125CE0320026F150 /* StereotaxCoord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxCoord.m; sourceTree = "<group>"; };
+		58C9B0AE126CF28E00B3959E /* MPRController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRController.h; sourceTree = "<group>"; };
+		58C9B0AF126CF28E00B3959E /* MPRDCMView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRDCMView.h; sourceTree = "<group>"; };
+		58C9B0B2126CF2A100B3959E /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		58C9B0C8126CF4AE00B3959E /* VRController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRController.h; sourceTree = "<group>"; };
+		58C9B0CC126CF4F600B3959E /* ColorTransferView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorTransferView.h; sourceTree = "<group>"; };
+		58C9B0CE126CF50800B3959E /* Window3DController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Window3DController.h; sourceTree = "<group>"; };
+		58C9B0D0126CF52400B3959E /* ShadingArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShadingArrayController.h; sourceTree = "<group>"; };
+		58C9B0D2126CF53900B3959E /* FlyThruController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlyThruController.h; sourceTree = "<group>"; };
+		58C9B0D4126CF54800B3959E /* FlyThru.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlyThru.h; sourceTree = "<group>"; };
+		58C9B0D8126CFAEB00B3959E /* NSFullScreenWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSFullScreenWindow.h; sourceTree = "<group>"; };
+		58C9B0DA126CFAF700B3959E /* OpacityTransferView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpacityTransferView.h; sourceTree = "<group>"; };
+		58C9B0DC126CFB1000B3959E /* Point3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Point3D.h; sourceTree = "<group>"; };
+		58C9B0DE126CFB2000B3959E /* Interpolation3D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Interpolation3D.h; sourceTree = "<group>"; };
+		58C9B0E0126CFB3200B3959E /* FlyThruAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlyThruAdapter.h; sourceTree = "<group>"; };
+		58C9B0E2126CFB5200B3959E /* QuicktimeExport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QuicktimeExport.h; sourceTree = "<group>"; };
+		58C9B0E4126CFB6D00B3959E /* FlyThruStepsArrayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlyThruStepsArrayController.h; sourceTree = "<group>"; };
+		58C9B0E8126CFB9000B3959E /* VRFlyThruAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRFlyThruAdapter.h; sourceTree = "<group>"; };
+		58C9B0EA126CFBA600B3959E /* ColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorView.h; sourceTree = "<group>"; };
+		58C9B0F5126CFC8600B3959E /* VRView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRView.h; sourceTree = "<group>"; };
+		58C9B245126E1F5C00B3959E /* MPRHeaders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRHeaders.h; sourceTree = "<group>"; };
+		58C9B24D126E200100B3959E /* CLUTOpacityView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLUTOpacityView.h; sourceTree = "<group>"; };
+		58C9B24F126E201700B3959E /* WaitRendering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaitRendering.h; sourceTree = "<group>"; };
+		58C9B255126E20AB00B3959E /* ViewerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewerController.h; sourceTree = "<group>"; };
 		59C2B9280FF0ED7100B50385 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB5D36050680E57E00F4007A /* TenTwenty.osirixplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TenTwenty.osirixplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -53,7 +98,6 @@
 		ABB7633C067FB2A8000912C1 /* MyPoint.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MyPoint.h; sourceTree = "<group>"; };
 		ABB7633D067FB2A8000912C1 /* PluginFilter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = PluginFilter.h; sourceTree = "<group>"; };
 		ABB7633E067FB2A8000912C1 /* ROI.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ROI.h; sourceTree = "<group>"; };
-		ABB7633F067FB2A8000912C1 /* ViewerController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ViewerController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +185,34 @@
 			name = "Other Sources";
 			sourceTree = "<group>";
 		};
+		58C9B0AB126CF22700B3959E /* MPR Headers */ = {
+			isa = PBXGroup;
+			children = (
+				58C9B24D126E200100B3959E /* CLUTOpacityView.h */,
+				58C9B0CC126CF4F600B3959E /* ColorTransferView.h */,
+				58C9B0EA126CFBA600B3959E /* ColorView.h */,
+				58C9B0B2126CF2A100B3959E /* Camera.h */,
+				58C9B0D4126CF54800B3959E /* FlyThru.h */,
+				58C9B0E0126CFB3200B3959E /* FlyThruAdapter.h */,
+				58C9B0D2126CF53900B3959E /* FlyThruController.h */,
+				58C9B0E4126CFB6D00B3959E /* FlyThruStepsArrayController.h */,
+				58C9B0DE126CFB2000B3959E /* Interpolation3D.h */,
+				58C9B0AF126CF28E00B3959E /* MPRDCMView.h */,
+				58C9B0AE126CF28E00B3959E /* MPRController.h */,
+				58C9B0D8126CFAEB00B3959E /* NSFullScreenWindow.h */,
+				58C9B0DA126CFAF700B3959E /* OpacityTransferView.h */,
+				58C9B0DC126CFB1000B3959E /* Point3D.h */,
+				58C9B0E2126CFB5200B3959E /* QuicktimeExport.h */,
+				58C9B0D0126CF52400B3959E /* ShadingArrayController.h */,
+				58C9B0C8126CF4AE00B3959E /* VRController.h */,
+				58C9B0E8126CFB9000B3959E /* VRFlyThruAdapter.h */,
+				58C9B0F5126CFC8600B3959E /* VRView.h */,
+				58C9B24F126E201700B3959E /* WaitRendering.h */,
+				58C9B0CE126CF50800B3959E /* Window3DController.h */,
+			);
+			name = "MPR Headers";
+			sourceTree = "<group>";
+		};
 		AB2C26750677B0C400A08910 /* TenTwentyFilter */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,6 +231,8 @@
 		ABB76338067FB2A8000912C1 /* OsiriX Headers */ = {
 			isa = PBXGroup;
 			children = (
+				58C9B0AB126CF22700B3959E /* MPR Headers */,
+				58C9B245126E1F5C00B3959E /* MPRHeaders.h */,
 				ABB7633D067FB2A8000912C1 /* PluginFilter.h */,
 				59C2B9280FF0ED7100B50385 /* Notifications.h */,
 				ABB76339067FB2A8000912C1 /* DCMPix.h */,
@@ -166,7 +240,7 @@
 				ABB7633B067FB2A8000912C1 /* dicomFile.h */,
 				ABB7633C067FB2A8000912C1 /* MyPoint.h */,
 				ABB7633E067FB2A8000912C1 /* ROI.h */,
-				ABB7633F067FB2A8000912C1 /* ViewerController.h */,
+				58C9B255126E20AB00B3959E /* ViewerController.h */,
 			);
 			path = "OsiriX Headers";
 			sourceTree = "<group>";
@@ -185,12 +259,34 @@
 				ABB76343067FB2A8000912C1 /* MyPoint.h in Headers */,
 				ABB76344067FB2A8000912C1 /* PluginFilter.h in Headers */,
 				ABB76345067FB2A8000912C1 /* ROI.h in Headers */,
-				ABB76346067FB2A8000912C1 /* ViewerController.h in Headers */,
 				ABA48A650680BB600089EB4F /* TenTwentyFilter.h in Headers */,
 				59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */,
 				5875E335125CE0320026F150 /* StereotaxCoord.h in Headers */,
 				585B6A38125E5BC400D42896 /* LineDividerController.h in Headers */,
 				585B6AE4125F662300D42896 /* TenTwentyController.h in Headers */,
+				58C9B0B0126CF28E00B3959E /* MPRController.h in Headers */,
+				58C9B0B1126CF28E00B3959E /* MPRDCMView.h in Headers */,
+				58C9B0B3126CF2A100B3959E /* Camera.h in Headers */,
+				58C9B0C9126CF4AE00B3959E /* VRController.h in Headers */,
+				58C9B0CD126CF4F600B3959E /* ColorTransferView.h in Headers */,
+				58C9B0CF126CF50800B3959E /* Window3DController.h in Headers */,
+				58C9B0D1126CF52400B3959E /* ShadingArrayController.h in Headers */,
+				58C9B0D3126CF53900B3959E /* FlyThruController.h in Headers */,
+				58C9B0D5126CF54800B3959E /* FlyThru.h in Headers */,
+				58C9B0D9126CFAEB00B3959E /* NSFullScreenWindow.h in Headers */,
+				58C9B0DB126CFAF700B3959E /* OpacityTransferView.h in Headers */,
+				58C9B0DD126CFB1000B3959E /* Point3D.h in Headers */,
+				58C9B0DF126CFB2000B3959E /* Interpolation3D.h in Headers */,
+				58C9B0E1126CFB3200B3959E /* FlyThruAdapter.h in Headers */,
+				58C9B0E3126CFB5200B3959E /* QuicktimeExport.h in Headers */,
+				58C9B0E5126CFB6D00B3959E /* FlyThruStepsArrayController.h in Headers */,
+				58C9B0E9126CFB9000B3959E /* VRFlyThruAdapter.h in Headers */,
+				58C9B0EB126CFBA600B3959E /* ColorView.h in Headers */,
+				58C9B0F6126CFC8600B3959E /* VRView.h in Headers */,
+				58C9B247126E1F5C00B3959E /* MPRHeaders.h in Headers */,
+				58C9B24E126E200100B3959E /* CLUTOpacityView.h in Headers */,
+				58C9B250126E201700B3959E /* WaitRendering.h in Headers */,
+				58C9B256126E20AB00B3959E /* ViewerController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

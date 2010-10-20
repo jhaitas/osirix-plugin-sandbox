@@ -3,7 +3,7 @@
 
   Copyright (c) OsiriX Team
   All rights reserved.
-  Distributed under GNU - GPL
+  Distributed under GNU - LGPL
   
   See http://www.osirix-viewer.com/copyright.html for details.
 
@@ -45,7 +45,6 @@
 // file functions
 + (BOOL) isTiffFile:(NSString *) file; /**< Test for TIFF file format */
 + (BOOL) isFVTiffFile:(NSString *) file; /**< Test for FV TIFF file format */
-+ (BOOL) isNIfTIFile:(NSString *) file; /**< Test for Nifti file format */
 + (BOOL) isDICOMFile:(NSString *) file; /**< Test for DICOM file format */
 + (BOOL) isDICOMFile:(NSString *) file compressed:(BOOL*) compressed; /**< Test for DICOM file format, returns YES for compressed BOOL if Transfer syntax is compressed. */
 + (BOOL) isDICOMFile:(NSString *) file compressed:(BOOL*) compressed image:(BOOL*) image;
@@ -65,9 +64,9 @@
 + (NSString*) NSreplaceBadCharacter: (NSString*) str; 
 + (char *) replaceBadCharacter:(char *) str encoding: (NSStringEncoding) encoding; /**< Same as NSreplaceBadCharacter, but using char* and encodings */
 + (NSString *) stringWithBytes:(char *) str encodings: (NSStringEncoding*) encoding; /**< Convert char* str with NSStringEncoding* encoding to NSString */ 
-+(NSXMLDocument *) getNIfTIXML : (NSString *) file; /**< Converts NIfTI to XML */
++ (NSString *) stringWithBytes:(char *) str encodings: (NSStringEncoding*) encoding replaceBadCharacters: (BOOL) replace; /**< Convert char* str with NSStringEncoding* encoding to NSString */ 
 
-
+- (NSPDFImageRep*) PDFImageRep; /**< Get a PDFImageRep from DICOM SR file */
 - (long) NoOfFrames; /**< Number of frames in the file */
 - (long) getWidth; /**<  Returns image width */
 - (long) getHeight; /**< Return image Height */
@@ -77,6 +76,7 @@
 - (id) initRandom; /**< Inits and returns an empty dicomFile */
 - (id) initWithXMLDescriptor: (NSString*)pathToXMLDescriptor path:(NSString*) f; /**< Init with XMLDescriptor for information and f for image data */
 - (NSString*) patientUID; /**< Returns the patientUID */
++ (NSString*) patientUID: (id) src; /**< Returns the patientUID */
 
 /** Returns a dictionary of the elements used to import into the database
 * Keys:
@@ -96,27 +96,34 @@
 *  Numbers at the end become the image number. The remainder of the file becomes the Series and Study ID 
 */
 - (void)extractSeriesStudyImageNumbersFromFileName:(NSString *)tempString;  
-- (short) decodeDICOMFileWithDCMFramework; /**< Decodes the file using the DCM Framework  Returns -1 for failure 0 for success*/
 
+#ifndef OSIRIX_LIGHT
+- (short) decodeDICOMFileWithDCMFramework; /**< Decodes the file using the DCM Framework  Returns -1 for failure 0 for success*/
+#endif
 
 -(short) getDicomFile;  /**< Decode DICOM.  Returns -1 for failure 0 for success */
--(short) getNIfTI; /**< Decode NIfTI  Returns -1 for failure 0 for success */
 
+#ifndef DECOMPRESS_APP
+-(short) getNIfTI; /**< Decode NIfTI  Returns -1 for failure 0 for success */
++(NSXMLDocument *) getNIfTIXML : (NSString *) file; /**< Converts NIfTI to XML */
++ (BOOL) isNIfTIFile:(NSString *) file; /**< Test for Nifti file format */
+#endif
 
 /** Returns the COMMENTSAUTOFILL default. 
 * If Yes, comments will be filled from the DICOM tag  commentsGroup/commentsElement
 */
-- (BOOL)autoFillComments; 
-- (BOOL)splitMultiEchoMR; /**< Returns the splitMultiEchoMR default If YES, splits multi echo series into separate series by Echo number. */
-- (BOOL)useSeriesDescription; /**< Returns the useSeriesDescription default. */
-- (BOOL)noLocalizer; /**< Returns the NOLOCALIZER default. */
-- (BOOL)combineProjectionSeries; /**< Returns the combineProjectionSeries default.  If YES, combines are projection Modalities: CR, DR into one series. */
-- (BOOL)oneFileOnSeriesForUS; /**< Returns the oneFileOnSeriesForUS default */
-- (BOOL)combineProjectionSeriesMode; /**< Returns the combineProjectionSeriesMode default. */
-- (BOOL)checkForLAVIM; /**< Returns the CHECKFORLAVIM default. */
-- (BOOL)separateCardiac4D; /**< Returns the SEPARATECARDIAC4D default. If YES separates cardiac studies into separate gated series. */
-- (int)commentsGroup; /**< Returns the commentsGroup default. The DICOM group to get comments from. */
-- (int)commentsElement; /**< Returns the commentsGroup default.  The DICOM  element to get get comments from. */
+- (BOOL) commentsFromDICOMFiles;
+- (BOOL) autoFillComments; 
+- (BOOL) splitMultiEchoMR; /**< Returns the splitMultiEchoMR default If YES, splits multi echo series into separate series by Echo number. */
+- (BOOL) useSeriesDescription; /**< Returns the useSeriesDescription default. */
+- (BOOL) noLocalizer; /**< Returns the NOLOCALIZER default. */
+- (BOOL) combineProjectionSeries; /**< Returns the combineProjectionSeries default.  If YES, combines are projection Modalities: CR, DR into one series. */
+- (BOOL) oneFileOnSeriesForUS; /**< Returns the oneFileOnSeriesForUS default */
+- (BOOL) combineProjectionSeriesMode; /**< Returns the combineProjectionSeriesMode default. */
+- (BOOL) checkForLAVIM; /**< Returns the CHECKFORLAVIM default. */
+- (BOOL) separateCardiac4D; /**< Returns the SEPARATECARDIAC4D default. If YES separates cardiac studies into separate gated series. */
+- (int) commentsGroup; /**< Returns the commentsGroup default. The DICOM group to get comments from. */
+- (int) commentsElement; /**< Returns the commentsGroup default.  The DICOM  element to get get comments from. */
 - (BOOL) containsString: (NSString*) s inArray: (NSArray*) a;
 @end
 

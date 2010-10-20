@@ -13,10 +13,13 @@
 =========================================================================*/
 
 
-#import <Foundation/Foundation.h>
-#import "Scheduler.h"
+#import <Cocoa/Cocoa.h>
 
-/** \brief Protocol for multithreading scheduling*/
-@protocol Schedulable 
--(void)performWorkUnits:(NSSet *)workUnits forScheduler:(Scheduler *)scheduler;
+
+@interface ColorView : NSView {
+	NSColor *color;
+}
+
+- (void)setColor:(NSColor*)newColor;
+
 @end
