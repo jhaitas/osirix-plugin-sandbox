@@ -32,11 +32,11 @@
         orientation = [[NSMutableDictionary alloc] init];
         direction   = [[NSMutableDictionary alloc] init];
         
-        midlineElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"Fp1",
+        midlineElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"Fpz",
                                                                          FBOX(.3),@"Fz",
                                                                          FBOX(.5),@"Cz",
                                                                          FBOX(.7),@"Pz",
-                                                                         FBOX(.9),@"O1", nil ];
+                                                                         FBOX(.9),@"Oz", nil ];
         
         coronalElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"T3",
                                                                          FBOX(.3),@"C3",
