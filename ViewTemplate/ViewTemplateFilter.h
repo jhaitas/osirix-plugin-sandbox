@@ -39,4 +39,8 @@
 - (void) lowerElectrode: (ROI *) thisROI 
                 inSlice: (DCMPix *) thisSlice;
 
+- (ROI *) findRoiWithName: (NSString *) thisName
+       inViewerController: (ViewerController *)vc;
+- (ROI *) findRoiWithName: (NSString *) thisName;
+
 @end

@@ -257,6 +257,10 @@
     pixelSpacingY   = [thisDCMPix pixelSpacingY];
         
     for (StereotaxCoord *thisElectrode in myTenTwenty.electrodes) {
+        // do not place nasion or inion from template
+        if ([thisElectrode.name isEqualToString:@"nasion"]) continue;
+        if ([thisElectrode.name isEqualToString:@"inion"]) continue;
+        
         // get DICOM coords which we will convert to slice coords
         [thisElectrode returnDICOMCoords:dicomCoords withOrientation:myTenTwenty.orientation];
         
@@ -285,6 +289,12 @@
         
         [thisROI release];
     }
+    // we are done with the user input nasion and inion ... remove them
+    thisROI = [self findRoiWithName:@"nasion"];
+    [[[viewerController imageView] curRoiList] removeObjectIdenticalTo:thisROI];
+    thisROI = [self findRoiWithName:@"inion"];
+    [[[viewerController imageView] curRoiList] removeObjectIdenticalTo:thisROI];
+    
     // update screen
     [viewerController updateImage:self];
 }
@@ -391,6 +401,31 @@
     // put this ROI back to sleep
     [thisROI setROIMode: ROI_sleep];
 
+}
+
+
+
+- (ROI *) findRoiWithName: (NSString *) thisName
+       inViewerController: (ViewerController *)vc
+{
+    NSArray *thisRoiList;
+    ROI     *thisROI;
+    
+    for (thisRoiList in [[vc imageView] dcmRoiList]) {
+        for (thisROI in thisRoiList) {
+            if ([thisROI.name isEqualToString:thisName]) {
+                return thisROI;
+            }
+        }
+    }
+    
+    // if we don't find the ROI return nil
+    return nil;
+}
+
+- (ROI *) findRoiWithName: (NSString *) thisName
+{
+    return [self findRoiWithName:thisName inViewerController:viewerController];
 }
 
 @end

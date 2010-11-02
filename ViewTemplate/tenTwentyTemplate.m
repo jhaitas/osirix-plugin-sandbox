@@ -11,7 +11,7 @@
 
 @implementation tenTwentyTemplate
 
-@synthesize nasion,inion,orientation,direction;
+@synthesize userNasion,userInion,orientation,direction;
 @synthesize electrodes;
 
 - (id) initWithNasion: (StereotaxCoord *) thisNasion
@@ -26,12 +26,12 @@
         // allocate and inititalize electrodes array
         electrodes = [[NSMutableArray alloc] init];
         
-        nasion  = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisNasion.name]
+        userNasion  = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisNasion.name]
                                                 withAP:thisNasion.AP
                                                 withML:thisNasion.ML
                                                 withDV:thisNasion.DV    ];
         
-        inion   = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisInion.name]
+        userInion   = [[StereotaxCoord alloc] initWithName:[NSString stringWithString:thisInion.name]
                                                 withAP:thisInion.AP
                                                 withML:thisInion.ML
                                                 withDV:thisInion.DV    ];
@@ -40,8 +40,8 @@
         [self computeOrientation];
         
         // remap coordinates per computed orientation
-        [nasion remapWithOrientation:orientation];
-        [inion remapWithOrientation:orientation];
+        [userNasion remapWithOrientation:orientation];
+        [userInion remapWithOrientation:orientation];
         
         // create array containing electrode names and coordinates
         [self populateTemplate];
@@ -57,8 +57,8 @@
 }
 
 // coordinates natively in (x,y,z) ...
-// ... greatest difference between nasion and inion should be AP
-// ... ML should be same in nasion and inion
+// ... greatest difference between userNasion and userInion should be AP
+// ... ML should be same in userNasion and userInion
 // ... DV should be smaller difference than AP
 - (void) computeOrientation
 {
@@ -70,11 +70,11 @@
     NSMutableArray  *diff;
     
     
-    diffAP  = [[NSNumber alloc] initWithDouble:(nasion.AP - inion.AP)];
-    diffML  = [[NSNumber alloc] initWithDouble:(nasion.ML - inion.ML)];
-    diffDV  = [[NSNumber alloc] initWithDouble:(nasion.DV - inion.DV)];
+    diffAP  = [[NSNumber alloc] initWithDouble:(userNasion.AP - userInion.AP)];
+    diffML  = [[NSNumber alloc] initWithDouble:(userNasion.ML - userInion.ML)];
+    diffDV  = [[NSNumber alloc] initWithDouble:(userNasion.DV - userInion.DV)];
     
-    // set directions based on difference between nasion and inion ...
+    // set directions based on difference between userNasion and userInion ...
     // ... ML is assumed to be zero and will be given a direction of 1
     dir[0]  = ([diffAP doubleValue] >= 0 ? 1 : -1);
     dir[1]  = ([diffML doubleValue] >= 0 ? 1 : -1);
@@ -240,13 +240,13 @@
 {
     float    diffAP,diffML,diffDV;
     
-    // for now we are matching nasion to Fpz electrode
+    // for now we are matching userNasion to templateNasion electrode
     StereotaxCoord    *firstElectrode = [[electrodes objectAtIndex:0] copy];
     
     // calcuate difference from nasion to Fpz
-    diffAP = nasion.AP - firstElectrode.AP;
-    diffML = nasion.ML - firstElectrode.ML;
-    diffDV = nasion.DV - firstElectrode.DV;
+    diffAP = userNasion.AP - firstElectrode.AP;
+    diffML = userNasion.ML - firstElectrode.ML;
+    diffDV = userNasion.DV - firstElectrode.DV;
     
     // release firstElectrode because it is no longer needed
     [firstElectrode release];
@@ -262,17 +262,17 @@
 - (void) scaleCoordinatesAP
 {
     float            referenceAP,scaleAP;
-    StereotaxCoord    *Fpz,*Oz;
+    StereotaxCoord    *templateNasion,*templateInion;
     
     // locate Fpz and Oz which are used to scale on AP plane
-    Fpz    = [self getElectrodeWithName:@"Fpz"];
-    Oz    = [self getElectrodeWithName:@"Oz"];
+    templateNasion  = [self getElectrodeWithName:@"nasion"];
+    templateInion   = [self getElectrodeWithName:@"inion"];
     
     // compute the scale using absolute values in differences
-    scaleAP = (fabs(nasion.AP - inion.AP) / fabs(Fpz.AP - Oz.AP));
+    scaleAP = (fabs(userNasion.AP - userInion.AP) / fabs(templateNasion.AP - templateInion.AP));
     
     // set reference AP coordinate
-    referenceAP = Fpz.AP;
+    referenceAP = templateNasion.AP;
     
     // apply scale to each electrode in template
     for (StereotaxCoord *thisElectrode in electrodes) {
