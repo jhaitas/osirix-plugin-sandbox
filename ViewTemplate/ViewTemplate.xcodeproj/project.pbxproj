@@ -9,12 +9,12 @@
 /* Begin PBXBuildFile section */
 		58ADBBCB124A79F800DC7F62 /* StereotaxCoord.h in Headers */ = {isa = PBXBuildFile; fileRef = 58ADBBC9124A79F800DC7F62 /* StereotaxCoord.h */; };
 		58ADBBCC124A79F800DC7F62 /* StereotaxCoord.m in Sources */ = {isa = PBXBuildFile; fileRef = 58ADBBCA124A79F800DC7F62 /* StereotaxCoord.m */; };
+		58B1568312834A55004EAF70 /* tenTwentyTemplateHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 58B1568212834A55004EAF70 /* tenTwentyTemplateHUD.xib */; };
 		58C36810124290A0009883A4 /* tenTwentyTemplate.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C3680E124290A0009883A4 /* tenTwentyTemplate.h */; };
 		58C36811124290A0009883A4 /* tenTwentyTemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C3680F124290A0009883A4 /* tenTwentyTemplate.m */; };
 		58C3702C1247AD7A009883A4 /* parseCSV.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C3702A1247AD7A009883A4 /* parseCSV.h */; };
 		58C3702D1247AD7A009883A4 /* parseCSV.m in Sources */ = {isa = PBXBuildFile; fileRef = 58C3702B1247AD7A009883A4 /* parseCSV.m */; };
 		58C3703C1247AE52009883A4 /* zeroedTemplate.csv in Resources */ = {isa = PBXBuildFile; fileRef = 58C3703B1247AE52009883A4 /* zeroedTemplate.csv */; };
-		58DF0919125670A6000A471D /* scalpSkullSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 58DF0918125670A6000A471D /* scalpSkullSheet.xib */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* ViewTemplate_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* ViewTemplate_Prefix.pch */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -38,12 +38,12 @@
 		32DBCF630370AF2F00C91783 /* ViewTemplate_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewTemplate_Prefix.pch; sourceTree = "<group>"; };
 		58ADBBC9124A79F800DC7F62 /* StereotaxCoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxCoord.h; sourceTree = "<group>"; };
 		58ADBBCA124A79F800DC7F62 /* StereotaxCoord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxCoord.m; sourceTree = "<group>"; };
+		58B1568212834A55004EAF70 /* tenTwentyTemplateHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = tenTwentyTemplateHUD.xib; sourceTree = "<group>"; };
 		58C3680E124290A0009883A4 /* tenTwentyTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tenTwentyTemplate.h; sourceTree = "<group>"; };
 		58C3680F124290A0009883A4 /* tenTwentyTemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = tenTwentyTemplate.m; sourceTree = "<group>"; };
 		58C3702A1247AD7A009883A4 /* parseCSV.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parseCSV.h; sourceTree = "<group>"; };
 		58C3702B1247AD7A009883A4 /* parseCSV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = parseCSV.m; sourceTree = "<group>"; };
 		58C3703B1247AE52009883A4 /* zeroedTemplate.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = zeroedTemplate.csv; sourceTree = "<group>"; };
-		58DF0918125670A6000A471D /* scalpSkullSheet.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = scalpSkullSheet.xib; sourceTree = "<group>"; };
 		59C2B9280FF0ED7100B50385 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB5D36050680E57E00F4007A /* ViewTemplate.osirixplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ViewTemplate.osirixplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,10 +94,10 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				58B1568212834A55004EAF70 /* tenTwentyTemplateHUD.xib */,
 				58C3703B1247AE52009883A4 /* zeroedTemplate.csv */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
-				58DF0918125670A6000A471D /* scalpSkullSheet.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -251,7 +251,7 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				58C3703C1247AE52009883A4 /* zeroedTemplate.csv in Resources */,
-				58DF0919125670A6000A471D /* scalpSkullSheet.xib in Resources */,
+				58B1568312834A55004EAF70 /* tenTwentyTemplateHUD.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

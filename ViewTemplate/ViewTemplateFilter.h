@@ -22,9 +22,10 @@
     IBOutlet NSWindow       *scalpSkullSheet;
     IBOutlet NSTextField    *minScalpField;
     IBOutlet NSTextField    *maxSkullField;
+    IBOutlet NSButton       *dropElectrodes;
 }
 
-- (IBAction) scalpSkullSheetOK: (id) sender;
+- (IBAction) dropElectrodes: (id) sender;
 
 - (long) filterImage:(NSString*) menuName;
 - (void) findUserInput;

@@ -18,15 +18,16 @@
 {
     DLog(@"Starting Plugin\n");
     
+    
+    if ([NSBundle loadNibNamed:@"tenTwentyTemplateHUD" owner:self]) {
+        DLog(@"successfully loaded xib");
+    } else {
+        DLog(@"failed to load xib");
+    }
+    
     // these values should be made user configurable in the future
     minScalpValue = 45.0;
     maxSkullValue = 45.0;
-    
-    if ([NSBundle loadNibNamed:@"scalpSkullSheet.nib" owner:self]) {
-        DLog(@"successfully loaded nib");
-    } else {
-        DLog(@"failed to load nib");
-    }
     
     // there should be an ROI named 'nasion' and 'inion'
     [self findUserInput];
@@ -36,6 +37,13 @@
         // pass the nasion and inion to the tenTwentyTemplate
         myTenTwenty = [[tenTwentyTemplate alloc] initWithNasion:nasion
                                                        andInion:inion                ];
+        
+        
+        
+        // set default values for the fields in the HUD
+        [minScalpField setFloatValue:minScalpValue];
+        [maxSkullField setFloatValue:maxSkullValue];
+        
         
         // tenTwentyTemplate has been allocated and populated ...
         // ... it has been scaled on the AP plane ...
@@ -53,6 +61,22 @@
     
     DLog(@"executed method\n");
     return 0;
+}
+
+- (IBAction) dropElectrodes: (id) sender
+{    
+    // set variables according to user input in text fields
+    minScalpValue = [minScalpField floatValue];
+    maxSkullValue = [maxSkullField floatValue];
+    
+    
+    // move electrodes 20 mm above skull
+    [myTenTwenty shiftElectrodesUp: 20.0];
+    
+    // now we are ready to add the electrodes to the DICOM
+    // this call might belong somewhere else ...
+    // ... possibly in in tenTwentyTemplate
+    [self addElectrodes];
 }
 
 - (void) findUserInput
@@ -158,10 +182,6 @@
     // give the user 2D point tool
     [[viewerML imageView] setCurrentTool:t2DPoint];
     
-    // set default values for the fields in the dropdown sheet
-    [minScalpField setFloatValue:minScalpValue];
-    [maxSkullField setFloatValue:maxSkullValue];
-    
     // start a timer to wait for user to place 2 ROIs
     [NSTimer scheduledTimerWithTimeInterval:2
                                      target:self
@@ -201,42 +221,11 @@
         // close the ML slice window
         [[viewerML window] performClose:self];
         
-        // *** the next 3 operations might fit in better somewhere else
-        
         // scale the coordinates on ML plane according to user inputs
         [myTenTwenty scaleCoordinatesMLwithM1: userM1 andM2: userM2];
         
-        // move electrodes 20 mm above skull
-        [myTenTwenty shiftElectrodesUp: 20.0];
-        
-        // present with a sheet in original viewer window ...
-        // ... user will input minScalp and maxSkull values
-        [NSApp          beginSheet: scalpSkullSheet
-                    modalForWindow: [viewerController window]
-                     modalDelegate: self
-                    didEndSelector: nil
-                       contextInfo: nil                         ];
-        
-        
+        [dropElectrodes setEnabled:YES];
     }
-}
-
-- (IBAction) scalpSkullSheetOK: (id) sender
-{
-    // the user clicked ok on the sheet
-    
-    // set variables according to user input in text fields
-    minScalpValue = [minScalpField floatValue];
-    maxSkullValue = [maxSkullField floatValue];
-    
-    // next two lines end the sheet
-    [scalpSkullSheet orderOut:nil];
-    [NSApp endSheet:scalpSkullSheet];
-    
-    // now we are ready to add the electrodes to the DICOM
-    // this call might belong somewhere else ...
-    // ... possibly in in tenTwentyTemplate
-    [self addElectrodes];
 }
 
 - (void) addElectrodes
