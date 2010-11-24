@@ -123,6 +123,63 @@
     [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
 }
 
+- (IBAction) mouseTest: (id) sender
+{
+    ROI     *focalROI;
+    float   pixelSpacingX,pixelSpacingY;
+    NSPoint roiPoint,crossPoint;
+    
+    focalROI        = nil;
+    pixelSpacingX   = mprViewer.mprView1.pixelSpacingX;
+    pixelSpacingY   = mprViewer.mprView1.pixelSpacingY;
+    
+    for (ROI *r in mprViewer.mprView1.curRoiList) {
+        if ([r.parentROI.name isEqualToString:@"Oz"]) {
+            focalROI = r;
+        }
+    }
+    
+    // return if we can't find the correct ROIs
+    if (focalROI == nil) return;
+    
+    crossPoint = [self centerLines:mprViewer.mprView1];
+    
+    roiPoint = focalROI.rect.origin;
+    
+    roiPoint.x *= pixelSpacingX;
+    roiPoint.y *= pixelSpacingY;
+        
+    NSLog(@"roiPoint        x,y = %f,%f\n",roiPoint.x,roiPoint.y);
+    NSLog(@"crossPoint      x,y = %f,%f\n",crossPoint.x,crossPoint.y);
+    
+    // FIXME using artificial points ...
+    // ... need to transform roiPoint and crossPoint to synthetic points below
+    
+    CGPoint pt1,pt2;
+    
+    pt1 = CGPointMake(445, 384);
+    pt2 = CGPointMake(511, 501);
+    
+    CGEventRef  myMouseDown,myMouseDrag,myMouseUp;
+    
+    // Mouse Down
+    myMouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, pt1, kCGMouseButtonLeft);
+    
+    // Mouse Dragged
+    myMouseDrag = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, pt2, kCGMouseButtonLeft);
+    
+    // Mouse Up
+    myMouseUp   = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, pt2, kCGMouseButtonLeft);
+    
+    CGEventPost(kCGHIDEventTap, myMouseDown);
+    CGEventPost(kCGHIDEventTap, myMouseDrag);
+    CGEventPost(kCGHIDEventTap, myMouseUp);
+    
+    NSLog(@"roiPoint   x,y = %f,%f\n",roiPoint.x,roiPoint.y);
+    NSLog(@"crossPoint x,y = %f,%f\n",crossPoint.x,crossPoint.y);
+    
+}
+
 - (void) findUserInput
 {
     int     i,ii;
@@ -1132,5 +1189,74 @@
     // update screen
     [vc updateImage:self];
 }
+
+
+#pragma mark MPR class methods
+
+- (NSPoint) centerLines: (MPRDCMView *) sender
+{
+    MPRDCMView  *mprView1,*mprView2,*mprView3;
+	float       a[2][3];
+	float       b[2][3];
+    
+    
+    mprView1 = mprViewer.mprView1;
+    mprView2 = mprViewer.mprView2;
+    mprView3 = mprViewer.mprView3;
+    
+    if (sender == mprView1) {
+        [self computeCrossReferenceLinesBetween: mprView1 and: mprView2 result: a];
+        [self computeCrossReferenceLinesBetween: mprView1 and: mprView3 result: b];
+    }
+    
+    
+    if (sender == mprView2) {
+        [self computeCrossReferenceLinesBetween: mprView2 and: mprView1 result: a];
+        [self computeCrossReferenceLinesBetween: mprView2 and: mprView3 result: b];
+    }
+    
+    
+    if (sender == mprView3) {
+        [self computeCrossReferenceLinesBetween: mprView3 and: mprView1 result: a];
+        [self computeCrossReferenceLinesBetween: mprView3 and: mprView2 result: b];
+    }
+    
+    
+	NSPoint a1 = NSMakePoint( a[ 0][ 0], a[ 0][ 1]);
+	NSPoint a2 = NSMakePoint( a[ 1][ 0], a[ 1][ 1]);
+	
+	NSPoint b1 = NSMakePoint( b[ 0][ 0], b[ 0][ 1]);
+	NSPoint b2 = NSMakePoint( b[ 1][ 0], b[ 1][ 1]);
+	
+	NSPoint r = NSMakePoint( 0, 0);
+	
+	[DCMView intersectionBetweenTwoLinesA1: a1 A2: a2 B1: b1 B2: b2 result: &r];
+	
+	return r;
+}
+
+- (void) computeCrossReferenceLinesBetween: (MPRDCMView*) mp1 and:(MPRDCMView*) mp2 result: (float[2][3]) s
+{
+	float vectorA[ 9], vectorB[ 9];
+	float originA[ 3], originB[ 3];
+    
+	s[ 0][ 0] = HUGE_VALF; s[ 0][ 1] = HUGE_VALF; s[ 0][ 2] = HUGE_VALF;
+	s[ 1][ 0] = HUGE_VALF; s[ 1][ 1] = HUGE_VALF; s[ 1][ 2] = HUGE_VALF;
+	
+	originA[ 0] = mp2.pix.originX; originA[ 1] = mp2.pix.originY; originA[ 2] = mp2.pix.originZ;
+	originB[ 0] = mp1.pix.originX; originB[ 1] = mp1.pix.originY; originB[ 2] = mp1.pix.originZ;
+	
+	[mp2.pix orientation: vectorA];
+	[mp1.pix orientation: vectorB];
+	
+	float slicePoint[ 3];
+	float sliceVector[ 3];
+	
+	if( intersect3D_2Planes( vectorA+6, originA, vectorB+6, originB, sliceVector, slicePoint) == noErr)
+	{
+		[mp1 computeSliceIntersection: mp2.pix sliceFromTo: s vector: vectorB origin: originB];
+	}
+}
+
 
 @end

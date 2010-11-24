@@ -56,6 +56,7 @@
     IBOutlet NSButton       *placeMidlineElectrodesButton;
     IBOutlet NSButton       *placeCoronalElectrodesButton;
     IBOutlet NSButton       *openMPRViewerButton;
+    IBOutlet NSButton       *mouseTest;
 }
 
 @property (assign) BOOL foundNasion,foundInion;
@@ -68,6 +69,7 @@
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
 - (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
 - (IBAction) openMPRViewerButtonClick: (id) sender;
+- (IBAction) mouseTest: (id) sender;
 
 - (void) findUserInput;
 - (void) getROI: (ROI *)    thisROI 
@@ -113,5 +115,10 @@
 
 - (void) printAllElectrodesInStereotax;
 - (void) placeElectrodesInViewerController: (ViewerController *) vc;
+
+
+#pragma mark MPR class methods
+- (NSPoint) centerLines: (MPRDCMView *) sender;
+- (void) computeCrossReferenceLinesBetween: (MPRDCMView*) mp1 and:(MPRDCMView*) mp2 result: (float[2][3]) s;
 
 @end

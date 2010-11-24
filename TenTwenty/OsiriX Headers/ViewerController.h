@@ -360,7 +360,10 @@ enum
 
 /** Array of all 2D Viewers */
 + (NSMutableArray*) getDisplayed2DViewers;
++ (NSMutableArray*) get2DViewers;
 + (NSArray*) getDisplayedSeries;
++ (BOOL) isFrontMost2DViewer: (NSWindow*) ww;
++ (ViewerController*) frontMostDisplayed2DViewer;
 + (void) closeAllWindows;
 
 /**  Create a new 2D Viewer
@@ -690,6 +693,8 @@ enum
 - (IBAction) roiSetPixels:(id) sender;
 - (IBAction) roiPropagateSetup: (id) sender;
 - (IBAction) roiPropagate:(id) sender;
+- (void) loadSeriesUp;
+- (void) loadSeriesDown;
 - (void) showWindowTransition;
 - (float) computeInterval;
 + (float) computeIntervalForDCMPix: (DCMPix*) p1 And: (DCMPix*) p2;
