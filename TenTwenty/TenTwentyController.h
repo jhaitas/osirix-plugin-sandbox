@@ -64,13 +64,15 @@
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
 
-// HUD Actions
+#pragma mark Interface Methods
 - (IBAction) identifyNasionAndInionButtonClick: (id) sender;
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
 - (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
 - (IBAction) openMPRViewerButtonClick: (id) sender;
 - (IBAction) mouseTest: (id) sender;
 
+
+#pragma mark Work Methods
 - (void) findUserInput;
 - (void) getROI: (ROI *)    thisROI 
         fromPix: (DCMPix *) thisPix 
@@ -120,5 +122,10 @@
 #pragma mark MPR class methods
 - (NSPoint) centerLines: (MPRDCMView *) sender;
 - (void) computeCrossReferenceLinesBetween: (MPRDCMView*) mp1 and:(MPRDCMView*) mp2 result: (float[2][3]) s;
+
+
+#pragma mark synthesize Mouse
+- (void) synthClickDragFromPt: (CGPoint) pt1
+                         toPt: (CGPoint) pt2;
 
 @end

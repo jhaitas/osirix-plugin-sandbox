@@ -56,6 +56,7 @@
     return self;
 }
 
+#pragma mark Interface Methods
 - (IBAction) identifyNasionAndInionButtonClick: (id) sender
 {
     // there should be an ROI named 'nasion' and 'inion'
@@ -148,38 +149,31 @@
     
     roiPoint.x *= pixelSpacingX;
     roiPoint.y *= pixelSpacingY;
-        
+    
+    NSPoint conPoint = [mprViewer.mprView1 ConvertFromGL2NSView:crossPoint];
+    
+    
     NSLog(@"roiPoint        x,y = %f,%f\n",roiPoint.x,roiPoint.y);
     NSLog(@"crossPoint      x,y = %f,%f\n",crossPoint.x,crossPoint.y);
+    NSLog(@"conPoint        x,y = %f,%f\n",conPoint.x,conPoint.y);
     
     // FIXME using artificial points ...
     // ... need to transform roiPoint and crossPoint to synthetic points below
-    
     CGPoint pt1,pt2;
-    
     pt1 = CGPointMake(445, 384);
     pt2 = CGPointMake(511, 501);
     
-    CGEventRef  myMouseDown,myMouseDrag,myMouseUp;
+    [self synthClickDragFromPt:pt1 toPt:pt2];
     
-    // Mouse Down
-    myMouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, pt1, kCGMouseButtonLeft);
-    
-    // Mouse Dragged
-    myMouseDrag = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, pt2, kCGMouseButtonLeft);
-    
-    // Mouse Up
-    myMouseUp   = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, pt2, kCGMouseButtonLeft);
-    
-    CGEventPost(kCGHIDEventTap, myMouseDown);
-    CGEventPost(kCGHIDEventTap, myMouseDrag);
-    CGEventPost(kCGHIDEventTap, myMouseUp);
+    crossPoint = [self centerLines:mprViewer.mprView1];
     
     NSLog(@"roiPoint   x,y = %f,%f\n",roiPoint.x,roiPoint.y);
     NSLog(@"crossPoint x,y = %f,%f\n",crossPoint.x,crossPoint.y);
     
 }
 
+
+#pragma mark Work Methods
 - (void) findUserInput
 {
     int     i,ii;
@@ -1259,4 +1253,24 @@
 }
 
 
+#pragma mark synthesize Mouse
+
+- (void) synthClickDragFromPt: (CGPoint) pt1
+                         toPt: (CGPoint) pt2
+{
+    CGEventRef  myMouseDown,myMouseDrag,myMouseUp;
+    
+    // Mouse Down
+    myMouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, pt1, kCGMouseButtonLeft);
+    
+    // Mouse Dragged
+    myMouseDrag = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, pt2, kCGMouseButtonLeft);
+    
+    // Mouse Up
+    myMouseUp   = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, pt2, kCGMouseButtonLeft);
+    
+    CGEventPost(kCGHIDEventTap, myMouseDown);
+    CGEventPost(kCGHIDEventTap, myMouseDrag);
+    CGEventPost(kCGHIDEventTap, myMouseUp);
+}
 @end
