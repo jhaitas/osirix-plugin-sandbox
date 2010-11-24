@@ -1272,5 +1272,7 @@
     CGEventPost(kCGHIDEventTap, myMouseDown);
     CGEventPost(kCGHIDEventTap, myMouseDrag);
     CGEventPost(kCGHIDEventTap, myMouseUp);
+    
+    // TODO - restore original mouse cursor location
 }
 @end
