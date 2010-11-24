@@ -246,9 +246,12 @@
     pixelSpacingY   = [thisDCMPix pixelSpacingY];
         
     for (StereotaxCoord *thisElectrode in myTenTwenty.electrodes) {
-        // do not place nasion or inion from template
+        // do not place nasion or inion from template ...
+        // do not place M1 or M2 either
         if ([thisElectrode.name isEqualToString:@"nasion"]) continue;
         if ([thisElectrode.name isEqualToString:@"inion"]) continue;
+        if ([thisElectrode.name isEqualToString:@"M1"]) continue;
+        if ([thisElectrode.name isEqualToString:@"M2"]) continue;
         
         // get DICOM coords which we will convert to slice coords
         [thisElectrode returnDICOMCoords:dicomCoords withOrientation:myTenTwenty.orientation];
