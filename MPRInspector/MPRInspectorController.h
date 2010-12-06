@@ -21,6 +21,7 @@
     IBOutlet NSButton   *openMprViewer;
     IBOutlet NSButton   *printCameraInfo;
     IBOutlet NSButton   *printROICoordList;
+    IBOutlet NSButton   *centerViewTest;
     IBOutlet NSButton   *convertRoiCoords;
 }
 
@@ -30,6 +31,10 @@
 - (IBAction) openMprViewer: (id) sender;
 - (IBAction) printCameraInfo: (id) sender;
 - (IBAction) printROICoordList: (id) sender;
+- (IBAction) centerViewTest: (id) sender;
 - (IBAction) convertRoiCoords: (id) sender;
+
+- (void) centerView: (MPRDCMView *) theView 
+             onPt3D: (float *) pt3D;
 
 @end

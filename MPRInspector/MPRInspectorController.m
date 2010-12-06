@@ -82,6 +82,46 @@
     
 }
 
+- (IBAction) centerViewTest: (id) sender
+{
+    unsigned int    i,indexROI;
+    float           pos[3];
+    VRController    *vrController;
+    VRView          *vrView;
+    NSString        *roiName;
+    NSArray         *roi2DPointsArray,*point3DPositionsArray;
+    ROI             *r,*thisROI;
+    
+    roiName                 = [NSString stringWithString:@"nasion"];
+    vrController            = [mprViewer valueForKey:@"hiddenVRController"];
+    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
+    roi2DPointsArray        = vrController.roi2DPointsArray;
+    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
+    
+    r = nil;
+    thisROI = nil;
+    
+    for (i = 0; i < [roi2DPointsArray count]; i++) {
+        r = [roi2DPointsArray objectAtIndex:i];
+        if ([r.name isEqualToString:roiName]) {
+            thisROI = r;
+            indexROI = i;
+        }
+    }
+             
+    if (thisROI == nil) {
+        NSLog(@"Failed to find ROI named %@.\n",roiName);
+        return;
+    }
+    
+    // we found the ROI we're interested in ...
+    // ... get the 3D position
+    [[point3DPositionsArray objectAtIndex:indexROI] getValue:pos];
+    
+    
+    [self centerView:mprViewer.mprView1 onPt3D:pos];
+}
+
 - (IBAction) convertRoiCoords: (id) sender
 {
     float   pt2d[3],pt3d[3];
@@ -104,6 +144,63 @@
         NSLog(@"%@ converts from (%.3f, %.3f) to (%.3f, %.3f)\n",r.parentROI.name,roiPoint.x,roiPoint.y,glPoint.x,glPoint.y);
         NSLog(@"%@ converts from (%.3f, %.3f, %.3f) to (%.3f, %.3f, %.3f)\n",r.parentROI.name,pt2d[0],pt2d[1],pt2d[2],pt3d[0],pt3d[1],pt3d[2]);
     }
+}
+
+- (void) centerView: (MPRDCMView *) theView 
+             onPt3D: (float *) pt3D
+{
+    Camera  *theCamera;
+    Point3D *oldFocal,*oldPosition,*direction,*newFocal,*newPosition;
+    
+    theCamera   = [[Camera alloc] initWithCamera:[theView camera]];
+    
+    oldFocal    = [[Point3D alloc] initWithPoint3D:theCamera.focalPoint];
+    oldPosition = [[Point3D alloc] initWithPoint3D:theCamera.position];
+    direction   = [[Point3D alloc] initWithPoint3D:oldFocal];
+                  
+    [direction subtract:oldPosition];
+    
+    NSLog(@"direction = %@\n",direction);
+    
+    newPosition    = [Point3D pointWithX:pt3D[0] y:pt3D[1] z:pt3D[2]];
+    newFocal       = [[Point3D alloc] initWithPoint3D:newPosition];
+    
+    [newFocal add:direction];
+    
+    NSLog(@"%@\n",theCamera);
+    
+    [theCamera.focalPoint setPoint3D:newFocal];
+    [theCamera.position setPoint3D:newPosition];
+    
+    NSLog(@"%@\n",theCamera);
+    
+    // the following line does not do the job
+    
+	[theView.windowController addToUndoQueue:@"mprCamera"];
+    
+    theView.camera = theCamera;
+    
+    [theView.vrView setCamera:theCamera];
+    theView.camera.forceUpdate = YES;
+    
+	if( [[theView window] firstResponder] != theView)
+		[[theView window] makeFirstResponder: theView];
+    
+    [theView restoreCamera];
+    [theView updateViewMPR: NO];
+    
+	
+	[NSObject cancelPreviousPerformRequestsWithTarget: theView.windowController selector:@selector( delayedFullLODRendering:) object: theView];	
+	[theView.windowController performSelector: @selector( delayedFullLODRendering:) withObject: theView afterDelay: 0.2];
+//    [theView setValue:[NSNumber numberWithBool:YES] forKey:@"moveCenter"];
+//    [theView setValue:[NSNumber numberWithBool:YES] forKey:@"dontReenterCrossReferenceLines"];
+//    [theView setValue:[NSNumber numberWithBool:NO] forKey:@"dontReenterCrossReferenceLines"];
+    
+    // at this point it appears we have the camera set up the way we would want it ...
+    // ... updating the view causes other things to happen though
+    
+    
+    NSLog(@"%@\n",theView.camera);
 }
 
 @end
