@@ -16,6 +16,7 @@
     if (self = [super init]) {
         [NSBundle loadNibNamed:@"MprInspectorHUD" owner:self];
         
+        currentROI = nil;
     }
     return self;
 }
@@ -121,6 +122,16 @@
     [self centerView:mprViewer.mprView1 onPt3D:pos];
 }
 
+- (IBAction) viewEachROI: (id) sender
+{
+    // start a timer to view next ROI every 2 seconds
+    [NSTimer scheduledTimerWithTimeInterval:2
+                                     target:self
+                                   selector:@selector(centerOnEachROI:)
+                                   userInfo:nil
+                                    repeats:YES];
+}
+
 - (IBAction) convertRoiCoords: (id) sender
 {
     float   pt2d[3],pt3d[3];
@@ -143,6 +154,39 @@
         NSLog(@"%@ converts from (%.3f, %.3f) to (%.3f, %.3f)\n",r.parentROI.name,roiPoint.x,roiPoint.y,glPoint.x,glPoint.y);
         NSLog(@"%@ converts from (%.3f, %.3f, %.3f) to (%.3f, %.3f, %.3f)\n",r.parentROI.name,pt2d[0],pt2d[1],pt2d[2],pt3d[0],pt3d[1],pt3d[2]);
     }
+}
+
+- (void) centerOnEachROI: (NSTimer *) theTimer
+{
+    unsigned int    indexROI;
+    float           pos[3];
+    VRController    *vrController;
+    VRView          *vrView;
+    NSArray         *roi2DPointsArray,*point3DPositionsArray;
+    
+    vrController            = [mprViewer valueForKey:@"hiddenVRController"];
+    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
+    roi2DPointsArray        = vrController.roi2DPointsArray;
+    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
+    
+    if (currentROI == nil) {
+        currentROI = [roi2DPointsArray lastObject];
+    }
+    
+    indexROI = [roi2DPointsArray indexOfObject:currentROI] + 1;
+    
+    if (indexROI == [roi2DPointsArray count]) {
+        indexROI = 0;
+    }
+    
+    currentROI = [roi2DPointsArray objectAtIndex:indexROI];
+    
+    [[point3DPositionsArray objectAtIndex:indexROI] getValue:pos];
+    
+    
+    [self centerView:mprViewer.mprView1 onPt3D:pos];
+    
+    
 }
 
 - (void) centerView: (MPRDCMView *) theView 

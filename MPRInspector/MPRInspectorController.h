@@ -17,11 +17,14 @@
     ViewerController    *viewerController;
     MPRController       *mprViewer;
     
+    ROI                 *currentROI;
+    
     IBOutlet NSPanel    *mprInspectorHUD;
     IBOutlet NSButton   *openMprViewer;
     IBOutlet NSButton   *printCameraInfo;
     IBOutlet NSButton   *printROICoordList;
     IBOutlet NSButton   *centerViewTest;
+    IBOutlet NSButton   *viewEachROI;
     IBOutlet NSButton   *convertRoiCoords;
 }
 
@@ -32,7 +35,10 @@
 - (IBAction) printCameraInfo: (id) sender;
 - (IBAction) printROICoordList: (id) sender;
 - (IBAction) centerViewTest: (id) sender;
+- (IBAction) viewEachROI: (id) sender;
 - (IBAction) convertRoiCoords: (id) sender;
+
+- (void) centerOnEachROI: (NSTimer *) theTimer;
 
 - (void) centerView: (MPRDCMView *) theView 
              onPt3D: (float *) pt3D;
