@@ -24,7 +24,7 @@
 {
     [self init];
     owner = theOwner;
-    viewerController = [owner viewerController];
+    viewerController = [owner valueForKey:@"viewerController"];
     return self;
 }
 
@@ -160,47 +160,21 @@
                   
     [direction subtract:oldPosition];
     
-    NSLog(@"direction = %@\n",direction);
-    
-    newPosition    = [Point3D pointWithX:pt3D[0] y:pt3D[1] z:pt3D[2]];
-    newFocal       = [[Point3D alloc] initWithPoint3D:newPosition];
+    newPosition = [Point3D pointWithX:pt3D[0] y:pt3D[1] z:pt3D[2]];
+    newFocal    = [[Point3D alloc] initWithPoint3D:newPosition];
     
     [newFocal add:direction];
     
-    NSLog(@"%@\n",theCamera);
-    
     [theCamera.focalPoint setPoint3D:newFocal];
     [theCamera.position setPoint3D:newPosition];
-    
-    NSLog(@"%@\n",theCamera);
-    
-    // the following line does not do the job
-    
-	[theView.windowController addToUndoQueue:@"mprCamera"];
+    theCamera.forceUpdate = YES;
     
     theView.camera = theCamera;
-    
-    [theView.vrView setCamera:theCamera];
-    theView.camera.forceUpdate = YES;
-    
-	if( [[theView window] firstResponder] != theView)
-		[[theView window] makeFirstResponder: theView];
-    
     [theView restoreCamera];
+    
     [theView updateViewMPR: NO];
+	[theView.windowController updateViewsAccordingToFrame:theView];
     
-	
-	[NSObject cancelPreviousPerformRequestsWithTarget: theView.windowController selector:@selector( delayedFullLODRendering:) object: theView];	
-	[theView.windowController performSelector: @selector( delayedFullLODRendering:) withObject: theView afterDelay: 0.2];
-//    [theView setValue:[NSNumber numberWithBool:YES] forKey:@"moveCenter"];
-//    [theView setValue:[NSNumber numberWithBool:YES] forKey:@"dontReenterCrossReferenceLines"];
-//    [theView setValue:[NSNumber numberWithBool:NO] forKey:@"dontReenterCrossReferenceLines"];
-    
-    // at this point it appears we have the camera set up the way we would want it ...
-    // ... updating the view causes other things to happen though
-    
-    
-    NSLog(@"%@\n",theView.camera);
 }
 
 @end
