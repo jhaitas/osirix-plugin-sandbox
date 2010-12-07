@@ -48,13 +48,12 @@
     int             i;
     float           x,y,z;
     VRController    *vrController;
-    NSArray         *roi2DPointsArray,*sliceNumber2DPointsArray,*x2DPointsArray,*y2DPointsArray,*z2DPointsArray;
+    NSArray         *roi2DPointsArray,*x2DPointsArray,*y2DPointsArray,*z2DPointsArray;
     
     
     // VRController
     vrController                = [mprViewer valueForKey:@"hiddenVRController"];
     roi2DPointsArray            = vrController.roi2DPointsArray;
-    sliceNumber2DPointsArray    = [vrController valueForKey:@"sliceNumber2DPointsArray"];
     x2DPointsArray              = [vrController valueForKey:@"x2DPointsArray"];
     y2DPointsArray              = [vrController valueForKey:@"y2DPointsArray"];
     z2DPointsArray              = [vrController valueForKey:@"z2DPointsArray"];
@@ -149,29 +148,25 @@
 - (void) centerView: (MPRDCMView *) theView 
              onPt3D: (float *) pt3D
 {
-    Camera  *theCamera;
-    Point3D *oldFocal,*oldPosition,*direction,*newFocal,*newPosition;
+    Point3D *direction,*newFocal,*newPosition;
     
-    theCamera   = [[Camera alloc] initWithCamera:[theView camera]];
-    
-    oldFocal    = [[Point3D alloc] initWithPoint3D:theCamera.focalPoint];
-    oldPosition = [[Point3D alloc] initWithPoint3D:theCamera.position];
-    direction   = [[Point3D alloc] initWithPoint3D:oldFocal];
+    direction   = [[Point3D alloc] initWithPoint3D:theView.camera.focalPoint];
                   
-    [direction subtract:oldPosition];
+    [direction subtract:theView.camera.position];
     
     newPosition = [Point3D pointWithX:pt3D[0] y:pt3D[1] z:pt3D[2]];
-    newFocal    = [[Point3D alloc] initWithPoint3D:newPosition];
+    newFocal    = [[[Point3D alloc] initWithPoint3D:newPosition] autorelease];
     
     [newFocal add:direction];
     
-    [theCamera.focalPoint setPoint3D:newFocal];
-    [theCamera.position setPoint3D:newPosition];
+    [theView.camera.focalPoint setPoint3D:newFocal];
+    [theView.camera.position setPoint3D:newPosition];
     
-    theView.camera = theCamera;
     [theView restoreCamera];
     
     [theView.windowController updateViewsAccordingToFrame:theView];
+    
+    [direction release];
 }
 
 @end
