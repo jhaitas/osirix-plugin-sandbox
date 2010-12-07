@@ -262,21 +262,4 @@ static double deg2rad = 3.14159265358979/180.0;
     return [Point3D pointWithX:(float)(x/mag) y:(float)(y/mag) z:(float)(z/mag)];
 }
 
-/*
-ux#=u*x
-uy#=u*y
-uz#=u*z
-vx#=v*x
-vy#=v*y
-vz#=v*z
-wx#=w*x
-wy#=w*y
-wz#=w*z
-sa#=Sin(a)
-ca#=Cos(a)
-x#=u*(ux+vy+wz)+(x*(v*v+w*w)-u*(vy+wz))*ca+(-wy+vz)*sa
-y#=v*(ux+vy+wz)+(y*(u*u+w*w)-v*(ux+wz))*ca+(wx-uz)*sa
-z#=w*(ux+vy+wz)+(z*(u*u+v*v)-w*(ux+vy))*ca+(-vx+uy)*sa
-*/
-
 @end
