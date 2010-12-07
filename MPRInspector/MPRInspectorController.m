@@ -35,6 +35,12 @@
     [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
     [mprViewer showWindow:self];
     [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
+    
+    
+    vrController            = [mprViewer valueForKey:@"hiddenVRController"];
+    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
+    roi2DPointsArray        = vrController.roi2DPointsArray;
+    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
 }
 
 - (IBAction) printCameraInfo: (id) sender
@@ -48,17 +54,14 @@
 {
     int             i;
     float           x,y,z;
-    VRController    *vrController;
-    NSArray         *roi2DPointsArray,*x2DPointsArray,*y2DPointsArray,*z2DPointsArray;
+    float           pos[3];
+    NSArray         *x2DPointsArray,*y2DPointsArray,*z2DPointsArray;
     
     
-    // VRController
-    vrController                = [mprViewer valueForKey:@"hiddenVRController"];
-    roi2DPointsArray            = vrController.roi2DPointsArray;
+    // DICOM Coordinates
     x2DPointsArray              = [vrController valueForKey:@"x2DPointsArray"];
     y2DPointsArray              = [vrController valueForKey:@"y2DPointsArray"];
     z2DPointsArray              = [vrController valueForKey:@"z2DPointsArray"];
-    
     for (i = 0; i < [roi2DPointsArray count]; i++) {
         x = [[x2DPointsArray objectAtIndex:i] floatValue];
         y = [[y2DPointsArray objectAtIndex:i] floatValue];
@@ -66,15 +69,7 @@
         NSLog(@"%d x,y,z = %f,%f,%f\n",i,x,y,z);
     }
     
-    // VRView !!! contains correct coordinates for camera!!!!
-    float   pos[3];
-    VRView  *vrView;
-    NSArray *point3DPositionsArray;
-    
-    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
-    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
-    
-    
+    // Volume world coordinates
     for (i = 0; i < [point3DPositionsArray count]; i++) {
         [[point3DPositionsArray objectAtIndex:i] getValue:pos];
         NSLog(@"%d x,y,z = %f,%f,%f\n",i,pos[0],pos[1],pos[2]);
@@ -86,17 +81,10 @@
 {
     unsigned int    i,indexROI;
     float           pos[3];
-    VRController    *vrController;
-    VRView          *vrView;
     NSString        *roiName;
-    NSArray         *roi2DPointsArray,*point3DPositionsArray;
     ROI             *r,*thisROI;
     
     roiName                 = [NSString stringWithString:@"nasion"];
-    vrController            = [mprViewer valueForKey:@"hiddenVRController"];
-    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
-    roi2DPointsArray        = vrController.roi2DPointsArray;
-    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
     
     r = nil;
     thisROI = nil;
@@ -159,15 +147,7 @@
 - (void) centerOnEachROI: (NSTimer *) theTimer
 {
     unsigned int    indexROI;
-    float           pos[3];
-    VRController    *vrController;
-    VRView          *vrView;
-    NSArray         *roi2DPointsArray,*point3DPositionsArray;
-    
-    vrController            = [mprViewer valueForKey:@"hiddenVRController"];
-    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
-    roi2DPointsArray        = vrController.roi2DPointsArray;
-    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
+    float           pos[3];    
     
     if (currentROI == nil) {
         currentROI = [roi2DPointsArray lastObject];

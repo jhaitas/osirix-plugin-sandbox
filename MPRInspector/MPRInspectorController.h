@@ -17,6 +17,11 @@
     ViewerController    *viewerController;
     MPRController       *mprViewer;
     
+    VRController        *vrController;
+    VRView              *vrView;
+    
+    NSArray             *roi2DPointsArray,*point3DPositionsArray;
+    
     ROI                 *currentROI;
     
     IBOutlet NSPanel    *mprInspectorHUD;
