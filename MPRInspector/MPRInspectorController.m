@@ -167,14 +167,11 @@
     
     [theCamera.focalPoint setPoint3D:newFocal];
     [theCamera.position setPoint3D:newPosition];
-    theCamera.forceUpdate = YES;
     
     theView.camera = theCamera;
     [theView restoreCamera];
     
-    [theView updateViewMPR: NO];
-	[theView.windowController updateViewsAccordingToFrame:theView];
-    
+    [theView.windowController updateViewsAccordingToFrame:theView];
 }
 
 @end
