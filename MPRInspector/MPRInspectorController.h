@@ -24,13 +24,21 @@
     
     ROI                 *currentROI;
     
+    BOOL                runningViewTest;
+    NSTimer             *centerTimer,*rotationTimer;
+    
     IBOutlet NSPanel    *mprInspectorHUD;
     IBOutlet NSButton   *openMprViewer;
     IBOutlet NSButton   *printCameraInfo;
     IBOutlet NSButton   *printROICoordList;
     IBOutlet NSButton   *centerViewTest;
+    IBOutlet NSButton   *rotationTest;
+    
+    IBOutlet NSTextField *rotationTheta;
+    
     IBOutlet NSButton   *viewEachROI;
-    IBOutlet NSButton   *convertRoiCoords;
+    
+    IBOutlet NSTextField *secondsPerROI;
 }
 
 - (id) init;
@@ -40,12 +48,22 @@
 - (IBAction) printCameraInfo: (id) sender;
 - (IBAction) printROICoordList: (id) sender;
 - (IBAction) centerViewTest: (id) sender;
+- (IBAction) rotationTest: (id) sender;
 - (IBAction) viewEachROI: (id) sender;
-- (IBAction) convertRoiCoords: (id) sender;
 
 - (void) centerOnEachROI: (NSTimer *) theTimer;
+- (void) rotateViewInc: (NSTimer *) theTimer;
 
 - (void) centerView: (MPRDCMView *) theView 
              onPt3D: (float *) pt3D;
+- (void) rotateView: (MPRDCMView *) theView
+            degrees: (float) theta;
+
+
+- (Point3D *) rotateVector: (Point3D *) vectorOne
+              aroundVector: (Point3D *) axis
+                   byTheta: (float) theta;
+
+- (Point3D *) normalizePt: (Point3D *) thePt;
 
 @end

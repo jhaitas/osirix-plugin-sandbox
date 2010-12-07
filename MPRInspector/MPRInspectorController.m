@@ -8,6 +8,7 @@
 
 #import "MPRInspectorController.h"
 
+static double deg2rad = 3.14159265358979/180.0;
 
 @implementation MPRInspectorController
 
@@ -15,7 +16,10 @@
 {
     if (self = [super init]) {
         [NSBundle loadNibNamed:@"MprInspectorHUD" owner:self];
-        
+        [rotationTheta setFloatValue:90.0];
+        [secondsPerROI setDoubleValue:5];
+        runningViewTest = NO;
+        [viewEachROI setTitle:@"Start View Each ROI"];
         currentROI = nil;
     }
     return self;
@@ -110,38 +114,41 @@
     [self centerView:mprViewer.mprView1 onPt3D:pos];
 }
 
-- (IBAction) viewEachROI: (id) sender
+- (IBAction) rotationTest: (id) sender
 {
-    // start a timer to view next ROI every 2 seconds
-    [NSTimer scheduledTimerWithTimeInterval:2
-                                     target:self
-                                   selector:@selector(centerOnEachROI:)
-                                   userInfo:nil
-                                    repeats:YES];
+    // rotate view 2 by user defined theta
+    [self rotateView:mprViewer.mprView2 degrees:[rotationTheta floatValue]];
 }
 
-- (IBAction) convertRoiCoords: (id) sender
+- (IBAction) viewEachROI: (id) sender
 {
-    float   pt2d[3],pt3d[3];
-    NSPoint roiPoint,glPoint;
-    
-    for (ROI *r in mprViewer.mprView1.curRoiList) {
-        roiPoint = r.rect.origin;
-        
-        roiPoint.x *= mprViewer.mprView1.pixelSpacingX;
-        roiPoint.y *= mprViewer.mprView1.pixelSpacingY;
-        
-        glPoint = [mprViewer.mprView1 ConvertFromNSView2GL:roiPoint];
-        
-        pt2d[0] = glPoint.x;
-        pt2d[1] = glPoint.y;
-        pt2d[2] = 0;
-        
-        [mprViewer.mprView1.vrView convert2DPoint:pt2d to3DPoint:pt3d];
-        
-        NSLog(@"%@ converts from (%.3f, %.3f) to (%.3f, %.3f)\n",r.parentROI.name,roiPoint.x,roiPoint.y,glPoint.x,glPoint.y);
-        NSLog(@"%@ converts from (%.3f, %.3f, %.3f) to (%.3f, %.3f, %.3f)\n",r.parentROI.name,pt2d[0],pt2d[1],pt2d[2],pt3d[0],pt3d[1],pt3d[2]);
+    if (runningViewTest) {
+        [centerTimer invalidate];
+        [rotationTimer invalidate];
+        runningViewTest = NO;
+        [viewEachROI setTitle:@"Start View Each ROI"];
+        return;
     }
+    
+    // start a timer to view next ROI every 2 seconds
+    centerTimer = [NSTimer scheduledTimerWithTimeInterval:[secondsPerROI doubleValue]
+                                                   target:self
+                                                 selector:@selector(centerOnEachROI:)
+                                                 userInfo:nil
+                                                  repeats:YES];
+    
+    
+    
+    // start a timer to view next ROI every 2 seconds
+    rotationTimer = [NSTimer scheduledTimerWithTimeInterval:[secondsPerROI doubleValue]/360.0
+                                                     target:self
+                                                   selector:@selector(rotateViewInc:)
+                                                   userInfo:nil
+                                                    repeats:YES];
+    
+    [viewEachROI setTitle:@"Stop View Each ROI"];
+    
+    runningViewTest = YES;
 }
 
 - (void) centerOnEachROI: (NSTimer *) theTimer
@@ -163,10 +170,12 @@
     
     [[point3DPositionsArray objectAtIndex:indexROI] getValue:pos];
     
-    
     [self centerView:mprViewer.mprView1 onPt3D:pos];
-    
-    
+}
+
+- (void) rotateViewInc: (NSTimer *) theTimer
+{
+    [self rotateView:mprViewer.mprView2 degrees:1.];
 }
 
 - (void) centerView: (MPRDCMView *) theView 
@@ -174,8 +183,8 @@
 {
     Point3D *direction,*newFocal,*newPosition;
     
+    // compute direction of projection vector
     direction   = [[Point3D alloc] initWithPoint3D:theView.camera.focalPoint];
-                  
     [direction subtract:theView.camera.position];
     
     newPosition = [Point3D pointWithX:pt3D[0] y:pt3D[1] z:pt3D[2]];
@@ -192,5 +201,82 @@
     
     [direction release];
 }
+
+- (void) rotateView: (MPRDCMView *) theView
+            degrees: (float) theta
+{
+    Point3D *direction,*newViewUp;
+    
+    // compute direction of projection vector
+    direction   = [[Point3D alloc] initWithPoint3D:theView.camera.focalPoint];
+    [direction subtract:theView.camera.position];
+    
+    // IMPORTANT vectors must be normalized
+    direction = [self normalizePt:direction];
+    
+    newViewUp = [self rotateVector:theView.camera.viewUp aroundVector:[self normalizePt:direction] byTheta:theta];
+    
+    theView.camera.viewUp = newViewUp;
+    
+    [theView restoreCamera];
+    
+    [theView.windowController updateViewsAccordingToFrame:theView];
+    
+}
+
+- (Point3D *) rotateVector: (Point3D *) vectorOne
+              aroundVector: (Point3D *) axis
+                   byTheta: (float) thetaDeg
+{
+    // rotate the point (x,y,z) around the vector (u,v,w)
+    double u,v,w,x,y,z,theX,theY,theZ,thetaRad;
+    
+    // convert degrees to radians
+    thetaRad = thetaDeg * deg2rad;
+    
+    x = vectorOne.x;
+    y = vectorOne.y;
+    z = vectorOne.z;
+    
+    u = axis.x;
+    v = axis.y;
+    w = axis.z;
+    
+    theX = u * (u*x + v*y + w*z) + (x * (v*v + w*w) - u * (v*y + w*z)) * cos(thetaRad) + (-(w*y) + v*z) * sin(thetaRad);
+    theY = v * (u*x + v*y + w*z) + (y * (u*u + w*w) - v * (u*x + w*z)) * cos(thetaRad) + (  w*x  - u*z) * sin(thetaRad);
+    theZ = w * (u*x + v*y + w*z) + (z * (u*u + v*v) - w * (u*x + v*y)) * cos(thetaRad) + (-(v*x) + u*y) * sin(thetaRad);
+    
+    return [Point3D pointWithX:(float)theX y:(float)theY z:(float)theZ];            
+}
+
+- (Point3D *) normalizePt: (Point3D *) thePt
+{
+    double x,y,z,mag;
+    
+    x = thePt.x;
+    y = thePt.y;
+    z = thePt.z;
+    
+    mag = sqrt(x*x+y*y+z*z);
+    
+    return [Point3D pointWithX:(float)(x/mag) y:(float)(y/mag) z:(float)(z/mag)];
+}
+
+/*
+ux#=u*x
+uy#=u*y
+uz#=u*z
+vx#=v*x
+vy#=v*y
+vz#=v*z
+wx#=w*x
+wy#=w*y
+wz#=w*z
+sa#=Sin(a)
+ca#=Cos(a)
+x#=u*(ux+vy+wz)+(x*(v*v+w*w)-u*(vy+wz))*ca+(-wy+vz)*sa
+y#=v*(ux+vy+wz)+(y*(u*u+w*w)-v*(ux+wz))*ca+(wx-uz)*sa
+z#=w*(ux+vy+wz)+(z*(u*u+v*v)-w*(ux+vy))*ca+(-vx+uy)*sa
+*/
 
 @end
