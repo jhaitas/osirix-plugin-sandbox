@@ -28,7 +28,7 @@
     NSTimer             *centerTimer,*rotationTimer;
     
     IBOutlet NSPanel    *mprInspectorHUD;
-    IBOutlet NSButton   *openMprViewer;
+    
     IBOutlet NSButton   *printCameraInfo;
     IBOutlet NSButton   *printROICoordList;
     IBOutlet NSButton   *centerViewTest;
@@ -39,17 +39,22 @@
     IBOutlet NSButton   *viewEachROI;
     
     IBOutlet NSTextField *secondsPerROI;
+    
+    IBOutlet NSButton   *view2RoiTest;
 }
 
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
 
-- (IBAction) openMprViewer: (id) sender;
+- (void) setOwner:(id *) theOwner;
+- (void) openMprViewer;
+
 - (IBAction) printCameraInfo: (id) sender;
 - (IBAction) printROICoordList: (id) sender;
 - (IBAction) centerViewTest: (id) sender;
 - (IBAction) rotationTest: (id) sender;
 - (IBAction) viewEachROI: (id) sender;
+- (IBAction) view2RoiTest: (id) sender;
 
 - (void) centerOnEachROI: (NSTimer *) theTimer;
 - (void) rotateViewInc: (NSTimer *) theTimer;
@@ -59,11 +64,16 @@
 - (void) rotateView: (MPRDCMView *) theView
             degrees: (float) theta;
 
+- (void) view: (MPRDCMView *) theView
+          ptA: (Point3D *) ptA
+          ptB: (Point3D *) ptB;
 
 - (Point3D *) rotateVector: (Point3D *) vectorOne
-              aroundVector: (Point3D *) axis
-                   byTheta: (float) theta;
+                aroundAxis: (Point3D *) axis
+                   byTheta: (float) thetaDeg;
 
-- (Point3D *) normalizePt: (Point3D *) thePt;
+- (Point3D *) directionOfCamera: (Camera *) cam;
+
+- (Point3D *) unitVectorFromVector: (Point3D *) vector;
 
 @end
