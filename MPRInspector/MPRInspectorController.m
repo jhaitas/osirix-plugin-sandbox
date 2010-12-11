@@ -276,8 +276,6 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     [theView restoreCamera];
     
     [theView.windowController updateViewsAccordingToFrame:theView];
-    
-    [direction release];
 }
 
 - (void) rotateView: (MPRDCMView *) theView
@@ -310,6 +308,10 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     Point3D         *direction;
     NSNumber        *xAxis,*yAxis,*zAxis;
     NSMutableArray  *axes;
+    
+    // set invalid default values
+    opposite = -1;
+    adjacent = -1;
     
     xAxis = IBox(0);
     yAxis = IBox(1);
@@ -354,6 +356,10 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
         NSLog(@"Logic error!");
     }
 
+    if (opposite == -1 || adjacent == -1) {
+        NSLog(@"Failed to set index values.\n");
+        return;
+    }
     
     pos[0] = ptA.x;
     pos[1] = ptA.y;
@@ -416,7 +422,7 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     Point3D *direction;
     
     // compute direction of projection vector
-    direction   = [[Point3D alloc] initWithPoint3D:cam.focalPoint];
+    direction   = [[[Point3D alloc] initWithPoint3D:cam.focalPoint] autorelease];
     [direction subtract:cam.position];
     
     return direction;
