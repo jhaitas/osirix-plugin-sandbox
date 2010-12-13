@@ -32,8 +32,6 @@ dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
 dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
 dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 
-#define IBox(x) [NSNumber numberWithInt:x]
-
 @implementation MPRInspectorController
 
 - (id) init
@@ -313,9 +311,9 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     opposite = -1;
     adjacent = -1;
     
-    xAxis = IBox(0);
-    yAxis = IBox(1);
-    zAxis = IBox(2);
+    xAxis = [NSNumber numberWithInt:0];
+    yAxis = [NSNumber numberWithInt:1];
+    zAxis = [NSNumber numberWithInt:2];
     axes = [NSMutableArray arrayWithObjects:xAxis,yAxis,zAxis,nil];
     
     direction = [self unitVectorFromVector:[self directionOfCamera:theView.camera]];
