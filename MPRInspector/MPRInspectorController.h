@@ -41,6 +41,7 @@
     IBOutlet NSTextField *secondsPerROI;
     
     IBOutlet NSButton   *view2RoiTest;
+    IBOutlet NSButton   *threeRoiPlane;
 }
 
 - (id) init;
@@ -55,6 +56,7 @@
 - (IBAction) rotationTest: (id) sender;
 - (IBAction) viewEachROI: (id) sender;
 - (IBAction) view2RoiTest: (id) sender;
+- (IBAction) threeRoiPlane: (id) sender;
 
 - (void) centerOnEachROI: (NSTimer *) theTimer;
 - (void) rotateViewInc: (NSTimer *) theTimer;
