@@ -74,8 +74,10 @@
                 aroundAxis: (Point3D *) axis
                    byTheta: (float) thetaDeg;
 
-- (Point3D *) directionOfCamera: (Camera *) cam;
+- (ROI *) getRoiNamed: (NSString *) roiName;
+- (void) get3dPosition: (float [3])pos ofRoi: (ROI *) theROI;
 
+- (Point3D *) directionOfCamera: (Camera *) cam;
 - (Point3D *) unitVectorFromVector: (Point3D *) vector;
 
 @end
