@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10H574</string>
-		<string key="IBDocument.InterfaceBuilderVersion">804</string>
+		<string key="IBDocument.InterfaceBuilderVersion">823</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">804</string>
+			<string key="NS.object.0">823</string>
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -41,7 +41,7 @@
 			<object class="NSWindowTemplate" id="7841363">
 				<int key="NSWindowStyleMask">8211</int>
 				<int key="NSWindowBacking">2</int>
-				<string key="NSWindowRect">{{1555, 741}, {257, 215}}</string>
+				<string key="NSWindowRect">{{1555, 766}, {257, 190}}</string>
 				<int key="NSWTFlags">611844096</int>
 				<string key="NSWindowTitle">Ten Twenty</string>
 				<string key="NSWindowClass">NSPanel</string>
@@ -55,7 +55,7 @@
 						<object class="NSTextField" id="371721894">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 178}, {119, 17}}</string>
+							<string key="NSFrame">{{17, 153}, {119, 17}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="192226596">
@@ -88,7 +88,7 @@
 						<object class="NSTextField" id="274714881">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{141, 175}, {96, 22}}</string>
+							<string key="NSFrame">{{141, 150}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="9855463">
@@ -121,7 +121,7 @@
 						<object class="NSTextField" id="447174882">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{17, 148}, {119, 17}}</string>
+							<string key="NSFrame">{{17, 123}, {119, 17}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="223988772">
@@ -137,7 +137,7 @@
 						<object class="NSTextField" id="456848635">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{141, 145}, {96, 22}}</string>
+							<string key="NSFrame">{{141, 120}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="121750501">
@@ -154,7 +154,7 @@
 						<object class="NSButton" id="473784567">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{20, 93}, {217, 19}}</string>
+							<string key="NSFrame">{{20, 68}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="534943054">
@@ -178,7 +178,7 @@
 						<object class="NSButton" id="760425249">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{20, 68}, {217, 19}}</string>
+							<string key="NSFrame">{{20, 43}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="866490462">
@@ -198,13 +198,13 @@
 						<object class="NSButton" id="680474603">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{20, 118}, {217, 19}}</string>
+							<string key="NSFrame">{{20, 93}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="684038707">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Identify Nasion &amp; Inion</string>
+								<string key="NSContents">Identify Brow &amp; Inion</string>
 								<reference key="NSSupport" ref="540522621"/>
 								<reference key="NSControlView" ref="680474603"/>
 								<int key="NSButtonFlags">-2038152961</int>
@@ -215,38 +215,18 @@
 								<int key="NSPeriodicInterval">75</int>
 							</object>
 						</object>
-						<object class="NSButton" id="1035298560">
-							<reference key="NSNextResponder" ref="918550806"/>
-							<int key="NSvFlags">268</int>
-							<string key="NSFrame">{{20, 43}, {217, 19}}</string>
-							<reference key="NSSuperview" ref="918550806"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="259181373">
-								<int key="NSCellFlags">-2080244224</int>
-								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Open MPR View</string>
-								<reference key="NSSupport" ref="540522621"/>
-								<reference key="NSControlView" ref="1035298560"/>
-								<int key="NSButtonFlags">-2038152961</int>
-								<int key="NSButtonFlags2">164</int>
-								<string key="NSAlternateContents"/>
-								<string key="NSKeyEquivalent"/>
-								<int key="NSPeriodicDelay">400</int>
-								<int key="NSPeriodicInterval">75</int>
-							</object>
-						</object>
-						<object class="NSButton" id="258356973">
+						<object class="NSButton" id="224979096">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{20, 18}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="569783444">
+							<object class="NSButtonCell" key="NSCell" id="255924383">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">Mouse Test</string>
+								<string key="NSContents">New Trace Method</string>
 								<reference key="NSSupport" ref="540522621"/>
-								<reference key="NSControlView" ref="258356973"/>
+								<reference key="NSControlView" ref="224979096"/>
 								<int key="NSButtonFlags">-2038152961</int>
 								<int key="NSButtonFlags2">164</int>
 								<string key="NSAlternateContents"/>
@@ -256,7 +236,7 @@
 							</object>
 						</object>
 					</object>
-					<string key="NSFrameSize">{257, 215}</string>
+					<string key="NSFrameSize">{257, 190}</string>
 					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
@@ -332,43 +312,35 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">identifyNasionAndInionButtonClick:</string>
+						<string key="label">identifyBrowAndInionButtonClick:</string>
 						<reference key="source" ref="1001"/>
 						<reference key="destination" ref="680474603"/>
 					</object>
-					<int key="connectionID">47</int>
+					<int key="connectionID">56</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">openMPRViewerButton</string>
+						<string key="label">identifyBrowAndInionButton</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="1035298560"/>
+						<reference key="destination" ref="680474603"/>
 					</object>
-					<int key="connectionID">50</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">openMPRViewerButtonClick:</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="1035298560"/>
-					</object>
-					<int key="connectionID">51</int>
+					<int key="connectionID">57</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">mouseTest</string>
+						<string key="label">newTraceMethod</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="258356973"/>
+						<reference key="destination" ref="224979096"/>
 					</object>
-					<int key="connectionID">54</int>
+					<int key="connectionID">60</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">mouseTest:</string>
+						<string key="label">newTraceMethod:</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="258356973"/>
+						<reference key="destination" ref="224979096"/>
 					</object>
-					<int key="connectionID">55</int>
+					<int key="connectionID">61</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -419,8 +391,7 @@
 							<reference ref="473784567"/>
 							<reference ref="760425249"/>
 							<reference ref="680474603"/>
-							<reference ref="1035298560"/>
-							<reference ref="258356973"/>
+							<reference ref="224979096"/>
 						</object>
 						<reference key="parent" ref="7841363"/>
 					</object>
@@ -523,32 +494,18 @@
 						<reference key="parent" ref="680474603"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">48</int>
-						<reference key="object" ref="1035298560"/>
+						<int key="objectID">58</int>
+						<reference key="object" ref="224979096"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="259181373"/>
+							<reference ref="255924383"/>
 						</object>
 						<reference key="parent" ref="918550806"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">49</int>
-						<reference key="object" ref="259181373"/>
-						<reference key="parent" ref="1035298560"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">52</int>
-						<reference key="object" ref="258356973"/>
-						<object class="NSMutableArray" key="children">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="569783444"/>
-						</object>
-						<reference key="parent" ref="918550806"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">53</int>
-						<reference key="object" ref="569783444"/>
-						<reference key="parent" ref="258356973"/>
+						<int key="objectID">59</int>
+						<reference key="object" ref="255924383"/>
+						<reference key="parent" ref="224979096"/>
 					</object>
 				</object>
 			</object>
@@ -575,13 +532,10 @@
 					<string>44.IBPluginDependency</string>
 					<string>44.IBViewBoundsToFrameTransform</string>
 					<string>45.IBPluginDependency</string>
-					<string>48.IBPluginDependency</string>
-					<string>48.IBViewBoundsToFrameTransform</string>
-					<string>49.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.IBViewBoundsToFrameTransform</string>
-					<string>52.IBPluginDependency</string>
-					<string>53.IBPluginDependency</string>
+					<string>58.IBPluginDependency</string>
+					<string>59.IBPluginDependency</string>
 					<string>6.IBPluginDependency</string>
 					<string>7.IBPluginDependency</string>
 					<string>7.IBViewBoundsToFrameTransform</string>
@@ -601,9 +555,9 @@
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABD54AAxDuAAA</bytes>
 					</object>
-					<string>{{540, 944}, {257, 215}}</string>
+					<string>{{540, 969}, {257, 190}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{540, 944}, {257, 215}}</string>
+					<string>{{540, 969}, {257, 190}}</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -616,11 +570,6 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<object class="NSAffineTransform">
 						<bytes key="NSTransformStruct">P4AAAL+AAABD54AAxEHAAA</bytes>
-					</object>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<object class="NSAffineTransform">
-						<bytes key="NSTransformStruct">P4AAAL+AAABD54AAxC8AAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -657,7 +606,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">55</int>
+			<int key="maxID">61</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -676,15 +625,13 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>identifyNasionAndInionButtonClick:</string>
-							<string>mouseTest:</string>
-							<string>openMPRViewerButtonClick:</string>
+							<string>identifyBrowAndInionButtonClick:</string>
+							<string>newTraceMethod:</string>
 							<string>placeCoronalElectrodesButtonClick:</string>
 							<string>placeMidlineElectrodesButtonClick:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -695,24 +642,19 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>identifyNasionAndInionButtonClick:</string>
-							<string>mouseTest:</string>
-							<string>openMPRViewerButtonClick:</string>
+							<string>identifyBrowAndInionButtonClick:</string>
+							<string>newTraceMethod:</string>
 							<string>placeCoronalElectrodesButtonClick:</string>
 							<string>placeMidlineElectrodesButtonClick:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
-								<string key="name">identifyNasionAndInionButtonClick:</string>
+								<string key="name">identifyBrowAndInionButtonClick:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">mouseTest:</string>
-								<string key="candidateClassName">id</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">openMPRViewerButtonClick:</string>
+								<string key="name">newTraceMethod:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
@@ -729,11 +671,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>identifyNasionAndInionButton</string>
+							<string>identifyBrowAndInionButton</string>
 							<string>maxSkullTextField</string>
 							<string>minScalpTextField</string>
-							<string>mouseTest</string>
-							<string>openMPRViewerButton</string>
+							<string>newTraceMethod</string>
 							<string>owner</string>
 							<string>placeCoronalElectrodesButton</string>
 							<string>placeMidlineElectrodesButton</string>
@@ -744,7 +685,6 @@
 							<string>NSButton</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>NSButton</string>
 							<string>NSButton</string>
 							<string>id</string>
 							<string>NSButton</string>
@@ -756,11 +696,10 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>identifyNasionAndInionButton</string>
+							<string>identifyBrowAndInionButton</string>
 							<string>maxSkullTextField</string>
 							<string>minScalpTextField</string>
-							<string>mouseTest</string>
-							<string>openMPRViewerButton</string>
+							<string>newTraceMethod</string>
 							<string>owner</string>
 							<string>placeCoronalElectrodesButton</string>
 							<string>placeMidlineElectrodesButton</string>
@@ -769,7 +708,7 @@
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">identifyNasionAndInionButton</string>
+								<string key="name">identifyBrowAndInionButton</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
@@ -781,11 +720,7 @@
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">mouseTest</string>
-								<string key="candidateClassName">NSButton</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">openMPRViewerButton</string>
+								<string key="name">newTraceMethod</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">

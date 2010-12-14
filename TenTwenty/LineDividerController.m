@@ -29,10 +29,10 @@
     return self;
 }
 
-- (id) initWithViewerController:(ViewerController *) vc
+- (id) initWithPix:(DCMPix *) pix
 {
     [self init];
-    viewerController = vc;
+    thePix = pix;
     return self;
 }
 
@@ -68,12 +68,9 @@
         // select indexed point from spline and add it to array
         [currentInterPoints setObject: [currentSpline objectAtIndex:pointIndex] forKey:key];
     }
-    
-    // add these intermediate points on line as ROIs
-    [self addIntermediateROIs];
 }
 
-- (void)addIntermediateROIs
+- (NSArray *) intermediateROIs
 {
 	int				thisRoiType;
 	float			pixelSpacingX,pixelSpacingY;
@@ -81,19 +78,20 @@
     
     id              key;
     NSEnumerator    *enumerator;
+    
+    NSMutableArray *newROIs;
+    
+    newROIs = [[NSMutableArray alloc] init];
 	
 	// temporary pointers for creating new ROI
 	MyPoint			*thisPoint;
 	ROI				*thisROI;
-	
-	// pointer to current DCMPix in OsiriX
-	DCMPix			*thisDCMPix	= [[viewerController imageView] curDCM];
     
 	// parameters necessary for initializting a new ROI
 	thisRoiType		= t2DPoint;
-	pixelSpacingX	= [thisDCMPix pixelSpacingX];
-	pixelSpacingY	= [thisDCMPix pixelSpacingY];
-	thisOrigin		= [DCMPix originCorrectedAccordingToOrientation: thisDCMPix];
+	pixelSpacingX	= [thePix pixelSpacingX];
+	pixelSpacingY	= [thePix pixelSpacingY];
+	thisOrigin		= [DCMPix originCorrectedAccordingToOrientation: thePix];
 	
     enumerator = [currentInterPoints keyEnumerator];
     while (key = [enumerator nextObject]) {
@@ -106,14 +104,16 @@
         thisROI.name = [NSString stringWithString:key];
         
 		// move the ROI from the 0,0 to correct coordinates
-		thisROI.rect = NSOffsetRect(thisROI.rect, thisPoint.x, thisPoint.y);
+		thisROI.rect = NSMakeRect(thisPoint.x, thisPoint.y, 0.0, 0.0);
         
 		[thisPoint release];
 		
-		// add the new ROI to the current ROI list
-		[[[viewerController imageView] curRoiList] addObject:thisROI];
+        [newROIs addObject:thisROI];
+        
 		[thisROI release];
     }
+    
+    return [NSArray arrayWithArray:newROIs];
 }
 
 - (NSMutableArray *)computePercentLength:(ROI *)thisROI

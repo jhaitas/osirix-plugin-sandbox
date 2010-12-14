@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5859052312B7CF3200AFD2A8 /* ResliceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 5859052112B7CF3200AFD2A8 /* ResliceController.h */; };
+		5859052412B7CF3200AFD2A8 /* ResliceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5859052212B7CF3200AFD2A8 /* ResliceController.m */; };
 		585B6A38125E5BC400D42896 /* LineDividerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 585B6A36125E5BC400D42896 /* LineDividerController.h */; };
 		585B6A39125E5BC400D42896 /* LineDividerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B6A37125E5BC400D42896 /* LineDividerController.m */; };
 		585B6AE4125F662300D42896 /* TenTwentyController.h in Headers */ = {isa = PBXBuildFile; fileRef = 585B6AE2125F662300D42896 /* TenTwentyController.h */; };
@@ -57,6 +59,8 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* TenTwenty_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TenTwenty_Prefix.pch; sourceTree = "<group>"; };
+		5859052112B7CF3200AFD2A8 /* ResliceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResliceController.h; sourceTree = "<group>"; };
+		5859052212B7CF3200AFD2A8 /* ResliceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResliceController.m; sourceTree = "<group>"; };
 		585B6A36125E5BC400D42896 /* LineDividerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineDividerController.h; sourceTree = "<group>"; };
 		585B6A37125E5BC400D42896 /* LineDividerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineDividerController.m; sourceTree = "<group>"; };
 		585B6AE2125F662300D42896 /* TenTwentyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TenTwentyController.h; sourceTree = "<group>"; };
@@ -216,6 +220,8 @@
 		AB2C26750677B0C400A08910 /* TenTwentyFilter */ = {
 			isa = PBXGroup;
 			children = (
+				5859052112B7CF3200AFD2A8 /* ResliceController.h */,
+				5859052212B7CF3200AFD2A8 /* ResliceController.m */,
 				585B6A36125E5BC400D42896 /* LineDividerController.h */,
 				585B6A37125E5BC400D42896 /* LineDividerController.m */,
 				5875E333125CE0320026F150 /* StereotaxCoord.h */,
@@ -287,6 +293,7 @@
 				58C9B24E126E200100B3959E /* CLUTOpacityView.h in Headers */,
 				58C9B250126E201700B3959E /* WaitRendering.h in Headers */,
 				58C9B256126E20AB00B3959E /* ViewerController.h in Headers */,
+				5859052312B7CF3200AFD2A8 /* ResliceController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,6 +375,7 @@
 				5875E336125CE0320026F150 /* StereotaxCoord.m in Sources */,
 				585B6A39125E5BC400D42896 /* LineDividerController.m in Sources */,
 				585B6AE5125F662300D42896 /* TenTwentyController.m in Sources */,
+				5859052412B7CF3200AFD2A8 /* ResliceController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

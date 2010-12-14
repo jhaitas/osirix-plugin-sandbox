@@ -20,7 +20,7 @@
 	<string>TenTwentyFilter</string>
 	<key>MenuTitles</key>
 	<array>
-		<string>TenTwenty</string>
+		<string>Ten Twenty</string>
 	</array>
 	<key>pluginType</key>
 	<string>roiTool</string>

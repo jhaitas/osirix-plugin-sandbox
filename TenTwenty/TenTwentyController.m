@@ -8,16 +8,18 @@
 
 #import "TenTwentyController.h"
 
+#define PI 3.14159265358979
 
 @implementation TenTwentyController
 
-@synthesize foundNasion,foundInion;
+@synthesize foundBrow,foundInion;
 
 - (id) init
 {
     if (self = [super init]) {
-        foundNasion = NO;
+        foundBrow = NO;
         foundInion  = NO;
+        
         
         // these values should be made user configurable in the future
         minScalpValue = 45.0;
@@ -52,33 +54,34 @@
 {
     [self init];
     owner = theOwner;
-    viewerController = [owner getViewerController];
+    viewerController    = [owner getViewerController];
+    reslicer            = [[ResliceController alloc] initWithOwner:(id *) self];
     return self;
 }
 
 #pragma mark Interface Methods
-- (IBAction) identifyNasionAndInionButtonClick: (id) sender
+- (IBAction) identifyBrowAndInionButtonClick: (id) sender
 {
-    // there should be an ROI named 'nasion' and 'inion'
+    // there should be an ROI named 'brow' and 'inion'
     [self findUserInput];
     
-    // check if 'nasion' and 'inion' were found
-    if (foundNasion && foundInion) {        
+    // check if 'brow' and 'inion' were found
+    if (foundBrow && foundInion) {        
         [self computeOrientation];
         
         // remap coordinates per computed orientation
-        [self remapNasionAndInion];
+        [self remapBrowAndInion];
         
         // disable this button
-        [identifyNasionAndInionButton setEnabled:NO];
+        [identifyBrowAndInionButton setEnabled:NO];
         
         // enable next button in sequence
         [placeMidlineElectrodesButton setEnabled:YES];
     } else {
-        // failed to locate 'nasion' and 'inion'
+        // failed to locate 'brow' and 'inion'
         // notify the user through the NSRunAlertPanel        
         NSRunAlertPanel(NSLocalizedString(@"Plugin Error", nil),
-                        NSLocalizedString(@"Unable to locate 'nasion' and 'inion'!", nil), 
+                        NSLocalizedString(@"Unable to locate 'brow' and 'inion'!", nil), 
                         nil, nil, nil);
     }
 }
@@ -116,62 +119,302 @@
     [self resliceCoronalAtCz];
 }
 
-- (IBAction) openMPRViewerButtonClick: (id) sender
-{    
-    mprViewer = [viewerController openMPRViewer];
-    [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
-    [mprViewer showWindow:self];
-    [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
+- (IBAction) newTraceMethod: (id) sender
+{
+    NSMutableDictionary *measureInstructions,*sliceInstructions,*divideInstructions;
+    
+    measureInstructions = [[NSMutableDictionary alloc] init];
+    sliceInstructions   = [[NSMutableDictionary alloc] init];
+    divideInstructions  = [[NSMutableDictionary alloc] init];
+    
+    [sliceInstructions setObject:[NSString stringWithString:@"apex"]    forKey:@"vertex"];
+    [sliceInstructions setObject:[NSString stringWithString:@"brow"]    forKey:@"point1"];
+    [sliceInstructions setObject:[NSString stringWithString:@"inion"]   forKey:@"point2"];
+    
+    divideInstructions = [[NSDictionary alloc] initWithObjectsAndKeys:  FBOX(.1),@"Fpz",
+                                                                        FBOX(.3),@"Fz",
+                                                                        FBOX(.5),@"Cz",
+                                                                        FBOX(.7),@"Pz",
+                                                                        FBOX(.9),@"Oz", nil ];
+    
+    [measureInstructions setObject:sliceInstructions forKey:@"sliceInstructions"];
+    [measureInstructions setObject:divideInstructions forKey:@"divideInstructions"];
+    
+    [self runInstructions:measureInstructions];
+    
 }
 
-- (IBAction) mouseTest: (id) sender
+- (void) runInstructions: (NSDictionary *) theInstructions
 {
-    ROI     *focalROI;
-    float   pixelSpacingX,pixelSpacingY;
-    NSPoint roiPoint,crossPoint;
+    NSDictionary    *sliceInstructions,*divideInstructions;
+    ROI             *skullTrace;
+    MPRDCMView      *theView;
     
-    focalROI        = nil;
-    pixelSpacingX   = mprViewer.mprView1.pixelSpacingX;
-    pixelSpacingY   = mprViewer.mprView1.pixelSpacingY;
+    sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
+    divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
-    for (ROI *r in mprViewer.mprView1.curRoiList) {
-        if ([r.parentROI.name isEqualToString:@"Oz"]) {
-            focalROI = r;
+    [reslicer openMprViewer];
+    
+    theView = reslicer.mprViewer.mprView3;
+    
+    [reslicer planeInView:theView
+               WithVertex:[sliceInstructions objectForKey:@"vertex"]
+               withPoint1:[sliceInstructions objectForKey:@"point1"]
+               withPoint2:[sliceInstructions objectForKey:@"point2"] ];
+    
+    [theView display];
+    
+    skullTrace = [self skullTraceFromInstructions:sliceInstructions];
+    
+    [self divideTrace: skullTrace inView: theView usingInstructions: divideInstructions];
+    
+//    [reslicer closeMprViewer];
+}
+
+- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions
+{
+    int         i,numSections,numPoints;
+    int         thisRoiType;
+    float       pointA[3],pointB[3],midpoint[3],displacement[3],stepSize[3],searchDir[3];
+    float       xVector[3],yVector[3],unitX[3],unitY[3];
+    float       point1DcmCoords[3],vertexDcmCoords[3],point2DcmCoords[3];
+    float       pixelSpacingX,pixelSpacingY;
+    ROI         *point1,*vertex,*point2;
+    MPRDCMView  *theView;
+    DCMPix      *thePix;
+    
+    NSMutableArray          *intermediatePoints;
+    intermediatePoints      = [[NSMutableArray alloc] init];
+    
+    numSections = 10;
+    numPoints = numSections + 1;
+    
+    theView = reslicer.mprViewer.mprView3;
+    thePix  = theView.pix;
+    
+    // parameters necessary for initializting a new ROI
+    thisRoiType     = t2DPoint;
+    pixelSpacingX   = [thePix pixelSpacingX];
+    pixelSpacingY   = [thePix pixelSpacingY];
+    
+    // get each ROI
+    point1 = [reslicer get2dRoiNamed:[traceInstructions objectForKey:@"point1"] fromView:theView];
+    vertex = [reslicer get2dRoiNamed:[traceInstructions objectForKey:@"vertex"] fromView:theView];
+    point2 = [reslicer get2dRoiNamed:[traceInstructions objectForKey:@"point2"] fromView:theView];
+    
+    
+    // get the DICOM coords of each ROI
+    [self getROI:point1 fromPix:thePix toDicomCoords:point1DcmCoords];
+    [self getROI:vertex fromPix:thePix toDicomCoords:vertexDcmCoords];
+    [self getROI:point2 fromPix:thePix toDicomCoords:point2DcmCoords];
+    
+    // we are tracing from point A to point B ...
+    // point A will be point 1
+    // point B will be point 2
+    pointA[0] = point1DcmCoords[0];
+    pointA[1] = point1DcmCoords[1];
+    pointA[2] = point1DcmCoords[2];
+    
+    pointB[0] = point2DcmCoords[0];
+    pointB[1] = point2DcmCoords[1];
+    pointB[2] = point2DcmCoords[2];
+    
+    // the mid point will be used to determine X and Y vectors
+    midpoint[0] = (pointA[0] + pointB[0]) / 2.0;
+    midpoint[1] = (pointA[1] + pointB[1]) / 2.0;
+    midpoint[2] = (pointA[2] + pointB[2]) / 2.0;
+    
+    // displacement will be used to compute step size
+    displacement[0] = pointB[0] - pointA[0];
+    displacement[1] = pointB[1] - pointA[1];
+    displacement[2] = pointB[2] - pointA[2];
+    
+    // stepSize will be use to space intermediate points evenly
+    stepSize[0] = displacement[0] / (float) numSections;
+    stepSize[1] = displacement[1] / (float) numSections;
+    stepSize[2] = displacement[2] / (float) numSections;
+    
+    // compute vectors for X and Y in the image
+    xVector[0] = pointA[0] - midpoint[0];
+    xVector[1] = pointA[1] - midpoint[1];
+    xVector[2] = pointA[2] - midpoint[2];
+    
+    yVector[0] = vertexDcmCoords[0] - midpoint[0];
+    yVector[1] = vertexDcmCoords[1] - midpoint[1];
+    yVector[2] = vertexDcmCoords[2] - midpoint[2];
+    
+    // make our directional vectors unit vectors
+    UNIT(unitX,xVector);
+    UNIT(unitY,yVector);
+    
+    for (i = 0; i < numPoints; i++)
+    {
+        float   startPos[3],finalPos[3],sliceCoords[3];
+        float   thetaRad;
+        NSPoint thisPoint;
+        
+        // get starting positons
+        startPos[0] = pointA[0] + (stepSize[0] * (float) i);
+        startPos[1] = pointA[1] + (stepSize[1] * (float) i);
+        startPos[2] = pointA[2] + (stepSize[2] * (float) i);
+        
+        thetaRad = i * (PI / (float)numSections);
+        
+        // compute search direction
+        searchDir[0] = (unitX[0] * cos(thetaRad)) + (unitY[0] * sin(thetaRad));
+        searchDir[1] = (unitX[1] * cos(thetaRad)) + (unitY[1] * sin(thetaRad));
+        searchDir[2] = (unitX[2] * cos(thetaRad)) + (unitY[2] * sin(thetaRad));
+
+        // search for skull
+        [self findSkullInView:theView fromPosition:startPos inDirection:searchDir toPosition:finalPos];
+        
+        
+        // get the slice coordinates
+        [thePix convertDICOMCoords:finalPos toSliceCoords:sliceCoords];
+        
+        thisPoint = NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
+        
+        // add this point to intermediate points array
+        [intermediatePoints addObject:[MyPoint point:thisPoint]];
+    }
+    
+    ROI *thisROI;
+    
+    // allocate and initialize a new 'Open Polygon' ROI
+    thisROI = [[ROI alloc] initWithType:tOPolygon
+                                       :pixelSpacingX
+                                       :pixelSpacingY
+                                       :NSMakePoint(0.0, 0.0)];
+    
+    
+    thisROI.name = [NSString stringWithString:@"skull trace"];
+    
+    // set points for spline
+    [thisROI setPoints:intermediatePoints];
+    
+    return thisROI;
+}
+
+- (void) divideTrace: (ROI *) theTrace
+               inView: (MPRDCMView *) theView
+   usingInstructions: (NSDictionary *) divideInstructions
+{
+    NSArray *newROIs;
+    DCMPix *thePix;
+    
+    thePix = theView.pix;
+    
+    ld = [[LineDividerController alloc] initWithPix:thePix];
+    [ld setDistanceDict:divideInstructions];
+    [ld divideLine:theTrace];
+    
+    newROIs = [ld intermediateROIs];
+    
+    for (ROI *r in newROIs) {
+        float dicomCoords[3];
+        
+        //get the dicom coords
+        [thePix convertPixX:r.rect.origin.x pixY:r.rect.origin.y toDICOMCoords:dicomCoords];
+        
+        // create the new ROI;
+        [theView add2DPoint: dicomCoords];
+    }
+}
+
+- (void) findSkullInView: (MPRDCMView *) theView
+            fromPosition: (float [3]) thePos
+             inDirection: (float [3]) theDir
+              toPosition: (float [3]) finalPos
+{
+    float   sliceCoords[3],pixelSpacingX,pixelSpacingY;
+    float   scalingFactor;
+    float   thisMin,thisMean,thisMax;
+    BOOL    foundScalp,foundSkull;
+    ROI     *thisROI;
+    DCMPix  *thePix;
+    
+    thePix = theView.pix;
+    
+    foundScalp = NO;
+    foundSkull = NO;
+    
+    scalingFactor = 0.1;
+    
+    finalPos[0] = thePos[0];
+    finalPos[1] = thePos[1];
+    finalPos[2] = thePos[2];
+    
+    pixelSpacingX   = thePix.pixelSpacingX;
+    pixelSpacingY   = thePix.pixelSpacingY;
+    
+    
+    // allocate and initialize a new ROI
+    thisROI = [[ROI alloc] initWithType:t2DPoint
+                                       :pixelSpacingX
+                                       :pixelSpacingY
+                                       :NSMakePoint(0.0, 0.0)];
+    
+    
+    NSLog(@"theDir x,y,z = %f,%f,%f",theDir[0],theDir[1],theDir[2]);
+    
+    // look for scalp
+    while (!foundScalp) {
+        // move point in direction
+        finalPos[0] += (theDir[0] * scalingFactor);
+        finalPos[1] += (theDir[1] * scalingFactor);
+        finalPos[2] += (theDir[2] * scalingFactor);
+       
+        // convert back to slice coords
+        [thePix convertDICOMCoords:finalPos toSliceCoords:sliceCoords];
+        
+        // set the position of the ROI
+        thisROI.rect = NSMakeRect(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY, 0.0, 0.0);
+        
+        // determine current pixel mean
+        [thePix computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
+        
+        // detect if we have found the scalp
+        if (thisMax > minScalpValue) {
+            foundScalp = YES;
+        }
+        
+        // be sure we haven't fallen to the bottom of the slice
+        if (![self isPoint:thisROI.rect.origin onSlice:thePix]) {
+            DLog(@"%@ falling off slice!!!\n",thisROI.name);
+            break;
         }
     }
     
-    // return if we can't find the correct ROIs
-    if (focalROI == nil) return;
+    // reverse direction and locate the skull
+    while (!foundSkull) {
+        // move point in opposite direction
+        finalPos[0] -= (theDir[0] * scalingFactor);
+        finalPos[1] -= (theDir[1] * scalingFactor);
+        finalPos[2] -= (theDir[2] * scalingFactor);
+        
+        // convert back to slice coords
+        [thePix convertDICOMCoords:finalPos toSliceCoords:sliceCoords];
+        
+        // set the position of the ROI
+        thisROI.rect = NSMakeRect(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY, 0.0, 0.0);
+        
+        // determine current pixel mean
+        [thePix computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
+        
+        // detect if we have found the scalp
+        if (thisMin < maxSkullValue) {
+            foundSkull = YES;
+        }
+        
+        // be sure we haven't fallen to the bottom of the slice
+        if (![self isPoint:thisROI.rect.origin onSlice:thePix]) {
+            DLog(@"%@ falling off slice!!!\n",thisROI.name);
+            break;
+        }
+    }
     
-    crossPoint = [self centerLines:mprViewer.mprView1];
-    
-    roiPoint = focalROI.rect.origin;
-    
-    roiPoint.x *= pixelSpacingX;
-    roiPoint.y *= pixelSpacingY;
-    
-    NSPoint conPoint = [mprViewer.mprView1 ConvertFromGL2NSView:crossPoint];
-    
-    
-    NSLog(@"roiPoint        x,y = %f,%f\n",roiPoint.x,roiPoint.y);
-    NSLog(@"crossPoint      x,y = %f,%f\n",crossPoint.x,crossPoint.y);
-    NSLog(@"conPoint        x,y = %f,%f\n",conPoint.x,conPoint.y);
-    
-    // FIXME using artificial points ...
-    // ... need to transform roiPoint and crossPoint to synthetic points below
-    CGPoint pt1,pt2;
-    pt1 = CGPointMake(445, 384);
-    pt2 = CGPointMake(511, 501);
-    
-    [self synthClickDragFromPt:pt1 toPt:pt2];
-    
-    crossPoint = [self centerLines:mprViewer.mprView1];
-    
-    NSLog(@"roiPoint   x,y = %f,%f\n",roiPoint.x,roiPoint.y);
-    NSLog(@"crossPoint x,y = %f,%f\n",crossPoint.x,crossPoint.y);
-    
+    [thisROI release];
 }
-
 
 #pragma mark Work Methods
 - (void) findUserInput
@@ -195,12 +438,12 @@
         // step through each ROI in the current ROI list
         for (ii = 0; ii < [thisRoiList count]; ii++) {
             selectedROI = [thisRoiList objectAtIndex:ii];
-            // check if this ROI is named 'nasion'
-            if ([selectedROI.name isEqualToString:@"nasion"]) {
+            // check if this ROI is named 'brow'
+            if ([selectedROI.name isEqualToString:@"brow"]) {
                 [self getROI:selectedROI fromPix:thisPix toDicomCoords:location];
-                nasion = [[StereotaxCoord alloc] initWithName:selectedROI.name
+                brow = [[StereotaxCoord alloc] initWithName:selectedROI.name
                                                        withDicomCoords:location ];
-                foundNasion = YES;
+                foundBrow = YES;
                 
                 // FIXME ... need to verify this
                 midlineSlice = thisPix;
@@ -237,8 +480,8 @@
 }
 
 // coordinates natively in (x,y,z) ...
-// ... greatest difference between nasion and inion should be AP
-// ... ML should be same in nasion and inion
+// ... greatest difference between brow and inion should be AP
+// ... ML should be same in brow and inion
 // ... DV should be smaller difference than AP
 - (void) computeOrientation
 {
@@ -250,11 +493,11 @@
     NSMutableArray  *diff;
     
     
-    diffAP  = [[NSNumber alloc] initWithDouble:(nasion.AP - inion.AP)];
-    diffML  = [[NSNumber alloc] initWithDouble:(nasion.ML - inion.ML)];
-    diffDV  = [[NSNumber alloc] initWithDouble:(nasion.DV - inion.DV)];
+    diffAP  = [[NSNumber alloc] initWithDouble:(brow.AP - inion.AP)];
+    diffML  = [[NSNumber alloc] initWithDouble:(brow.ML - inion.ML)];
+    diffDV  = [[NSNumber alloc] initWithDouble:(brow.DV - inion.DV)];
     
-    // set directions based on difference between nasion and inion ...
+    // set directions based on difference between brow and inion ...
     // ... ML is assumed to be zero and will be given a direction of 1
     dir[0]  = ([diffAP floatValue] >= 0 ? 1 : -1);
     dir[1]  = ([diffML floatValue] >= 0 ? 1 : -1);
@@ -338,9 +581,9 @@
     [direction setObject:[NSNumber numberWithInt:dir[indexDV]] forKey:@"DV"];
 }
 
-- (void) remapNasionAndInion
+- (void) remapBrowAndInion
 {
-    [nasion remapWithOrientation:orientation];
+    [brow remapWithOrientation:orientation];
     [inion remapWithOrientation:orientation];   
 }
 
@@ -349,7 +592,7 @@
     // set the current image to the midline slice image
     [[viewerController imageView] setIndex:[[[viewerController imageView] dcmPixList] indexOfObjectIdenticalTo:midlineSlice]];
     
-    // trace the skull from 'nasion' to 'inion'
+    // trace the skull from 'brow' to 'inion'
     [self traceSkullMidline];
     
     ld = [[LineDividerController alloc] initWithViewerController:viewerController];
@@ -383,12 +626,12 @@
     indexDV = [[orientation objectForKey:@"DV"] intValue];
     
     numIntermediatePoints   = 15;
-    displacement            = nasion.AP - inion.AP;
+    displacement            = brow.AP - inion.AP;
     stepSize                = displacement / (numIntermediatePoints -1);
     stepDir                 = [[direction objectForKey:@"AP"] intValue];
     
-    thisDV = nasion.DV + (20 * [[direction objectForKey:@"DV"] intValue]);
-    thisML = nasion.ML;
+    thisDV = brow.DV + (20 * [[direction objectForKey:@"DV"] intValue]);
+    thisML = brow.ML;
     
     dicomCoords[indexML] = thisML;
     dicomCoords[indexDV] = thisDV;
@@ -401,7 +644,7 @@
     sliceIndex = [[[viewerController imageView] dcmPixList] indexOfObject:midlineSlice];
     
     for (i = 0; i < numIntermediatePoints; i++) {
-        thisAP =  nasion.AP - (stepDir * (stepSize * i));
+        thisAP =  brow.AP - (stepDir * (stepSize * i));
         
         dicomCoords[indexAP] = thisAP;
         
@@ -793,41 +1036,6 @@
         return NSMakePoint(0, 0);
     }
     
-    // drop till we locate the scalp
-    while (!foundScalp) {
-        roiPosition = thisROI.rect.origin;
-        
-        // get DICOM coordinates (in mm)
-        [thisSlice convertPixX:roiPosition.x pixY:roiPosition.y toDICOMCoords:dicomCoords];
-        
-        // drop point .1 mm on DV plane
-        dicomCoords[indexDV] -= (directionDV * .1);
-        
-        // convert back to slice coords
-        [thisSlice convertDICOMCoords:dicomCoords toSliceCoords:sliceCoords];
-        
-        // determine how coordinates should be shifted
-        offsetShift.x = (sliceCoords[0] / pixelSpacingX) - roiPosition.x;
-        offsetShift.y = (sliceCoords[1] / pixelSpacingY) - roiPosition.y;
-        
-        // shift the ROI
-        [thisROI roiMove:offsetShift :TRUE];
-        
-        // determine current pixel mean
-        [thisSlice computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
-        
-        // detect if we have found the scalp
-        if (thisMax > minScalpValue) {
-            foundScalp = YES;
-        }
-        
-        // be sure we haven't fallen to the bottom of the slice
-        if (![self isPoint:thisROI.rect.origin onSlice:thisSlice]) {
-            DLog(@"%@ falling off slice!!!\n",thisROI.name);
-            break;
-        }
-    }
-    
     // drop till we locate the skull
     while (!foundSkull) {
         roiPosition = thisROI.rect.origin;
@@ -1184,95 +1392,4 @@
     [vc updateImage:self];
 }
 
-
-#pragma mark MPR class methods
-
-- (NSPoint) centerLines: (MPRDCMView *) sender
-{
-    MPRDCMView  *mprView1,*mprView2,*mprView3;
-	float       a[2][3];
-	float       b[2][3];
-    
-    
-    mprView1 = mprViewer.mprView1;
-    mprView2 = mprViewer.mprView2;
-    mprView3 = mprViewer.mprView3;
-    
-    if (sender == mprView1) {
-        [self computeCrossReferenceLinesBetween: mprView1 and: mprView2 result: a];
-        [self computeCrossReferenceLinesBetween: mprView1 and: mprView3 result: b];
-    }
-    
-    
-    if (sender == mprView2) {
-        [self computeCrossReferenceLinesBetween: mprView2 and: mprView1 result: a];
-        [self computeCrossReferenceLinesBetween: mprView2 and: mprView3 result: b];
-    }
-    
-    
-    if (sender == mprView3) {
-        [self computeCrossReferenceLinesBetween: mprView3 and: mprView1 result: a];
-        [self computeCrossReferenceLinesBetween: mprView3 and: mprView2 result: b];
-    }
-    
-    
-	NSPoint a1 = NSMakePoint( a[ 0][ 0], a[ 0][ 1]);
-	NSPoint a2 = NSMakePoint( a[ 1][ 0], a[ 1][ 1]);
-	
-	NSPoint b1 = NSMakePoint( b[ 0][ 0], b[ 0][ 1]);
-	NSPoint b2 = NSMakePoint( b[ 1][ 0], b[ 1][ 1]);
-	
-	NSPoint r = NSMakePoint( 0, 0);
-	
-	[DCMView intersectionBetweenTwoLinesA1: a1 A2: a2 B1: b1 B2: b2 result: &r];
-	
-	return r;
-}
-
-- (void) computeCrossReferenceLinesBetween: (MPRDCMView*) mp1 and:(MPRDCMView*) mp2 result: (float[2][3]) s
-{
-	float vectorA[ 9], vectorB[ 9];
-	float originA[ 3], originB[ 3];
-    
-	s[ 0][ 0] = HUGE_VALF; s[ 0][ 1] = HUGE_VALF; s[ 0][ 2] = HUGE_VALF;
-	s[ 1][ 0] = HUGE_VALF; s[ 1][ 1] = HUGE_VALF; s[ 1][ 2] = HUGE_VALF;
-	
-	originA[ 0] = mp2.pix.originX; originA[ 1] = mp2.pix.originY; originA[ 2] = mp2.pix.originZ;
-	originB[ 0] = mp1.pix.originX; originB[ 1] = mp1.pix.originY; originB[ 2] = mp1.pix.originZ;
-	
-	[mp2.pix orientation: vectorA];
-	[mp1.pix orientation: vectorB];
-	
-	float slicePoint[ 3];
-	float sliceVector[ 3];
-	
-	if( intersect3D_2Planes( vectorA+6, originA, vectorB+6, originB, sliceVector, slicePoint) == noErr)
-	{
-		[mp1 computeSliceIntersection: mp2.pix sliceFromTo: s vector: vectorB origin: originB];
-	}
-}
-
-
-#pragma mark synthesize Mouse
-
-- (void) synthClickDragFromPt: (CGPoint) pt1
-                         toPt: (CGPoint) pt2
-{
-    CGEventRef  myMouseDown,myMouseDrag,myMouseUp;
-    
-    // Mouse Down
-    myMouseDown = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, pt1, kCGMouseButtonLeft);
-    
-    // Mouse Dragged
-    myMouseDrag = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDragged, pt2, kCGMouseButtonLeft);
-    
-    // Mouse Up
-    myMouseUp   = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseUp, pt2, kCGMouseButtonLeft);
-    
-    CGEventPost(kCGHIDEventTap, myMouseDown);
-    CGEventPost(kCGHIDEventTap, myMouseDrag);
-    CGEventPost(kCGHIDEventTap, myMouseUp);
-    
-    // TODO - restore original mouse cursor location
-}
 @end

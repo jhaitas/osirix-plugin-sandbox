@@ -14,6 +14,7 @@
 #import "MPRHeaders.h"
 
 #import "TenTwentyFilter.h"
+#import "ResliceController.h"
 #import "LineDividerController.h"
 #import "StereotaxCoord.h"
 
@@ -25,8 +26,8 @@
     ViewerController    *viewerController;
     ViewerController    *viewerML;
     
-    BOOL                foundNasion,foundInion;
-    StereotaxCoord      *nasion,*inion;
+    BOOL                foundBrow,foundInion;
+    StereotaxCoord      *brow,*inion;
     StereotaxCoord      *Cz;
     StereotaxCoord      *userP1,*userP2;
     NSMutableDictionary *orientation,*direction;
@@ -44,33 +45,37 @@
     
     NSMutableDictionary *allElectrodes;
     
-    LineDividerController *ld;
-    
-    MPRController       *mprViewer;
+    LineDividerController   *ld;
+    ResliceController       *reslicer;
     
     // HUD Outlets
     IBOutlet NSPanel        *tenTwentyHUDPanel;
     IBOutlet NSTextField    *minScalpTextField;
     IBOutlet NSTextField    *maxSkullTextField;
-    IBOutlet NSButton       *identifyNasionAndInionButton;
+    IBOutlet NSButton       *identifyBrowAndInionButton;
     IBOutlet NSButton       *placeMidlineElectrodesButton;
     IBOutlet NSButton       *placeCoronalElectrodesButton;
-    IBOutlet NSButton       *openMPRViewerButton;
-    IBOutlet NSButton       *mouseTest;
+    IBOutlet NSButton       *newTraceMethod;
 }
 
-@property (assign) BOOL foundNasion,foundInion;
+@property (assign) BOOL foundBrow,foundInion;
 
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
 
 #pragma mark Interface Methods
-- (IBAction) identifyNasionAndInionButtonClick: (id) sender;
+- (IBAction) identifyBrowAndInionButtonClick: (id) sender;
 - (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
 - (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
-- (IBAction) openMPRViewerButtonClick: (id) sender;
-- (IBAction) mouseTest: (id) sender;
+- (IBAction) newTraceMethod: (id) sender;
 
+
+- (void) runInstructions: (NSDictionary *) theInstructions;
+- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions;
+- (void) findSkullInView: (MPRDCMView *) theView
+            fromPosition: (float [3]) thePos
+             inDirection: (float [3]) theDir
+              toPosition: (float [3]) finalPos;
 
 #pragma mark Work Methods
 - (void) findUserInput;
@@ -80,7 +85,7 @@
 
 
 - (void) computeOrientation;
-- (void) remapNasionAndInion;
+- (void) remapBrowAndInion;
 
 - (void) placeMidlineElectrodes;
 - (void) traceSkullMidline;
@@ -117,15 +122,5 @@
 
 - (void) printAllElectrodesInStereotax;
 - (void) placeElectrodesInViewerController: (ViewerController *) vc;
-
-
-#pragma mark MPR class methods
-- (NSPoint) centerLines: (MPRDCMView *) sender;
-- (void) computeCrossReferenceLinesBetween: (MPRDCMView*) mp1 and:(MPRDCMView*) mp2 result: (float[2][3]) s;
-
-
-#pragma mark synthesize Mouse
-- (void) synthClickDragFromPt: (CGPoint) pt1
-                         toPt: (CGPoint) pt2;
 
 @end

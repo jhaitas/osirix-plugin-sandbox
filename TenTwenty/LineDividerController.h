@@ -12,7 +12,7 @@
 #define FBOX(x) [NSNumber numberWithFloat:x]
 
 @interface LineDividerController : NSObject {
-    ViewerController    *viewerController;
+    DCMPix          *thePix;
     
 	float			scaleValue;
     NSDictionary    *lineIntervalsDict;
@@ -22,12 +22,14 @@
 }
 
 - (id) init;
-- (id) initWithViewerController:(ViewerController *) vc;
+- (id) initWithPix:(DCMPix *) pix;
+
 - (void) setDistanceDict: (NSDictionary *) inputDict;
 
 - (void) divideLine:(ROI *) roiOPoly;
 
-- (void) addIntermediateROIs;
+- (NSArray *) intermediateROIs;
+
 - (NSMutableArray *) computePercentLength:(ROI *)thisROI;
 - (float) measureOPolyLength:(ROI *)thisROI 
             fromPointAtIndex:(long)indexPointA 
