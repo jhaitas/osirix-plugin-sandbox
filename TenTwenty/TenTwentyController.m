@@ -121,27 +121,21 @@
 
 - (IBAction) newTraceMethod: (id) sender
 {
-    NSMutableDictionary *measureInstructions,*sliceInstructions,*divideInstructions;
+    NSString        *bundlePath,*instructionsFilename;
+    NSDictionary    *tenTwentyInstructions;
+    NSArray         *instructionList;
     
-    measureInstructions = [[NSMutableDictionary alloc] init];
-    sliceInstructions   = [[NSMutableDictionary alloc] init];
-    divideInstructions  = [[NSMutableDictionary alloc] init];
+    bundlePath              = [[[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath] retain];
+    instructionsFilename    = [[NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath] retain];
+    tenTwentyInstructions   = [[NSDictionary alloc] initWithContentsOfFile:instructionsFilename];
+    instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"];
     
-    [sliceInstructions setObject:[NSString stringWithString:@"apex"]    forKey:@"vertex"];
-    [sliceInstructions setObject:[NSString stringWithString:@"brow"]    forKey:@"point1"];
-    [sliceInstructions setObject:[NSString stringWithString:@"inion"]   forKey:@"point2"];
+    NSLog(@"%@",bundlePath);
+    NSLog(@"%@",instructionsFilename);
     
-    divideInstructions = [[NSDictionary alloc] initWithObjectsAndKeys:  FBOX(.1),@"Fpz",
-                                                                        FBOX(.3),@"Fz",
-                                                                        FBOX(.5),@"Cz",
-                                                                        FBOX(.7),@"Pz",
-                                                                        FBOX(.9),@"Oz", nil ];
-    
-    [measureInstructions setObject:sliceInstructions forKey:@"sliceInstructions"];
-    [measureInstructions setObject:divideInstructions forKey:@"divideInstructions"];
-    
-    [self runInstructions:measureInstructions];
-    
+    for (NSDictionary *theseInstructions in instructionList) {
+        [self runInstructions:theseInstructions];
+    }    
 }
 
 - (void) runInstructions: (NSDictionary *) theInstructions

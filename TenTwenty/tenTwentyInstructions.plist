@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>instructionSteps</key>
+	<array>
+		<dict>
+			<key>divideInstructions</key>
+			<dict>
+				<key>Cz</key>
+				<real>0.5</real>
+				<key>Fpz</key>
+				<real>0.1</real>
+				<key>Fz</key>
+				<real>0.3</real>
+				<key>Oz</key>
+				<real>0.9</real>
+				<key>Pz</key>
+				<real>0.7</real>
+			</dict>
+			<key>sliceInstructions</key>
+			<dict>
+				<key>point1</key>
+				<string>brow</string>
+				<key>point2</key>
+				<string>inion</string>
+				<key>vertex</key>
+				<string>apex</string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>
