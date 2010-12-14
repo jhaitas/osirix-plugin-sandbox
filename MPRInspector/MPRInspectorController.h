@@ -31,17 +31,25 @@
     
     IBOutlet NSButton   *printCameraInfo;
     IBOutlet NSButton   *printROICoordList;
-    IBOutlet NSButton   *centerViewTest;
-    IBOutlet NSButton   *rotationTest;
     
-    IBOutlet NSTextField *rotationTheta;
+    IBOutlet NSButton       *centerViewTest;
+    IBOutlet NSTextField    *centerRoiName;
     
-    IBOutlet NSButton   *viewEachROI;
+    IBOutlet NSButton       *rotationTest;
+    IBOutlet NSTextField    *rotationTheta;
     
-    IBOutlet NSTextField *secondsPerROI;
+    IBOutlet NSButton       *viewEachROI;
+    IBOutlet NSTextField    *secondsPerROI;
     
-    IBOutlet NSButton   *view2RoiTest;
-    IBOutlet NSButton   *threeRoiPlane;
+    IBOutlet NSButton       *view2RoiTest;
+    IBOutlet NSTextField    *twoRoiRoiName1;
+    IBOutlet NSTextField    *twoRoiRoiName2;
+    
+    
+    IBOutlet NSButton       *threeRoiPlane;
+    IBOutlet NSTextField    *threeRoiVertex;
+    IBOutlet NSTextField    *threeRoiPoint1;
+    IBOutlet NSTextField    *threeRoiPoint2;
 }
 
 - (id) init;

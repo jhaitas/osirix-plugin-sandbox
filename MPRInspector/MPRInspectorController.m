@@ -40,6 +40,16 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
         [NSBundle loadNibNamed:@"MprInspectorHUD" owner:self];
         [rotationTheta setFloatValue:90.0];
         [secondsPerROI setDoubleValue:5];
+        
+        [centerRoiName setStringValue:@"Fpz"];
+        
+        [twoRoiRoiName1 setStringValue:@"Oz"];
+        [twoRoiRoiName2 setStringValue:@"T3"];
+        
+        [threeRoiVertex setStringValue:@"Oz"];
+        [threeRoiPoint1 setStringValue:@"T3"];
+        [threeRoiPoint2 setStringValue:@"T4"];
+        
         runningViewTest = NO;
         [viewEachROI setTitle:@"Start View Each ROI"];
     }
@@ -114,33 +124,9 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 
 - (IBAction) centerViewTest: (id) sender
 {
-    unsigned int    i,indexROI;
-    float           pos[3];
-    NSString        *roiName;
-    ROI             *r,*thisROI;
+    float pos[3];
     
-    roiName                 = [NSString stringWithString:@"nasion"];
-    
-    r = nil;
-    thisROI = nil;
-    
-    for (i = 0; i < [roi2DPointsArray count]; i++) {
-        r = [roi2DPointsArray objectAtIndex:i];
-        if ([r.name isEqualToString:roiName]) {
-            thisROI = r;
-            indexROI = i;
-        }
-    }
-             
-    if (thisROI == nil) {
-        NSLog(@"Failed to find ROI named %@.\n",roiName);
-        return;
-    }
-    
-    // we found the ROI we're interested in ...
-    // ... get the 3D position
-    [[point3DPositionsArray objectAtIndex:indexROI] getValue:pos];
-    
+    [self get3dPosition: pos ofRoi:[self getRoiNamed:[centerRoiName stringValue]]];
     
     [self centerView:mprViewer.mprView1 onPt3D:pos];
 }
@@ -184,44 +170,10 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 
 - (IBAction) view2RoiTest: (id) sender
 {
-    int         i,indexROI1,indexROI2;
     float       pos1[3],pos2[3];
-    ROI         *r,*roi1,*roi2;
-    NSString    *roiName1,*roiName2;
     
-    roiName1 = [NSString stringWithString:@"Oz"];
-    roiName2 = [NSString stringWithString:@"T4"];
-    
-    
-    r = nil;
-    roi1 = nil;
-    roi2 = nil;
-    
-    for (i = 0; i < [roi2DPointsArray count]; i++) {
-        r = [roi2DPointsArray objectAtIndex:i];
-        if ([r.name isEqualToString:roiName1]) {
-            roi1 = r;
-            indexROI1 = i;
-        }
-        if ([r.name isEqualToString:roiName2]) {
-            roi2 = r;
-            indexROI2 = i;
-        }
-    }
-    
-    if (roi1 == nil) {
-        NSLog(@"Failed to find ROI named %@.\n",roiName1);
-        return;
-    }
-    
-    if (roi2 == nil) {
-        NSLog(@"Failed to find ROI named %@.\n",roiName2);
-        return;
-    }
-    
-    
-    [[point3DPositionsArray objectAtIndex:indexROI1] getValue:pos1];
-    [[point3DPositionsArray objectAtIndex:indexROI2] getValue:pos2];
+    [self get3dPosition: pos1 ofRoi:[self getRoiNamed:[twoRoiRoiName1 stringValue]]];
+    [self get3dPosition: pos2 ofRoi:[self getRoiNamed:[twoRoiRoiName2 stringValue]]];
     
     [self view: mprViewer.mprView1 
            ptA:[Point3D pointWithX:pos1[0] y:pos1[1] z:pos1[2]]
@@ -230,19 +182,16 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 
 - (IBAction) threeRoiPlane: (id) sender
 {
-    
     float   vertex[3],point1[3],point2[3];
     float   vector1[3],vector2[3],camPos[3],direction[3],viewUp[3];
     float   unitDirection[3],unitViewUp[3];
     Camera  *theCam;
     Point3D *camPosition,*camDirection,*camFocalPoint,*camViewUp;
     
-    // pos1 is the vertex
-    
     // get 3d positions of each ROI
-    [self get3dPosition: vertex ofRoi:[self getRoiNamed:@"Oz"]];
-    [self get3dPosition: point1 ofRoi:[self getRoiNamed:@"T3"]];
-    [self get3dPosition: point2 ofRoi:[self getRoiNamed:@"T4"]];
+    [self get3dPosition: vertex ofRoi:[self getRoiNamed:[threeRoiVertex stringValue]]];
+    [self get3dPosition: point1 ofRoi:[self getRoiNamed:[threeRoiPoint1 stringValue]]];
+    [self get3dPosition: point2 ofRoi:[self getRoiNamed:[threeRoiPoint2 stringValue]]];
     
     // set camera position as average position
     camPos[0] = ( vertex[0] + point1[0] + point2[0] ) / 3.0;
@@ -273,9 +222,18 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     // modify the camera
     theCam = mprViewer.mprView3.camera;
     
-    camPosition     = [Point3D pointWithX:camPos[0] y:camPos[1] z:camPos[2]];
-    camViewUp       = [Point3D pointWithX:unitViewUp[0] y:unitViewUp[1] z:unitViewUp[2]];
-    camDirection    = [Point3D pointWithX:unitDirection[0] y:unitDirection[1] z:unitDirection[2]];
+    camPosition     = [Point3D pointWithX:camPos[0]
+                                        y:camPos[1]
+                                        z:camPos[2] ];
+    
+    camViewUp       = [Point3D pointWithX:unitViewUp[0]
+                                        y:unitViewUp[1]
+                                        z:unitViewUp[2] ];
+    
+    camDirection    = [Point3D pointWithX:unitDirection[0]
+                                        y:unitDirection[1]
+                                        z:unitDirection[2]  ];
+    
     camFocalPoint   = [[Point3D alloc] initWithPoint3D:camPosition];
     [camFocalPoint add:camDirection];
     
