@@ -12,15 +12,9 @@
 
 @implementation TenTwentyController
 
-@synthesize foundBrow,foundInion;
-
 - (id) init
 {
-    if (self = [super init]) {
-        foundBrow = NO;
-        foundInion  = NO;
-        
-        
+    if (self = [super init]) {        
         // these values should be made user configurable in the future
         minScalpValue = 45.0;
         maxSkullValue = 45.0;
@@ -28,24 +22,6 @@
         [NSBundle loadNibNamed:@"TenTwentyHUD.nib" owner:self];
         [minScalpTextField setFloatValue:minScalpValue];
         [maxSkullTextField setFloatValue:maxSkullValue];
-        
-        
-        // allocate and init orientation and direction dictionaries
-        orientation = [[NSMutableDictionary alloc] init];
-        direction   = [[NSMutableDictionary alloc] init];
-        
-        midlineElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"Fpz",
-                                                                         FBOX(.3),@"Fz",
-                                                                         FBOX(.5),@"Cz",
-                                                                         FBOX(.7),@"Pz",
-                                                                         FBOX(.9),@"Oz", nil ];
-        
-        coronalElectrodes = [[NSDictionary alloc] initWithObjectsAndKeys:FBOX(.1),@"T3",
-                                                                         FBOX(.3),@"C3",
-                                                                         FBOX(.7),@"C4",
-                                                                         FBOX(.9),@"T4", nil ];
-        
-        allElectrodes = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -56,12 +32,17 @@
     owner = theOwner;
     viewerController    = [owner getViewerController];
     reslicer            = [[ResliceController alloc] initWithOwner:(id *) self];
+    
+    landmarks   = [[NSMutableDictionary alloc] init];
+    allPoints   = [[NSMutableDictionary alloc] init];
+    
+    [self identifyLandmarks];
+    [allPoints addEntriesFromDictionary:landmarks];
+    
     return self;
 }
 
 #pragma mark Interface Methods
-
-
 - (IBAction) newTraceMethod: (id) sender
 {
     NSString        *bundlePath,*instructionsFilename;
@@ -73,12 +54,25 @@
     tenTwentyInstructions   = [[NSDictionary alloc] initWithContentsOfFile:instructionsFilename];
     instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"];
     
-    NSLog(@"%@",bundlePath);
-    NSLog(@"%@",instructionsFilename);
-    
     for (NSDictionary *theseInstructions in instructionList) {
         [self runInstructions:theseInstructions];
     }    
+}
+
+- (void) identifyLandmarks
+{
+    NSArray *landmarkNames;
+    Point3D *dicomPoint;
+    
+    landmarkNames = [NSArray arrayWithObjects:@"brow",@"apex",@"inion",@"A1",@"A2",nil];
+    
+    for (NSString *name in landmarkNames) {
+        float dicomCoords[3];
+        [self roiWithName:name toDicomCoords:dicomCoords];
+        dicomPoint = [Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]];
+        NSLog(@"%@ %@",name,dicomPoint);
+        [landmarks setObject:dicomPoint forKey:name]; 
+    }
 }
 
 - (void) runInstructions: (NSDictionary *) theInstructions
@@ -116,7 +110,6 @@
     float       xVector[3],yVector[3],unitX[3],unitY[3];
     float       point1DcmCoords[3],vertexDcmCoords[3],point2DcmCoords[3];
     float       pixelSpacingX,pixelSpacingY;
-    ROI         *point1,*vertex,*point2;
     MPRDCMView  *theView;
     DCMPix      *thePix;
     
@@ -134,16 +127,11 @@
     pixelSpacingX   = [thePix pixelSpacingX];
     pixelSpacingY   = [thePix pixelSpacingY];
     
-    // get each ROI
-    point1 = [reslicer get2dRoiNamed:[traceInstructions objectForKey:@"point1"] fromView:theView];
-    vertex = [reslicer get2dRoiNamed:[traceInstructions objectForKey:@"vertex"] fromView:theView];
-    point2 = [reslicer get2dRoiNamed:[traceInstructions objectForKey:@"point2"] fromView:theView];
+    // get the DICOM coords of each point
+    [self pointNamed:[traceInstructions objectForKey:@"point1"] toDicomCoords:point1DcmCoords];
+    [self pointNamed:[traceInstructions objectForKey:@"vertex"] toDicomCoords:vertexDcmCoords];
+    [self pointNamed:[traceInstructions objectForKey:@"point2"] toDicomCoords:point2DcmCoords];
     
-    
-    // get the DICOM coords of each ROI
-    [self getROI:point1 fromPix:thePix toDicomCoords:point1DcmCoords];
-    [self getROI:vertex fromPix:thePix toDicomCoords:vertexDcmCoords];
-    [self getROI:point2 fromPix:thePix toDicomCoords:point2DcmCoords];
     
     // we are tracing from point A to point B ...
     // point A will be point 1
@@ -233,7 +221,7 @@
 }
 
 - (void) divideTrace: (ROI *) theTrace
-               inView: (MPRDCMView *) theView
+              inView: (MPRDCMView *) theView
    usingInstructions: (NSDictionary *) divideInstructions
 {
     NSArray *newROIs;
@@ -372,77 +360,67 @@
     [thisPix convertPixX:roiCenterPoint.x
                     pixY:roiCenterPoint.y
            toDICOMCoords:location            ];
-    DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
+    DLog(@"%@ coordinates = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
 }
 
-- (void) removeSkullTrace: (ROI *) thisSkullTrace inViewerController: (ViewerController *) vc
-{
-    NSMutableArray *thisRoiList;
-    for (thisRoiList in [[vc imageView] dcmRoiList]) {
-        if ([thisRoiList containsObject:thisSkullTrace]) {
-            [thisRoiList removeObjectIdenticalTo:thisSkullTrace];
-        }
-    }
-}
 
-- (void) removeSkullTrace: (ROI *) thisSkullTrace
+- (void) pointNamed: (NSString *) name
+      toDicomCoords: (float *) dicomCoords
 {
-    [self removeSkullTrace:thisSkullTrace inViewerController:viewerController];
-}
-
-- (void) storeElectrodesWithNames: (NSArray *) electrodeNames
-               inViewerController: (ViewerController *) vc
-{
-    float           dicomCoords[3];
-    NSString        *thisName;
-    ROI             *thisElectrode;
-    DCMPix          *thisPix;
-    StereotaxCoord  *thisStereotax;
+    Point3D *point;
     
-    for (thisName in electrodeNames) {
-        thisElectrode   = [self findRoiWithName:thisName inViewerController:vc];
-        thisPix         = [self findPixWithROI:thisElectrode inViewerController:vc];
-        
-        // determine the DICOM coordinates for this electrode
-        [self getROI:thisElectrode fromPix:thisPix toDicomCoords:dicomCoords];
-        
-        // convert to stereotax coords
-        thisStereotax = [[StereotaxCoord alloc] initWithName:thisName
-                                             withDicomCoords:dicomCoords ];
-        
-        // remap with correct orientation
-        [thisStereotax remapWithOrientation:orientation];
-        
-        // store this stereotax coord
-        [allElectrodes setObject:thisStereotax forKey:thisName];
-        [thisStereotax release];
+    point = [allPoints objectForKey:name];
+    
+    if (point == nil) {
+        NSLog(@"Point named %@ not found",name);
+        return;
     }
     
-    // print list of all electrodes with stereotax coords
-    [self printAllElectrodesInStereotax];
+    dicomCoords[0] = point.x;
+    dicomCoords[1] = point.y;
+    dicomCoords[2] = point.z;
 }
 
-- (void) storeElectrodesWithNames: (NSArray *) electrodeNames
+- (void) roiWithName: (NSString *) name
+       toDicomCoords: (float *) dicomCoords
 {
-    [self storeElectrodesWithNames:electrodeNames inViewerController:viewerController];
+    [self roiWithName:name inViewerController: viewerController toDicomCoords:dicomCoords];
+}
+
+- (void) roiWithName: (NSString *) name
+  inViewerController: (ViewerController *) vc
+       toDicomCoords: (float *) dicomCoords
+{
+    DCMPix              *pix;
+    ROI                 *roi;
+    
+    roi = [self findRoiWithName:name inViewerController:vc];
+    pix = [self findPixWithROI:roi inViewerController:vc];
+    
+    if (pix == nil || roi == nil) {
+        NSLog(@"Failed to find ROI named %@ in viewerController",name);
+    }
+    
+    [pix convertPixX:roi.rect.origin.x pixY:roi.rect.origin.y toDICOMCoords:dicomCoords];
+    NSLog(@"%@ found with dicomCoords %f,%f,%f",name,dicomCoords[0],dicomCoords[1],dicomCoords[2]);
 }
 
 - (ROI *) findRoiWithName: (NSString *) thisName
        inViewerController: (ViewerController *)vc
 {
-    NSArray *thisRoiList;
     ROI     *thisROI;
     
-    for (thisRoiList in [[vc imageView] dcmRoiList]) {
-        for (thisROI in thisRoiList) {
-            if ([thisROI.name isEqualToString:thisName]) {
-                return thisROI;
+    thisROI = nil;
+    
+    for (NSArray *roiList in [[vc imageView] dcmRoiList]) {
+        for (ROI *r in roiList) {
+            if ([r.name isEqualToString:thisName]) {
+                thisROI = r;
             }
         }
     }
     
-    // if we don't find the ROI return nil
-    return nil;
+    return thisROI;
 }
 
 - (ROI *) findRoiWithName: (NSString *) thisName
@@ -482,75 +460,6 @@
         return YES;
     }
     return NO;
-}
-
-- (void) printAllElectrodesInStereotax
-{
-    NSEnumerator    *enumerator;
-    NSString        *key;
-    
-    enumerator = [allElectrodes keyEnumerator];
-    DLog(@"Electrode list\n");
-    DLog(@"==============\n");
-    for (key in enumerator) {
-        DLog(@"%@\n",[allElectrodes objectForKey:key]);
-    }
-    DLog(@"\n\n\n");
-}
-
-- (void) placeElectrodesInViewerController: (ViewerController *) vc
-{
-    int             thisRoiType,bestSlice;
-    float           pixelSpacingX,pixelSpacingY;
-    float           dicomCoords[3],sliceCoords[3];
-    NSEnumerator    *enumerator;
-    NSString        *key;
-    
-    enumerator = [allElectrodes keyEnumerator];
-    
-    // temporary pointers for creating new ROI
-    ROI     *thisROI;
-    
-    // pointer to current DCMPix in OsiriX
-    DCMPix  *thisDCMPix    = [[vc imageView] curDCM];
-    
-    // parameters necessary for initializting a new ROI
-    thisRoiType     = t2DPoint;
-    pixelSpacingX   = [thisDCMPix pixelSpacingX];
-    pixelSpacingY   = [thisDCMPix pixelSpacingY];
-    
-    for (key in enumerator) {
-        StereotaxCoord *thisElectrode = [allElectrodes objectForKey:key];
-        
-        DLog(@"%@\n",thisElectrode);
-        
-        // get DICOM coords which we will convert to slice coords
-        [thisElectrode returnDICOMCoords:dicomCoords withOrientation:orientation];
-        
-        // find nearest slice
-        bestSlice = [DCMPix nearestSliceInPixelList:[[vc imageView] dcmPixList]
-                                    withDICOMCoords:dicomCoords
-                                        sliceCoords:sliceCoords                                    ];
-        
-        // allocate and initialize a new ROI
-        thisROI = [[ROI alloc] initWithType:thisRoiType
-                                           :pixelSpacingX
-                                           :pixelSpacingY
-                                           :NSMakePoint(0.0, 0.0)];
-        
-        // move the ROI to the correct location
-        thisROI.rect = NSOffsetRect(thisROI.rect, sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
-        
-        // give the ROI the correct name
-        thisROI.name = [NSString stringWithString:thisElectrode.name];
-        
-        // add the new ROI to the correct ROI list
-        [[[[vc imageView] dcmRoiList] objectAtIndex:bestSlice] addObject:thisROI];
-        
-        [thisROI release];
-    }
-    // update screen
-    [vc updateImage:self];
 }
 
 @end
