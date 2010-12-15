@@ -44,6 +44,8 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     VRView              *vrView;
     
     NSArray             *roi2DPointsArray,*point3DPositionsArray;
+    
+    float factor;
 }
 
 
@@ -57,9 +59,9 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 - (void) closeMprViewer;
 
 - (void) planeInView: (MPRDCMView *) theView
-          WithVertex: (NSString *) vertexName
-          withPoint1: (NSString *) point1Name
-          withPoint2: (NSString *) point2Name;
+          WithVertex: (Point3D *) vertexPt
+          withPoint1: (Point3D *) point1Pt
+          withPoint2: (Point3D *) point2Pt;
 
 - (ROI *) get2dRoiNamed: (NSString *) roiName
                fromView: (MPRDCMView *) theView;
@@ -69,5 +71,6 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 - (Point3D *) directionOfCamera: (Camera *) cam;
 - (Point3D *) unitVectorFromVector: (Point3D *) vector;
 
+- (void) point3d: (Point3D *) point toWorldCoords: (float *) worldCoords;
 
 @end

@@ -89,9 +89,9 @@
     theView = reslicer.mprViewer.mprView3;
     
     [reslicer planeInView:theView
-               WithVertex:[sliceInstructions objectForKey:@"vertex"]
-               withPoint1:[sliceInstructions objectForKey:@"point1"]
-               withPoint2:[sliceInstructions objectForKey:@"point2"] ];
+               WithVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
+               withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
+               withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
     
     [theView display];
     

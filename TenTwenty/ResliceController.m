@@ -51,6 +51,7 @@
     vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
     roi2DPointsArray        = vrController.roi2DPointsArray;
     point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
+    factor                  = [vrView factor];
 }
 
 - (void) closeMprViewer
@@ -59,9 +60,9 @@
 }
 
 - (void) planeInView: (MPRDCMView *) theView
-          WithVertex: (NSString *) vertexName
-          withPoint1: (NSString *) point1Name
-          withPoint2: (NSString *) point2Name
+          WithVertex: (Point3D *) vertexPt
+          withPoint1: (Point3D *) point1Pt
+          withPoint2: (Point3D *) point2Pt
 {
     float   vertex[3],point1[3],point2[3];
     float   vector1[3],vector2[3],camPos[3],direction[3],viewUp[3];
@@ -69,10 +70,10 @@
     Camera  *theCam;
     Point3D *camPosition,*camDirection,*camFocalPoint,*camViewUp;
     
-    // get 3d positions of each ROI
-    [self get3dPosition: vertex ofRoi:[self getWorldRoiNamed:vertexName]];
-    [self get3dPosition: point1 ofRoi:[self getWorldRoiNamed:point1Name]];
-    [self get3dPosition: point2 ofRoi:[self getWorldRoiNamed:point2Name]];
+    // get 3d positions of each point
+    [self point3d: vertexPt toWorldCoords:vertex];
+    [self point3d: point1Pt toWorldCoords:point1];
+    [self point3d: point2Pt toWorldCoords:point2];
     
     // set camera position as average position
     camPos[0] = ( vertex[0] + point1[0] + point2[0] ) / 3.0;
@@ -198,6 +199,13 @@
     UNIT(unitVec,vec);
     
     return [Point3D pointWithX:(float)unitVec[0] y:(float)unitVec[1] z:(float)unitVec[2]];
+}
+
+- (void) point3d: (Point3D *) point toWorldCoords: (float *) worldCoords
+{
+    worldCoords[0] = point.x * factor;
+    worldCoords[1] = point.y * factor;
+    worldCoords[2] = point.z * factor;
 }
 
 @end
