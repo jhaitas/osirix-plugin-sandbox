@@ -52,9 +52,6 @@
     IBOutlet NSPanel        *tenTwentyHUDPanel;
     IBOutlet NSTextField    *minScalpTextField;
     IBOutlet NSTextField    *maxSkullTextField;
-    IBOutlet NSButton       *identifyBrowAndInionButton;
-    IBOutlet NSButton       *placeMidlineElectrodesButton;
-    IBOutlet NSButton       *placeCoronalElectrodesButton;
     IBOutlet NSButton       *newTraceMethod;
 }
 
@@ -64,9 +61,6 @@
 - (id) initWithOwner:(id *) theOwner;
 
 #pragma mark Interface Methods
-- (IBAction) identifyBrowAndInionButtonClick: (id) sender;
-- (IBAction) placeMidlineElectrodesButtonClick: (id) sender;
-- (IBAction) placeCoronalElectrodesButtonClick: (id) sender;
 - (IBAction) newTraceMethod: (id) sender;
 
 
@@ -76,31 +70,14 @@
             fromPosition: (float [3]) thePos
              inDirection: (float [3]) theDir
               toPosition: (float [3]) finalPos;
+- (void) divideTrace: (ROI *) theTrace
+              inView: (MPRDCMView *) theView
+   usingInstructions: (NSDictionary *) divideInstructions;
 
 #pragma mark Work Methods
-- (void) findUserInput;
 - (void) getROI: (ROI *)    thisROI 
         fromPix: (DCMPix *) thisPix 
   toDicomCoords: (float *)  location;
-
-
-- (void) computeOrientation;
-- (void) remapBrowAndInion;
-
-- (void) placeMidlineElectrodes;
-- (void) traceSkullMidline;
-
-- (void) resliceCoronalAtCz;
-- (void) watchViewerML: (NSTimer *) theTimer;
-- (void) placeCoronalElectrodes;
-- (void) traceSkullCzCoronal;
-
-- (NSPoint) lowerElectrode: (ROI *) thisROI
-                   inSlice: (DCMPix *) thisSlice;
-- (NSPoint) extendPoint: (ROI *) thisROI
-                inSlice: (DCMPix *) thisSlice
-              withDirML: (int) directionML
-              withDirDV: (int) directionDV;
 
 - (void) storeElectrodesWithNames: (NSArray *) electrodeNames
                inViewerController: (ViewerController *) vc;
