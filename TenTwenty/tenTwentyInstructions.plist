@@ -28,6 +28,30 @@
 				<string>apex</string>
 			</dict>
 		</dict>
+		<dict>
+			<key>divideInstructions</key>
+			<dict>
+				<key>Cz</key>
+				<real>0.5</real>
+				<key>T3</key>
+				<real>0.1</real>
+				<key>C3</key>
+				<real>0.3</real>
+				<key>C4</key>
+				<real>0.9</real>
+				<key>T4</key>
+				<real>0.7</real>
+			</dict>
+			<key>sliceInstructions</key>
+			<dict>
+				<key>point1</key>
+				<string>A1</string>
+				<key>point2</key>
+				<string>A2</string>
+				<key>vertex</key>
+				<string>apex</string>
+			</dict>
+		</dict>
 	</array>
 </dict>
 </plist>
