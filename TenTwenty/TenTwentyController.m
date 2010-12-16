@@ -49,14 +49,25 @@
     NSDictionary    *tenTwentyInstructions;
     NSArray         *instructionList;
     
+    [reslicer openMprViewer];
+    
     bundlePath              = [[[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath] retain];
     instructionsFilename    = [[NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath] retain];
     tenTwentyInstructions   = [[NSDictionary alloc] initWithContentsOfFile:instructionsFilename];
-    instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"];
+    instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"];    
     
     for (NSDictionary *theseInstructions in instructionList) {
         [self runInstructions:theseInstructions];
-    }    
+    }
+    
+    // delete all existing ROIs
+    [viewerController roiDeleteAll:self];
+    
+    // place electrodes according to dictionary
+    [self placeElectrodes:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]];
+    
+    [reslicer closeMprViewer];
+    [tenTwentyHUDPanel close];
 }
 
 - (void) identifyLandmarks
@@ -84,16 +95,12 @@
     sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
     divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
-    [reslicer openMprViewer];
-    
     theView = reslicer.mprViewer.mprView3;
     
     [reslicer planeInView:theView
-               WithVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
+               withVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
                withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
                withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
-    
-    [theView display];
     
     skullTrace = [self skullTraceFromInstructions:sliceInstructions];
     
@@ -178,24 +185,28 @@
         float   thetaRad;
         NSPoint thisPoint;
         
+        thetaRad = i * (PI / (float)numSections);
+        
         // get starting positons
         startPos[0] = pointA[0] + (stepSize[0] * (float) i);
         startPos[1] = pointA[1] + (stepSize[1] * (float) i);
         startPos[2] = pointA[2] + (stepSize[2] * (float) i);
         
-        thetaRad = i * (PI / (float)numSections);
+        startPos[0] += (yVector[0]) * sin(thetaRad);
+        startPos[1] += (yVector[1]) * sin(thetaRad);
+        startPos[2] += (yVector[2]) * sin(thetaRad);
         
         // compute search direction
         searchDir[0] = (unitX[0] * cos(thetaRad)) + (unitY[0] * sin(thetaRad));
         searchDir[1] = (unitX[1] * cos(thetaRad)) + (unitY[1] * sin(thetaRad));
-        searchDir[2] = (unitX[2] * cos(thetaRad)) + (unitY[2] * sin(thetaRad));
+        searchDir[2] = (unitX[2] * cos(thetaRad)) + (unitY[2] * sin(thetaRad));        
 
         // search for skull
         [self findSkullInView:theView fromPosition:startPos inDirection:searchDir toPosition:finalPos];
         
-        
         // get the slice coordinates
         [thePix convertDICOMCoords:finalPos toSliceCoords:sliceCoords];
+        
         
         thisPoint = NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
         
@@ -216,6 +227,10 @@
     
     // set points for spline
     [thisROI setPoints:intermediatePoints];
+    
+    [theView.curRoiList addObject:thisROI];
+    
+    [theView display];
     
     return thisROI;
 }
@@ -240,10 +255,13 @@
         
         //get the dicom coords
         [thePix convertPixX:r.rect.origin.x pixY:r.rect.origin.y toDICOMCoords:dicomCoords];
+                
+        [theView add2DPoint:dicomCoords];
         
-        // create the new ROI;
-        [theView add2DPoint: dicomCoords];
+        [allPoints setObject:[Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]] forKey:r.name]; 
     }
+
+    [theView display];
 }
 
 - (void) findSkullInView: (MPRDCMView *) theView
@@ -278,9 +296,6 @@
                                        :pixelSpacingX
                                        :pixelSpacingY
                                        :NSMakePoint(0.0, 0.0)];
-    
-    
-    NSLog(@"theDir x,y,z = %f,%f,%f",theDir[0],theDir[1],theDir[2]);
     
     // look for scalp
     while (!foundScalp) {
@@ -339,6 +354,48 @@
     }
     
     [thisROI release];
+}
+
+
+- (void) placeElectrodes: (NSArray *) electrodesToPlace
+{
+    float   dicomCoords[3],sliceCoords[3];
+    Point3D *point;
+    ROI     *roi;
+    DCMPix  *pix;
+    
+    pix = [[viewerController pixList] objectAtIndex: 0];
+    for (NSString *name in electrodesToPlace) {
+        point = [allPoints objectForKey:name];
+        
+        dicomCoords[0] = point.x;
+        dicomCoords[1] = point.y;
+        dicomCoords[2] = point.z;
+        
+		[pix convertDICOMCoords: dicomCoords 
+                  toSliceCoords: sliceCoords 
+                    pixelCenter: YES];
+        
+		sliceCoords[0] /= pix.pixelSpacingX;
+		sliceCoords[1] /= pix.pixelSpacingY;
+		sliceCoords[2] /= pix.sliceInterval;
+        
+        sliceCoords[2] = round(sliceCoords[2]);
+        
+		if (sliceCoords[ 2] >= 0 && sliceCoords[ 2] < [[viewerController pixList] count])
+        {
+            roi = [[[ROI alloc] initWithType: t2DPoint 
+                                            : pix.pixelSpacingX 
+                                            : pix.pixelSpacingY 
+                                            : [DCMPix originCorrectedAccordingToOrientation: pix] ] autorelease];
+
+
+            [roi setROIRect: NSMakeRect( sliceCoords[ 0], sliceCoords[ 1], 0, 0)];
+
+            [[viewerController imageView] roiSet:roi];
+            [[[viewerController roiList] objectAtIndex: sliceCoords[ 2]] addObject: roi];
+        }
+    }
 }
 
 #pragma mark Work Methods

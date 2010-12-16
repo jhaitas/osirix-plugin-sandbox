@@ -48,18 +48,16 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     float factor;
 }
 
-
 @property (assign) MPRController *mprViewer;
 
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
-- (void) setOwner:(id *) theOwner;
 
 - (void) openMprViewer;
 - (void) closeMprViewer;
 
 - (void) planeInView: (MPRDCMView *) theView
-          WithVertex: (Point3D *) vertexPt
+          withVertex: (Point3D *) vertexPt
           withPoint1: (Point3D *) point1Pt
           withPoint2: (Point3D *) point2Pt;
 

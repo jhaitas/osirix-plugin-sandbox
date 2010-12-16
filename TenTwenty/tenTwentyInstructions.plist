@@ -2,6 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>electrodesToPlace</key>
+	<array>
+		<string>Fp1</string>
+		<string>Fp2</string>
+		<string>Fz</string>
+		<string>F3</string>
+		<string>F4</string>
+		<string>F7</string>
+		<string>F8</string>
+		<string>Cz</string>
+		<string>C3</string>
+		<string>C4</string>
+		<string>Pz</string>
+		<string>P3</string>
+		<string>P4</string>
+		<string>T3</string>
+		<string>T4</string>
+		<string>T5</string>
+		<string>T6</string>
+		<string>O1</string>
+		<string>O2</string>
+	</array>
 	<key>instructionSteps</key>
 	<array>
 		<dict>
@@ -31,16 +53,16 @@
 		<dict>
 			<key>divideInstructions</key>
 			<dict>
-				<key>Cz</key>
-				<real>0.5</real>
 				<key>T3</key>
 				<real>0.1</real>
 				<key>C3</key>
 				<real>0.3</real>
+				<key>Cz</key>
+				<real>0.5</real>
 				<key>C4</key>
-				<real>0.9</real>
-				<key>T4</key>
 				<real>0.7</real>
+				<key>T4</key>
+				<string>0.9</string>
 			</dict>
 			<key>sliceInstructions</key>
 			<dict>
@@ -50,6 +72,94 @@
 				<string>A2</string>
 				<key>vertex</key>
 				<string>apex</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>divideInstructions</key>
+			<dict>
+				<key>Fp1</key>
+				<real>0.1</real>
+				<key>F7</key>
+				<real>0.3</real>
+				<key>T3</key>
+				<real>0.5</real>
+				<key>T5</key>
+				<real>0.7</real>
+				<key>O1</key>
+				<real>0.9</real>
+			</dict>
+			<key>sliceInstructions</key>
+			<dict>
+				<key>point1</key>
+				<string>Fpz</string>
+				<key>point2</key>
+				<string>Oz</string>
+				<key>vertex</key>
+				<string>T3</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>divideInstructions</key>
+			<dict>
+				<key>Fp2</key>
+				<real>0.1</real>
+				<key>F8</key>
+				<real>0.3</real>
+				<key>T4</key>
+				<real>0.5</real>
+				<key>T6</key>
+				<real>0.7</real>
+				<key>O2</key>
+				<real>0.9</real>
+			</dict>
+			<key>sliceInstructions</key>
+			<dict>
+				<key>point1</key>
+				<string>Fpz</string>
+				<key>point2</key>
+				<string>Oz</string>
+				<key>vertex</key>
+				<string>T4</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>divideInstructions</key>
+			<dict>
+				<key>F3</key>
+				<real>0.25</real>
+				<key>Fz</key>
+				<real>0.5</real>
+				<key>F4</key>
+				<real>0.75</real>
+			</dict>
+			<key>sliceInstructions</key>
+			<dict>
+				<key>point1</key>
+				<string>F7</string>
+				<key>point2</key>
+				<string>F8</string>
+				<key>vertex</key>
+				<string>Fz</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>divideInstructions</key>
+			<dict>
+				<key>P3</key>
+				<real>0.25</real>
+				<key>Pz</key>
+				<real>0.5</real>
+				<key>P4</key>
+				<real>0.75</real>
+			</dict>
+			<key>sliceInstructions</key>
+			<dict>
+				<key>point1</key>
+				<string>T5</string>
+				<key>point2</key>
+				<string>T6</string>
+				<key>vertex</key>
+				<string>Pz</string>
 			</dict>
 		</dict>
 	</array>

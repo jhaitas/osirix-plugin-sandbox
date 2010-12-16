@@ -28,15 +28,10 @@
 {
     [self init];
     
-    [self setOwner:theOwner];
-    
-    return self;
-}
-
-- (void) setOwner:(id *) theOwner
-{
     owner = theOwner;
     viewerController = [owner valueForKey:@"viewerController"];
+    
+    return self;
 }
 
 - (void) openMprViewer
@@ -60,7 +55,7 @@
 }
 
 - (void) planeInView: (MPRDCMView *) theView
-          WithVertex: (Point3D *) vertexPt
+          withVertex: (Point3D *) vertexPt
           withPoint1: (Point3D *) point1Pt
           withPoint2: (Point3D *) point2Pt
 {
@@ -129,6 +124,9 @@
     
     [theView.windowController updateViewsAccordingToFrame:theView];
     
+    [mprViewer.mprView1 display];
+    [mprViewer.mprView2 display];
+    [mprViewer.mprView3 display];
 }
 
 - (ROI *) get2dRoiNamed: (NSString *) roiName

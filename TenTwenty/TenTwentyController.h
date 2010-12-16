@@ -16,7 +16,6 @@
 #import "TenTwentyFilter.h"
 #import "ResliceController.h"
 #import "LineDividerController.h"
-#import "StereotaxCoord.h"
 
 #define FBOX(x) [NSNumber numberWithFloat:x]
 
@@ -58,6 +57,8 @@
 - (void) divideTrace: (ROI *) theTrace
               inView: (MPRDCMView *) theView
    usingInstructions: (NSDictionary *) divideInstructions;
+
+- (void) placeElectrodes: (NSArray *) electrodesToPlace;
 
 #pragma mark Work Methods
 

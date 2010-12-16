@@ -14,8 +14,6 @@
 		585B6AE4125F662300D42896 /* TenTwentyController.h in Headers */ = {isa = PBXBuildFile; fileRef = 585B6AE2125F662300D42896 /* TenTwentyController.h */; };
 		585B6AE5125F662300D42896 /* TenTwentyController.m in Sources */ = {isa = PBXBuildFile; fileRef = 585B6AE3125F662300D42896 /* TenTwentyController.m */; };
 		585B740E1264B64F00D42896 /* TenTwentyHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 585B740D1264B64F00D42896 /* TenTwentyHUD.xib */; };
-		5875E335125CE0320026F150 /* StereotaxCoord.h in Headers */ = {isa = PBXBuildFile; fileRef = 5875E333125CE0320026F150 /* StereotaxCoord.h */; };
-		5875E336125CE0320026F150 /* StereotaxCoord.m in Sources */ = {isa = PBXBuildFile; fileRef = 5875E334125CE0320026F150 /* StereotaxCoord.m */; };
 		58915D0512B83394007A10A9 /* tenTwentyInstructions.plist in Resources */ = {isa = PBXBuildFile; fileRef = 58915D0412B83394007A10A9 /* tenTwentyInstructions.plist */; };
 		58C9B0B0126CF28E00B3959E /* MPRController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0AE126CF28E00B3959E /* MPRController.h */; };
 		58C9B0B1126CF28E00B3959E /* MPRDCMView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B0AF126CF28E00B3959E /* MPRDCMView.h */; };
@@ -67,8 +65,6 @@
 		585B6AE2125F662300D42896 /* TenTwentyController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TenTwentyController.h; sourceTree = "<group>"; };
 		585B6AE3125F662300D42896 /* TenTwentyController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TenTwentyController.m; sourceTree = "<group>"; };
 		585B740D1264B64F00D42896 /* TenTwentyHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TenTwentyHUD.xib; sourceTree = "<group>"; };
-		5875E333125CE0320026F150 /* StereotaxCoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxCoord.h; sourceTree = "<group>"; };
-		5875E334125CE0320026F150 /* StereotaxCoord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxCoord.m; sourceTree = "<group>"; };
 		58915D0412B83394007A10A9 /* tenTwentyInstructions.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = tenTwentyInstructions.plist; sourceTree = "<group>"; };
 		58C9B0AE126CF28E00B3959E /* MPRController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRController.h; sourceTree = "<group>"; };
 		58C9B0AF126CF28E00B3959E /* MPRDCMView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRDCMView.h; sourceTree = "<group>"; };
@@ -227,8 +223,6 @@
 				5859052212B7CF3200AFD2A8 /* ResliceController.m */,
 				585B6A36125E5BC400D42896 /* LineDividerController.h */,
 				585B6A37125E5BC400D42896 /* LineDividerController.m */,
-				5875E333125CE0320026F150 /* StereotaxCoord.h */,
-				5875E334125CE0320026F150 /* StereotaxCoord.m */,
 				585B6AE2125F662300D42896 /* TenTwentyController.h */,
 				585B6AE3125F662300D42896 /* TenTwentyController.m */,
 				ABA48A640680BB600089EB4F /* TenTwentyFilter.h */,
@@ -270,7 +264,6 @@
 				ABB76345067FB2A8000912C1 /* ROI.h in Headers */,
 				ABA48A650680BB600089EB4F /* TenTwentyFilter.h in Headers */,
 				59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */,
-				5875E335125CE0320026F150 /* StereotaxCoord.h in Headers */,
 				585B6A38125E5BC400D42896 /* LineDividerController.h in Headers */,
 				585B6AE4125F662300D42896 /* TenTwentyController.h in Headers */,
 				58C9B0B0126CF28E00B3959E /* MPRController.h in Headers */,
@@ -376,7 +369,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ABA48A670680BB690089EB4F /* TenTwentyFilter.m in Sources */,
-				5875E336125CE0320026F150 /* StereotaxCoord.m in Sources */,
 				585B6A39125E5BC400D42896 /* LineDividerController.m in Sources */,
 				585B6AE5125F662300D42896 /* TenTwentyController.m in Sources */,
 				5859052412B7CF3200AFD2A8 /* ResliceController.m in Sources */,
