@@ -15,6 +15,7 @@
 
 #import "TenTwentyFilter.h"
 #import "ResliceController.h"
+#import "TraceController.h"
 #import "LineDividerController.h"
 
 #define FBOX(x) [NSNumber numberWithFloat:x]
@@ -27,8 +28,9 @@
     
     float               minScalpValue,maxSkullValue;
     
-    LineDividerController   *ld;
     ResliceController       *reslicer;
+    TraceController         *tracer;
+    LineDividerController   *lineDivider;
     
     NSMutableDictionary     *landmarks;
     NSMutableDictionary     *allPoints;
@@ -37,23 +39,18 @@
     IBOutlet NSPanel        *tenTwentyHUDPanel;
     IBOutlet NSTextField    *minScalpTextField;
     IBOutlet NSTextField    *maxSkullTextField;
-    IBOutlet NSButton       *newTraceMethod;
+    IBOutlet NSButton       *performTenTwentyMeasurments;
 }
 
 - (id) init;
 - (id) initWithOwner:(id *) theOwner;
 
 #pragma mark Interface Methods
-- (IBAction) newTraceMethod: (id) sender;
+- (IBAction) performTenTwentyMeasurments: (id) sender;
 
 - (void) identifyLandmarks;
 
 - (void) runInstructions: (NSDictionary *) theInstructions;
-- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions;
-- (void) findSkullInView: (MPRDCMView *) theView
-            fromPosition: (float [3]) thePos
-             inDirection: (float [3]) theDir
-              toPosition: (float [3]) finalPos;
 - (void) divideTrace: (ROI *) theTrace
               inView: (MPRDCMView *) theView
    usingInstructions: (NSDictionary *) divideInstructions;
@@ -84,6 +81,5 @@
          inViewerController: (ViewerController *) vc;
 - (DCMPix *) findPixWithROI: (ROI *) thisROI;
 
-- (BOOL) isPoint: (NSPoint) thePoint onSlice: (DCMPix *) thisPix;
 
 @end

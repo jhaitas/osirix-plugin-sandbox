@@ -38,6 +38,8 @@
 		58C9B24E126E200100B3959E /* CLUTOpacityView.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B24D126E200100B3959E /* CLUTOpacityView.h */; };
 		58C9B250126E201700B3959E /* WaitRendering.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B24F126E201700B3959E /* WaitRendering.h */; };
 		58C9B256126E20AB00B3959E /* ViewerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58C9B255126E20AB00B3959E /* ViewerController.h */; };
+		58CF976C12BAAA0200FCFBBF /* TraceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58CF976A12BAAA0200FCFBBF /* TraceController.h */; };
+		58CF976D12BAAA0200FCFBBF /* TraceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58CF976B12BAAA0200FCFBBF /* TraceController.m */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* TenTwenty_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* TenTwenty_Prefix.pch */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
@@ -89,6 +91,8 @@
 		58C9B24D126E200100B3959E /* CLUTOpacityView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLUTOpacityView.h; sourceTree = "<group>"; };
 		58C9B24F126E201700B3959E /* WaitRendering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaitRendering.h; sourceTree = "<group>"; };
 		58C9B255126E20AB00B3959E /* ViewerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewerController.h; sourceTree = "<group>"; };
+		58CF976A12BAAA0200FCFBBF /* TraceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TraceController.h; sourceTree = "<group>"; };
+		58CF976B12BAAA0200FCFBBF /* TraceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TraceController.m; sourceTree = "<group>"; };
 		59C2B9280FF0ED7100B50385 /* Notifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifications.h; sourceTree = "<group>"; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB5D36050680E57E00F4007A /* TenTwenty.osirixplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TenTwenty.osirixplugin; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -219,10 +223,12 @@
 		AB2C26750677B0C400A08910 /* TenTwentyFilter */ = {
 			isa = PBXGroup;
 			children = (
-				5859052112B7CF3200AFD2A8 /* ResliceController.h */,
-				5859052212B7CF3200AFD2A8 /* ResliceController.m */,
 				585B6A36125E5BC400D42896 /* LineDividerController.h */,
 				585B6A37125E5BC400D42896 /* LineDividerController.m */,
+				5859052112B7CF3200AFD2A8 /* ResliceController.h */,
+				5859052212B7CF3200AFD2A8 /* ResliceController.m */,
+				58CF976A12BAAA0200FCFBBF /* TraceController.h */,
+				58CF976B12BAAA0200FCFBBF /* TraceController.m */,
 				585B6AE2125F662300D42896 /* TenTwentyController.h */,
 				585B6AE3125F662300D42896 /* TenTwentyController.m */,
 				ABA48A640680BB600089EB4F /* TenTwentyFilter.h */,
@@ -290,6 +296,7 @@
 				58C9B250126E201700B3959E /* WaitRendering.h in Headers */,
 				58C9B256126E20AB00B3959E /* ViewerController.h in Headers */,
 				5859052312B7CF3200AFD2A8 /* ResliceController.h in Headers */,
+				58CF976C12BAAA0200FCFBBF /* TraceController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,6 +379,7 @@
 				585B6A39125E5BC400D42896 /* LineDividerController.m in Sources */,
 				585B6AE5125F662300D42896 /* TenTwentyController.m in Sources */,
 				5859052412B7CF3200AFD2A8 /* ResliceController.m in Sources */,
+				58CF976D12BAAA0200FCFBBF /* TraceController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

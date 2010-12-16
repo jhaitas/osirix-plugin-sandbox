@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="3"/>
+			<integer value="4"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -151,22 +151,22 @@
 								<reference key="NSTextColor" ref="840649953"/>
 							</object>
 						</object>
-						<object class="NSButton" id="859037540">
+						<object class="NSButton" id="634276635">
 							<reference key="NSNextResponder" ref="918550806"/>
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{20, 18}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
 							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="849148307">
+							<object class="NSButtonCell" key="NSCell" id="938408802">
 								<int key="NSCellFlags">-2080244224</int>
 								<int key="NSCellFlags2">134217728</int>
-								<string key="NSContents">New Trace Method</string>
+								<string key="NSContents">Perform Ten Twenty Measurments</string>
 								<object class="NSFont" key="NSSupport">
 									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">12</double>
 									<int key="NSfFlags">16</int>
 								</object>
-								<reference key="NSControlView" ref="859037540"/>
+								<reference key="NSControlView" ref="634276635"/>
 								<int key="NSButtonFlags">-2038152961</int>
 								<int key="NSButtonFlags2">164</int>
 								<string key="NSAlternateContents"/>
@@ -230,17 +230,25 @@
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">newTraceMethod</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="859037540"/>
+						<reference key="destination" ref="634276635"/>
 					</object>
 					<int key="connectionID">64</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">newTraceMethod:</string>
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">performTenTwentyMeasurments</string>
 						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="859037540"/>
+						<reference key="destination" ref="634276635"/>
 					</object>
-					<int key="connectionID">65</int>
+					<int key="connectionID">66</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">performTenTwentyMeasurments:</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="634276635"/>
+					</object>
+					<int key="connectionID">67</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -288,7 +296,7 @@
 							<reference ref="274714881"/>
 							<reference ref="447174882"/>
 							<reference ref="456848635"/>
-							<reference ref="859037540"/>
+							<reference ref="634276635"/>
 						</object>
 						<reference key="parent" ref="7841363"/>
 					</object>
@@ -350,17 +358,17 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">58</int>
-						<reference key="object" ref="859037540"/>
+						<reference key="object" ref="634276635"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="849148307"/>
+							<reference ref="938408802"/>
 						</object>
 						<reference key="parent" ref="918550806"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">59</int>
-						<reference key="object" ref="849148307"/>
-						<reference key="parent" ref="859037540"/>
+						<reference key="object" ref="938408802"/>
+						<reference key="parent" ref="634276635"/>
 					</object>
 				</object>
 			</object>
@@ -441,7 +449,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">65</int>
+			<int key="maxID">67</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -457,13 +465,13 @@
 					<string key="className">TenTwentyController</string>
 					<string key="superclassName">NSWindowController</string>
 					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">newTraceMethod:</string>
+						<string key="NS.key.0">performTenTwentyMeasurments:</string>
 						<string key="NS.object.0">id</string>
 					</object>
 					<object class="NSMutableDictionary" key="actionInfosByName">
-						<string key="NS.key.0">newTraceMethod:</string>
+						<string key="NS.key.0">performTenTwentyMeasurments:</string>
 						<object class="IBActionInfo" key="NS.object.0">
-							<string key="name">newTraceMethod:</string>
+							<string key="name">performTenTwentyMeasurments:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</object>
@@ -471,15 +479,17 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>maxSkull</string>
-							<string>minScalp</string>
-							<string>newTraceMethod</string>
+							<string>maxSkullTextField</string>
+							<string>minScalpTextField</string>
+							<string>owner</string>
+							<string>performTenTwentyMeasurments</string>
 							<string>tenTwentyHUDPanel</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
+							<string>id</string>
 							<string>NSButton</string>
 							<string>NSPanel</string>
 						</object>
@@ -488,23 +498,28 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>maxSkull</string>
-							<string>minScalp</string>
-							<string>newTraceMethod</string>
+							<string>maxSkullTextField</string>
+							<string>minScalpTextField</string>
+							<string>owner</string>
+							<string>performTenTwentyMeasurments</string>
 							<string>tenTwentyHUDPanel</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">maxSkull</string>
+								<string key="name">maxSkullTextField</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">minScalp</string>
+								<string key="name">minScalpTextField</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">newTraceMethod</string>
+								<string key="name">owner</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">performTenTwentyMeasurments</string>
 								<string key="candidateClassName">NSButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">

@@ -10,8 +10,6 @@
 #import "PluginFilter.h"
 #import "MPRHeaders.h"
 
-
-
 #define PRECISION 0.0001
 
 #define PI 3.14159265358979
@@ -30,9 +28,6 @@ dest[2]=v1[2]/MAG(v1);
 dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
 dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
 dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
-
-@class TenTwentyController;
-
 
 @interface ResliceController : NSObject {
     id owner;
