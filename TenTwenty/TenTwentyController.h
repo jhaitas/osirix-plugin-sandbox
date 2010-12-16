@@ -13,6 +13,8 @@
 // ... MPRHeaders.h contains imports needed for MPR
 #import "MPRHeaders.h"
 
+#import "Notifications.h"
+
 #import "TenTwentyFilter.h"
 #import "ResliceController.h"
 #import "TraceController.h"
@@ -55,8 +57,6 @@
               inView: (MPRDCMView *) theView
    usingInstructions: (NSDictionary *) divideInstructions;
 
-- (void) placeElectrodes: (NSArray *) electrodesToPlace;
-
 #pragma mark Work Methods
 
 - (void) getROI: (ROI *)    thisROI 
@@ -81,5 +81,10 @@
          inViewerController: (ViewerController *) vc;
 - (DCMPix *) findPixWithROI: (ROI *) thisROI;
 
+- (void) placeElectrodes: (NSArray *) electrodesToPlace;
+
+- (void) addPoint: (float [3]) dicomCoords;
+- (void) addPoint: (float [3]) dicomCoords
+         withName: (NSString *) name;
 
 @end

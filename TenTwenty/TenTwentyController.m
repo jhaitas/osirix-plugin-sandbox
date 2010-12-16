@@ -20,6 +20,9 @@
         [NSBundle loadNibNamed:@"TenTwentyHUD.nib" owner:self];
         [minScalpTextField setFloatValue:minScalpValue];
         [maxSkullTextField setFloatValue:maxSkullValue];
+        
+        // set ROIs to display name only
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ROITEXTNAMEONLY"];
     }
     return self;
 }
@@ -62,6 +65,7 @@
     
     for (NSDictionary *theseInstructions in instructionList) {
         [self runInstructions:theseInstructions];
+        
     }
     
     // delete all existing ROIs
@@ -109,8 +113,6 @@
     skullTrace = [tracer skullTraceFromInstructions:sliceInstructions];
     
     [self divideTrace: skullTrace inView: theView usingInstructions: divideInstructions];
-    
-//    [reslicer closeMprViewer];
 }
 
 
@@ -134,57 +136,17 @@
         
         //get the dicom coords
         [thePix convertPixX:r.rect.origin.x pixY:r.rect.origin.y toDICOMCoords:dicomCoords];
-                
-        [theView add2DPoint:dicomCoords];
         
         [allPoints setObject:[Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]] forKey:r.name]; 
+                
+        [self addPoint:dicomCoords withName:r.name];
     }
-
+    [theView detect2DPointInThisSlice];
     [theView display];
 }
 
 
 
-- (void) placeElectrodes: (NSArray *) electrodesToPlace
-{
-    float   dicomCoords[3],sliceCoords[3];
-    Point3D *point;
-    ROI     *roi;
-    DCMPix  *pix;
-    
-    pix = [[viewerController pixList] objectAtIndex: 0];
-    for (NSString *name in electrodesToPlace) {
-        point = [allPoints objectForKey:name];
-        
-        dicomCoords[0] = point.x;
-        dicomCoords[1] = point.y;
-        dicomCoords[2] = point.z;
-        
-		[pix convertDICOMCoords: dicomCoords 
-                  toSliceCoords: sliceCoords 
-                    pixelCenter: YES];
-        
-		sliceCoords[0] /= pix.pixelSpacingX;
-		sliceCoords[1] /= pix.pixelSpacingY;
-		sliceCoords[2] /= pix.sliceInterval;
-        
-        sliceCoords[2] = round(sliceCoords[2]);
-        
-		if (sliceCoords[ 2] >= 0 && sliceCoords[ 2] < [[viewerController pixList] count])
-        {
-            roi = [[[ROI alloc] initWithType: t2DPoint 
-                                            : pix.pixelSpacingX 
-                                            : pix.pixelSpacingY 
-                                            : [DCMPix originCorrectedAccordingToOrientation: pix] ] autorelease];
-
-
-            [roi setROIRect: NSMakeRect( sliceCoords[ 0], sliceCoords[ 1], 0, 0)];
-
-            [[viewerController imageView] roiSet:roi];
-            [[[viewerController roiList] objectAtIndex: sliceCoords[ 2]] addObject: roi];
-        }
-    }
-}
 
 #pragma mark Work Methods
 
@@ -297,6 +259,66 @@
 - (DCMPix *) findPixWithROI: (ROI *) thisROI
 {
     return [self findPixWithROI:thisROI inViewerController:viewerController];
+}
+
+
+- (void) placeElectrodes: (NSArray *) electrodesToPlace
+{
+    float   dicomCoords[3];
+    Point3D *point;
+    
+    for (NSString *name in electrodesToPlace) {
+        point = [allPoints objectForKey:name];
+        
+        dicomCoords[0] = point.x;
+        dicomCoords[1] = point.y;
+        dicomCoords[2] = point.z;
+        
+        [self addPoint:dicomCoords withName:name];
+    }
+}
+
+- (void) addPoint:(float [3])dicomCoords
+{
+    [self addPoint:dicomCoords withName:[ROI defaultName]];
+}
+
+- (void) addPoint: (float [3]) dicomCoords
+         withName: (NSString *) name
+{
+    float   sliceCoords[3];
+    ROI     *roi;
+    DCMPix  *pix;
+    
+    pix = [[viewerController pixList] objectAtIndex: 0];
+    
+    
+    [pix convertDICOMCoords: dicomCoords 
+              toSliceCoords: sliceCoords 
+                pixelCenter: YES            ];
+    
+    sliceCoords[0] /= pix.pixelSpacingX;
+    sliceCoords[1] /= pix.pixelSpacingY;
+    sliceCoords[2] /= pix.sliceInterval;
+    
+    sliceCoords[2] = round(sliceCoords[2]);
+    
+    if (sliceCoords[ 2] >= 0 && sliceCoords[ 2] < [[viewerController pixList] count])
+    {
+        roi = [[[ROI alloc] initWithType: t2DPoint 
+                                        : pix.pixelSpacingX 
+                                        : pix.pixelSpacingY 
+                                        : [DCMPix originCorrectedAccordingToOrientation: pix] ] autorelease];
+        
+        roi.name = name;
+        
+        [roi setROIRect: NSMakeRect( sliceCoords[ 0], sliceCoords[ 1], 0, 0)];
+        
+        [[[viewerController roiList] objectAtIndex: sliceCoords[ 2]] addObject: roi];
+    }
+    
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName: OsirixROIChangeNotification object: roi userInfo: nil];
 }
 
 @end
