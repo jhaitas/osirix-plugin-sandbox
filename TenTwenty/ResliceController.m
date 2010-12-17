@@ -12,21 +12,16 @@
 
 @synthesize mprViewer;
 
-- (id) init
+- (id) initWithTenTwenty: (TenTwentyController *) theTenTwenty
 {
     if (self = [super init]) {
-    
+        owner = theTenTwenty;
+        viewerController = [owner valueForKey:@"viewerController"];
     } else {
         NSLog(@"failed to initialize ResliceController");
     }
 
     return self;
-}
-
-- (void) prepareWithTenTwenty: (TenTwentyController *) theTenTwenty
-{
-    owner = theTenTwenty;
-    viewerController = [owner valueForKey:@"viewerController"];
 }
 
 - (void) openMprViewer
@@ -36,12 +31,7 @@
     [mprViewer showWindow:self];
     [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
     
-    
-    vrController            = [mprViewer valueForKey:@"hiddenVRController"];
-    vrView                  = [mprViewer valueForKey:@"hiddenVRView"];
-    roi2DPointsArray        = vrController.roi2DPointsArray;
-    point3DPositionsArray   = [vrView valueForKey:@"point3DPositionsArray"];
-    factor                  = [vrView factor];
+    factor                  = [[mprViewer valueForKey:@"hiddenVRView"] factor];
 }
 
 - (void) closeMprViewer
@@ -122,52 +112,6 @@
     [mprViewer.mprView1 display];
     [mprViewer.mprView2 display];
     [mprViewer.mprView3 display];
-}
-
-- (ROI *) get2dRoiNamed: (NSString *) roiName
-               fromView: (MPRDCMView *) theView
-{
-    ROI *theROI;
-    
-    theROI = nil;
-    
-    for (ROI *r in theView.curRoiList) {
-        if ([r.parentROI.name isEqualToString:roiName]) {
-            theROI = r;
-        }
-    }
-    
-    if (theROI == nil) {
-        NSLog(@"Failed to return ROI named %@",roiName);
-    }
-    
-    return theROI;
-}
-
-- (ROI *) getWorldRoiNamed: (NSString *) roiName
-{
-    ROI *theRoi;
-    
-    theRoi = nil;
-    
-    for (ROI *r in roi2DPointsArray) {
-        if ([r.name isEqualToString:roiName]) {
-            theRoi = r;
-        }
-    }
-    
-    if (theRoi == nil)
-        NSLog(@"Failed to return ROI named %@",roiName);
-    
-    return theRoi;
-}
-
-- (void) get3dPosition: (float [3])pos ofRoi: (ROI *) theROI
-{
-    int     indexROI;
-    
-    indexROI = [roi2DPointsArray indexOfObject:theROI];
-    [[point3DPositionsArray objectAtIndex:indexROI] getValue:pos];
 }
 
 - (Point3D *) directionOfCamera: (Camera *) cam

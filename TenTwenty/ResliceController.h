@@ -37,19 +37,12 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
     ViewerController    *viewerController;
     MPRController       *mprViewer;
     
-    VRController        *vrController;
-    VRView              *vrView;
-    
-    NSArray             *roi2DPointsArray,*point3DPositionsArray;
-    
     float factor;
 }
 
 @property (assign) MPRController *mprViewer;
 
-- (id) init;
-
-- (void) prepareWithTenTwenty: (TenTwentyController *) theTenTwenty;
+- (id) initWithTenTwenty: (TenTwentyController *) theTenTwenty;
 
 - (void) openMprViewer;
 - (void) closeMprViewer;
@@ -58,11 +51,6 @@ dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
           withVertex: (Point3D *) vertexPt
           withPoint1: (Point3D *) point1Pt
           withPoint2: (Point3D *) point2Pt;
-
-- (ROI *) get2dRoiNamed: (NSString *) roiName
-               fromView: (MPRDCMView *) theView;
-- (ROI *) getWorldRoiNamed: (NSString *) roiName;
-- (void) get3dPosition: (float [3])pos ofRoi: (ROI *) theROI;
 
 - (Point3D *) directionOfCamera: (Camera *) cam;
 - (Point3D *) unitVectorFromVector: (Point3D *) vector;

@@ -29,9 +29,7 @@
     
     viewerController    = [owner valueForKey:@"viewerController"];
     
-    reslicer            = [[ResliceController alloc] init];
-    
-    [reslicer prepareWithTenTwenty:self];
+    reslicer            = [[ResliceController alloc] initWithTenTwenty:self];
     
     [reslicer openMprViewer];
     
