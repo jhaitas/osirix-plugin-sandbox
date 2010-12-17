@@ -30,6 +30,8 @@
     viewerController    = [owner valueForKey:@"viewerController"];
     
     
+    brainROIs   = [[viewerController roisWithName:@"Brain"] retain];
+    
     landmarks   = [[NSMutableDictionary alloc] init];
     allPoints   = [[NSMutableDictionary alloc] init];
     
@@ -43,6 +45,8 @@
     NSDictionary    *tenTwentyInstructions;
     NSArray         *instructionList;
     
+    [self removeBrain];
+    
     [self openMprViewer];
     
     
@@ -54,14 +58,24 @@
         
     }
     
+    // close MPR viewer and Ten Twenty HUD
+    [mprViewer close];
+    [tenTwentyHUDPanel close];
+    
+    // make only brain visible
+    [self displayOnlyBrain];
+    
     // delete all existing ROIs
     [viewerController roiDeleteAll:self];
     
     // place electrodes according to dictionary
     [self placeElectrodes:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]];
     
-    [mprViewer close];
-    [tenTwentyHUDPanel close];
+    // update the view
+    [viewerController updateImage:self];
+    
+    // display 3D Viewer
+    [self openVrViewer];
 }
 
 - (void) identifyLandmarks
@@ -80,6 +94,85 @@
     }
 }
 
+- (void) removeBrain
+{
+    ROI     *roi;
+    short   allRois;
+    BOOL    propagateIn4D,outside,revert;
+    float   minValue,maxValue,newValue;
+    
+    
+    
+    roi             = [brainROIs objectAtIndex:0];
+    allRois         = 0;
+    propagateIn4D   = NO;
+    outside         = NO;
+    minValue        = -FLT_MAX;
+    maxValue        = FLT_MAX;
+    newValue        = 0.0;
+    revert          = NO;
+    
+    // deselect any selected ROIs
+    for (ROI *r in [viewerController selectedROIs]) {
+        [r setROIMode: ROI_sleep];
+    }
+    
+    // select all brain ROIs
+    for (ROI *r in brainROIs) {
+        [r setROIMode: ROI_selected];
+    }
+    
+    // set pixels inside brain ROIs to 0
+    [viewerController roiSetPixels: roi
+                                  : allRois
+                                  : propagateIn4D
+                                  : outside
+                                  : minValue
+                                  : maxValue
+                                  : newValue
+                                  : revert          ];
+}
+
+- (void) displayOnlyBrain
+{
+    ROI     *roi;
+    short   allRois;
+    BOOL    propagateIn4D,outside,revert;
+    float   minValue,maxValue,newValue;
+    
+    // deselect any selected ROIs
+    for (ROI *r in [viewerController selectedROIs]) {
+        [r setROIMode: ROI_sleep];
+    }
+    
+    // select all brain ROIs
+    for (ROI *r in brainROIs) {
+        [r setROIMode: ROI_selected];
+    }
+    
+    // revert the series
+    [viewerController revertSeries: self];
+    
+    roi             = [brainROIs objectAtIndex:0];
+    allRois         = 0;
+    propagateIn4D   = NO;
+    outside         = YES;
+    minValue        = -FLT_MAX;
+    maxValue        = FLT_MAX;
+    newValue        = 0.0;
+    revert          = NO;
+    
+    // set pixels outside brain ROIs to 0
+    [viewerController roiSetPixels: roi
+                                  : allRois
+                                  : propagateIn4D
+                                  : outside
+                                  : minValue
+                                  : maxValue
+                                  : newValue
+                                  : revert          ];
+}
+                    
 - (void) openMprViewer
 {
     mprViewer = [viewerController openMPRViewer];
@@ -197,6 +290,25 @@
     [lineDivider release];
 }
 
+- (VRController *) openVrViewer
+{
+    VRController    *viewer;
+    float           iwl, iww;
+    
+    viewer = [viewerController openVRViewerForMode:@"VR"];
+
+    [viewer ApplyCLUTString: [viewerController curCLUTMenu]];
+    [[viewerController imageView] getWLWW:&iwl :&iww];
+    [viewer setWLWW:iwl :iww];
+    [viewerController place3DViewerWindow: viewer];
+    [viewer load3DState];
+    [viewer showWindow:viewerController];			
+    [[viewer window] makeKeyAndOrderFront:viewerController];
+    [[viewer window] display];
+    [[viewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[viewer window] title], [[self window] title]]];
+    
+    return viewer;
+}
 
 
 

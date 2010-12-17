@@ -31,6 +31,8 @@
     NSMutableDictionary     *landmarks;
     NSMutableDictionary     *allPoints;
     
+    NSArray *brainROIs;
+    
     // HUD Outlets
     IBOutlet NSPanel        *tenTwentyHUDPanel;
     IBOutlet NSTextField    *minScalp;
@@ -45,6 +47,9 @@
 - (IBAction) performTenTwentyMeasurments: (id) sender;
 
 - (void) identifyLandmarks;
+
+- (void) removeBrain;
+- (void) displayOnlyBrain;
 
 - (void) openMprViewer;
 
@@ -61,6 +66,8 @@
 - (void) divideTrace: (ROI *) theTrace
                inPix: (DCMPix *) thePix
    fromInstructions: (NSDictionary *) divideInstructions;
+
+- (VRController *) openVrViewer;
 
 #pragma mark Work Methods
 
