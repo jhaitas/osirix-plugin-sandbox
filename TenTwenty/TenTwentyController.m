@@ -13,13 +13,9 @@
 - (id) init
 {
     if (self = [super init]) {        
-        // these values should be made user configurable in the future
-        minScalpValue = 45.0;
-        maxSkullValue = 45.0;
-        
         [NSBundle loadNibNamed:@"TenTwentyHUD.nib" owner:self];
-        [minScalpTextField setFloatValue:minScalpValue];
-        [maxSkullTextField setFloatValue:maxSkullValue];
+        [minScalp setFloatValue:45.0];
+        [maxSkull setFloatValue:45.0];
         
         // set ROIs to display name only
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ROITEXTNAMEONLY"];
@@ -39,9 +35,6 @@
     
     [reslicer openMprViewer];
     
-    tracer              = [[TraceController alloc] init];
-    
-    [tracer prepareWithTenTwenty:self minScalp:minScalpValue maxSkull:maxSkullValue];
     
     landmarks   = [[NSMutableDictionary alloc] init];
     allPoints   = [[NSMutableDictionary alloc] init];
@@ -57,6 +50,7 @@
     NSDictionary    *tenTwentyInstructions;
     NSArray         *instructionList;
     
+    tracer  = [[TraceController alloc] initWithMinScalp:[minScalp floatValue] andMaxSkull:[maxSkull floatValue]];
     
     bundlePath              = [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath];
     instructionsFilename    = [NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath];
@@ -77,6 +71,7 @@
     [reslicer closeMprViewer];
     [tenTwentyHUDPanel close];
     
+    [tracer release];
     [tenTwentyInstructions release];
 }
 
@@ -112,23 +107,39 @@
                withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
                withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
     
-    skullTrace = [self skullTraceFromInstructions:sliceInstructions];
+    skullTrace = [self skullTraceInView: theView
+                       fromInstructions:sliceInstructions];
     
     [self divideTrace: skullTrace inView: theView usingInstructions: divideInstructions];
 }
 
 
-- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions
+- (ROI *) skullTraceInView: (MPRDCMView *) theView
+          fromInstructions: (NSDictionary *) traceInstructions
 {
     Point3D *pointA,*pointB,*vertex;
+    ROI     *skullTrace;
+    DCMPix  *thePix;
+    
+    thePix = theView.pix;
     
     pointA = [allPoints objectForKey:[traceInstructions objectForKey:@"point1"]];
     pointB = [allPoints objectForKey:[traceInstructions objectForKey:@"point2"]];
     vertex = [allPoints objectForKey:[traceInstructions objectForKey:@"vertex"]];
     
-    return [tracer skullTraceFromPtA:pointA
-                            toPointB:pointB
-                          withVertex:vertex ]; 
+    skullTrace =  [tracer skullTraceInPix: thePix
+                                  fromPtA: pointA
+                                 toPointB: pointB
+                               withVertex: vertex ];
+    
+    // set it selected so we can see how well our intermediate points fit
+    [skullTrace setROIMode:ROI_selected];
+    
+    [theView.curRoiList addObject:skullTrace];
+    
+    [theView display];
+    
+    return skullTrace;
 }
 
 - (void) divideTrace: (ROI *) theTrace

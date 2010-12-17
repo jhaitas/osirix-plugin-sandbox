@@ -12,6 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<integer value="3"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -56,7 +57,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 78}, {119, 17}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="192226596">
 								<int key="NSCellFlags">68288064</int>
@@ -90,7 +90,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{141, 75}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="9855463">
 								<int key="NSCellFlags">-1804468671</int>
@@ -124,7 +123,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 48}, {119, 17}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="223988772">
 								<int key="NSCellFlags">68288064</int>
@@ -141,7 +139,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{141, 45}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="121750501">
 								<int key="NSCellFlags">-1804468671</int>
@@ -159,7 +156,6 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{20, 18}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
-							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="938408802">
 								<int key="NSCellFlags">-2080244224</int>
@@ -182,7 +178,6 @@
 					</object>
 					<string key="NSFrameSize">{257, 115}</string>
 					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
@@ -191,22 +186,6 @@
 		<object class="IBObjectContainer" key="IBDocument.Objects">
 			<object class="NSMutableArray" key="connectionRecords">
 				<bool key="EncodedWithXMLCoder">YES</bool>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">minScalpTextField</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="274714881"/>
-					</object>
-					<int key="connectionID">37</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">maxSkullTextField</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="456848635"/>
-					</object>
-					<int key="connectionID">38</int>
-				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">tenTwentyHUDPanel</string>
@@ -230,6 +209,22 @@
 						<reference key="destination" ref="634276635"/>
 					</object>
 					<int key="connectionID">67</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">minScalp</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="274714881"/>
+					</object>
+					<int key="connectionID">68</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">maxSkull</string>
+						<reference key="source" ref="1001"/>
+						<reference key="destination" ref="456848635"/>
+					</object>
+					<int key="connectionID">69</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -387,9 +382,9 @@
 						<bytes key="NSTransformStruct">P4AAAL+AAABEEgAAxElAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{490, 589}, {257, 115}}</string>
+					<string>{{398, 978}, {257, 115}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{490, 589}, {257, 115}}</string>
+					<string>{{398, 978}, {257, 115}}</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="208280861"/>
@@ -430,7 +425,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">67</int>
+			<int key="maxID">69</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -460,8 +455,8 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>maxSkullTextField</string>
-							<string>minScalpTextField</string>
+							<string>maxSkull</string>
+							<string>minScalp</string>
 							<string>performTenTwentyMeasurments</string>
 							<string>tenTwentyHUDPanel</string>
 						</object>
@@ -477,19 +472,19 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>maxSkullTextField</string>
-							<string>minScalpTextField</string>
+							<string>maxSkull</string>
+							<string>minScalp</string>
 							<string>performTenTwentyMeasurments</string>
 							<string>tenTwentyHUDPanel</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBToOneOutletInfo">
-								<string key="name">maxSkullTextField</string>
+								<string key="name">maxSkull</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">
-								<string key="name">minScalpTextField</string>
+								<string key="name">minScalp</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">

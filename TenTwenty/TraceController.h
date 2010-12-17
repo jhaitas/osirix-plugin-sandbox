@@ -10,8 +10,6 @@
 #import "PluginFilter.h"
 #import "MPRHeaders.h"
 
-@class TenTwentyController;
-
 #define PI 3.14159265358979
 
 #define MAG(v1) sqrt(v1[0]*v1[0]+v1[1]*v1[1]+v1[2]*v1[2]);
@@ -22,26 +20,25 @@ dest[1]=v1[1]/MAG(v1); \
 dest[2]=v1[2]/MAG(v1);
 
 @interface TraceController : NSObject {
-    TenTwentyController *owner;
-    MPRDCMView          *view;
-    float               minScalpValue,maxSkullValue;
+    float minScalpValue,maxSkullValue;
 }
+- (id) initWithMinScalp: (float) minScalp
+            andMaxSkull: (float) maxSkull;
 
-- (void) prepareWithTenTwenty: (TenTwentyController *) tenTwenty
-                     minScalp: (float) minScalp
-                     maxSkull: (float) maxSkull;
+- (ROI *) skullTraceInPix: (DCMPix *)   pix
+                  fromPtA: (Point3D *)  pointAPt
+                 toPointB: (Point3D *)  pointBPt
+               withVertex: (Point3D *)  vertexPt;
 
-- (ROI *) skullTraceFromPtA: (Point3D *) pointAPt
-                   toPointB: (Point3D *) pointBPt
-                 withVertex: (Point3D *) vertexPt;
+- (void) findSkullInPix: (DCMPix *)     pix
+           fromPosition: (float [3])    position
+            inDirection: (float [3])    direction
+             toPosition: (float [3])    finalPosition;
 
-- (void) findSkullInPix: (DCMPix *) thePix
-           fromPosition: (float [3]) thePos
-            inDirection: (float [3]) theDir
-             toPosition: (float [3]) finalPos;
+- (BOOL) isPoint: (NSPoint)     point
+           onPix: (DCMPix *)    pix;
 
-- (BOOL) isPoint: (NSPoint) thePoint onSlice: (DCMPix *) thisPix;
-
-- (void) point3d: (Point3D *) point toDicomCoords: (float [3]) dicomCoords;
+- (void) point3d: (Point3D *) point
+   toDicomCoords: (float [3]) dicomCoords;
 
 @end

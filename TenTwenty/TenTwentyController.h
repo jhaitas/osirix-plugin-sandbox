@@ -28,8 +28,6 @@
     ViewerController    *viewerController;
     ViewerController    *viewerML;
     
-    float               minScalpValue,maxSkullValue;
-    
     ResliceController       *reslicer;
     TraceController         *tracer;
     LineDividerController   *lineDivider;
@@ -39,8 +37,8 @@
     
     // HUD Outlets
     IBOutlet NSPanel        *tenTwentyHUDPanel;
-    IBOutlet NSTextField    *minScalpTextField;
-    IBOutlet NSTextField    *maxSkullTextField;
+    IBOutlet NSTextField    *minScalp;
+    IBOutlet NSTextField    *maxSkull;
     IBOutlet NSButton       *performTenTwentyMeasurments;
 }
 
@@ -54,7 +52,8 @@
 
 - (void) runInstructions: (NSDictionary *) theInstructions;
 
-- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions;
+- (ROI *) skullTraceInView: (MPRDCMView *) theView
+          fromInstructions: (NSDictionary *) traceInstructions;
 
 - (void) divideTrace: (ROI *) theTrace
               inView: (MPRDCMView *) theView
