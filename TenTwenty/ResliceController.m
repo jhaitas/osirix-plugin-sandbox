@@ -23,15 +23,10 @@
     return self;
 }
 
-
-- (id) initWithOwner:(id *) theOwner
+- (void) prepareWithTenTwenty: (TenTwentyController *) theTenTwenty
 {
-    [self init];
-    
-    owner = theOwner;
+    owner = theTenTwenty;
     viewerController = [owner valueForKey:@"viewerController"];
-    
-    return self;
 }
 
 - (void) openMprViewer

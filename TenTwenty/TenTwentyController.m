@@ -31,9 +31,11 @@
 {
     owner = thePlugin;
     
-    viewerController    = [owner getViewerController];
+    viewerController    = [owner valueForKey:@"viewerController"];
     
-    reslicer            = [[ResliceController alloc] initWithOwner:(id *) self];
+    reslicer            = [[ResliceController alloc] init];
+    
+    [reslicer prepareWithTenTwenty:self];
     
     [reslicer openMprViewer];
     
@@ -56,8 +58,8 @@
     NSArray         *instructionList;
     
     
-    bundlePath              = [[[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath] retain];
-    instructionsFilename    = [[NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath] retain];
+    bundlePath              = [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath];
+    instructionsFilename    = [NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath];
     tenTwentyInstructions   = [[NSDictionary alloc] initWithContentsOfFile:instructionsFilename];
     instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"];    
     
@@ -74,6 +76,8 @@
     
     [reslicer closeMprViewer];
     [tenTwentyHUDPanel close];
+    
+    [tenTwentyInstructions release];
 }
 
 - (void) identifyLandmarks
@@ -326,10 +330,9 @@
         [roi setROIRect: NSMakeRect( sliceCoords[ 0], sliceCoords[ 1], 0, 0)];
         
         [[[viewerController roiList] objectAtIndex: sliceCoords[ 2]] addObject: roi];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName: OsirixROIChangeNotification object: roi userInfo: nil];
     }
-    
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName: OsirixROIChangeNotification object: roi userInfo: nil];
 }
 
 @end

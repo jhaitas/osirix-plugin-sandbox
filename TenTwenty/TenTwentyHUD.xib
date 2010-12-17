@@ -12,7 +12,6 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="4"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -57,6 +56,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 78}, {119, 17}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="192226596">
 								<int key="NSCellFlags">68288064</int>
@@ -90,6 +90,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{141, 75}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="9855463">
 								<int key="NSCellFlags">-1804468671</int>
@@ -123,6 +124,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{17, 48}, {119, 17}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="223988772">
 								<int key="NSCellFlags">68288064</int>
@@ -139,6 +141,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{141, 45}, {96, 22}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="121750501">
 								<int key="NSCellFlags">-1804468671</int>
@@ -156,6 +159,7 @@
 							<int key="NSvFlags">268</int>
 							<string key="NSFrame">{{20, 18}, {217, 19}}</string>
 							<reference key="NSSuperview" ref="918550806"/>
+							<reference key="NSWindow"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="938408802">
 								<int key="NSCellFlags">-2080244224</int>
@@ -178,6 +182,7 @@
 					</object>
 					<string key="NSFrameSize">{257, 115}</string>
 					<reference key="NSSuperview"/>
+					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
@@ -209,30 +214,6 @@
 						<reference key="destination" ref="7841363"/>
 					</object>
 					<int key="connectionID">41</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">minScalp</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="274714881"/>
-					</object>
-					<int key="connectionID">62</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">maxSkull</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="456848635"/>
-					</object>
-					<int key="connectionID">63</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">newTraceMethod</string>
-						<reference key="source" ref="1001"/>
-						<reference key="destination" ref="634276635"/>
-					</object>
-					<int key="connectionID">64</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -406,9 +387,9 @@
 						<bytes key="NSTransformStruct">P4AAAL+AAABEEgAAxElAAA</bytes>
 					</object>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{540, 1044}, {257, 115}}</string>
+					<string>{{490, 589}, {257, 115}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{540, 1044}, {257, 115}}</string>
+					<string>{{490, 589}, {257, 115}}</string>
 					<boolean value="YES"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="208280861"/>
@@ -481,7 +462,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>maxSkullTextField</string>
 							<string>minScalpTextField</string>
-							<string>owner</string>
 							<string>performTenTwentyMeasurments</string>
 							<string>tenTwentyHUDPanel</string>
 						</object>
@@ -489,7 +469,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
-							<string>id</string>
 							<string>NSButton</string>
 							<string>NSPanel</string>
 						</object>
@@ -500,7 +479,6 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>maxSkullTextField</string>
 							<string>minScalpTextField</string>
-							<string>owner</string>
 							<string>performTenTwentyMeasurments</string>
 							<string>tenTwentyHUDPanel</string>
 						</object>
@@ -513,10 +491,6 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">minScalpTextField</string>
 								<string key="candidateClassName">NSTextField</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">owner</string>
-								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">performTenTwentyMeasurments</string>

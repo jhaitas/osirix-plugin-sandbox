@@ -81,7 +81,7 @@
     
     NSMutableArray *newROIs;
     
-    newROIs = [[NSMutableArray alloc] init];
+    newROIs = [[[NSMutableArray alloc] init] autorelease];
 	
 	// temporary pointers for creating new ROI
 	MyPoint			*thisPoint;

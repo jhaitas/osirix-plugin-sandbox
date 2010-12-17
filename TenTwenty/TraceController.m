@@ -25,7 +25,6 @@
                  withVertex: (Point3D *) vertexPt
 {
     int         i,numSections,numPoints;
-    int         thisRoiType;
     float       pointA[3],pointB[3],midpoint[3],displacement[3],stepSize[3],searchDir[3];
     float       xVector[3],yVector[3],unitX[3],unitY[3];
     float       point1DcmCoords[3],vertexDcmCoords[3],point2DcmCoords[3];
@@ -43,7 +42,6 @@
     thePix  = theView.pix;
     
     // parameters necessary for initializting a new ROI
-    thisRoiType     = t2DPoint;
     pixelSpacingX   = [thePix pixelSpacingX];
     pixelSpacingY   = [thePix pixelSpacingY];
     
