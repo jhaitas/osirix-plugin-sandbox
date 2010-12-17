@@ -29,10 +29,6 @@
     
     viewerController    = [owner valueForKey:@"viewerController"];
     
-    reslicer            = [[ResliceController alloc] initWithTenTwenty:self];
-    
-    [reslicer openMprViewer];
-    
     
     landmarks   = [[NSMutableDictionary alloc] init];
     allPoints   = [[NSMutableDictionary alloc] init];
@@ -44,16 +40,14 @@
 #pragma mark Interface Methods
 - (IBAction) performTenTwentyMeasurments: (id) sender
 {
-    NSString        *bundlePath,*instructionsFilename;
     NSDictionary    *tenTwentyInstructions;
     NSArray         *instructionList;
     
-    tracer  = [[TraceController alloc] initWithMinScalp:[minScalp floatValue] andMaxSkull:[maxSkull floatValue]];
+    [self openMprViewer];
     
-    bundlePath              = [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath];
-    instructionsFilename    = [NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath];
-    tenTwentyInstructions   = [[NSDictionary alloc] initWithContentsOfFile:instructionsFilename];
-    instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"];    
+    
+    tenTwentyInstructions   = [self loadInstructions];
+    instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"]; 
     
     for (NSDictionary *theseInstructions in instructionList) {
         [self runInstructions:theseInstructions];
@@ -66,11 +60,8 @@
     // place electrodes according to dictionary
     [self placeElectrodes:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]];
     
-    [reslicer closeMprViewer];
+    [mprViewer close];
     [tenTwentyHUDPanel close];
-    
-    [tracer release];
-    [tenTwentyInstructions release];
 }
 
 - (void) identifyLandmarks
@@ -89,37 +80,79 @@
     }
 }
 
+- (void) openMprViewer
+{
+    mprViewer = [viewerController openMPRViewer];
+    [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
+    [mprViewer showWindow:self];
+    [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
+}
+
+- (NSDictionary *) loadInstructions
+{
+    NSString        *bundlePath,*instructionsFilename;
+    
+    bundlePath              = [[NSBundle bundleWithIdentifier:@"edu.vanderbilt.tentwenty"] resourcePath];
+    instructionsFilename    = [NSString stringWithFormat:@"%@/tenTwentyInstructions.plist",bundlePath];
+    
+    return [[[NSDictionary alloc] initWithContentsOfFile:instructionsFilename] autorelease];
+}
+
 - (void) runInstructions: (NSDictionary *) theInstructions
 {
     NSDictionary    *sliceInstructions,*divideInstructions;
     ROI             *skullTrace;
     MPRDCMView      *theView;
+    DCMPix          *thePix;
     
     sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
     divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
-    theView = reslicer.mprViewer.mprView3;
+    theView = mprViewer.mprView3;
+    
+    thePix = [self      resliceView: theView
+                   fromInstructions: sliceInstructions  ];
+    
+    skullTrace = [self skullTraceInPix: thePix
+                      fromInstructions: sliceInstructions ];
+    
+    [self       divideTrace: skullTrace
+                      inPix: thePix
+           fromInstructions: divideInstructions     ];
+    
+    
+    [theView detect2DPointInThisSlice];
+    [theView.curRoiList addObject:skullTrace];
+    [theView display];
+}
+
+- (DCMPix *) resliceView: (MPRDCMView *) theView
+        fromInstructions: (NSDictionary *) sliceInstructions
+{
+    ResliceController *reslicer;
+    
+    reslicer = [[ResliceController alloc] initWithFactor:[[mprViewer valueForKey:@"hiddenVRView"] factor]];
     
     [reslicer planeInView:theView
                withVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
                withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
                withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
     
-    skullTrace = [self skullTraceInView: theView
-                       fromInstructions:sliceInstructions];
+    [reslicer release];
     
-    [self divideTrace: skullTrace inView: theView usingInstructions: divideInstructions];
+    return theView.pix;
 }
 
 
-- (ROI *) skullTraceInView: (MPRDCMView *) theView
-          fromInstructions: (NSDictionary *) traceInstructions
+- (ROI *) skullTraceInPix: (DCMPix *) thePix
+         fromInstructions: (NSDictionary *) traceInstructions
 {
     Point3D *pointA,*pointB,*vertex;
     ROI     *skullTrace;
-    DCMPix  *thePix;
     
-    thePix = theView.pix;
+    TraceController *tracer;
+    
+    tracer  = [[TraceController alloc] initWithMinScalp:[minScalp floatValue] andMaxSkull:[maxSkull floatValue]];
     
     pointA = [allPoints objectForKey:[traceInstructions objectForKey:@"point1"]];
     pointB = [allPoints objectForKey:[traceInstructions objectForKey:@"point2"]];
@@ -133,21 +166,17 @@
     // set it selected so we can see how well our intermediate points fit
     [skullTrace setROIMode:ROI_selected];
     
-    [theView.curRoiList addObject:skullTrace];
-    
-    [theView display];
+    [tracer release];
     
     return skullTrace;
 }
 
 - (void) divideTrace: (ROI *) theTrace
-              inView: (MPRDCMView *) theView
-   usingInstructions: (NSDictionary *) divideInstructions
+               inPix: (DCMPix *) thePix
+    fromInstructions: (NSDictionary *) divideInstructions;
 {
+    LineDividerController *lineDivider;
     NSArray *newROIs;
-    DCMPix *thePix;
-    
-    thePix = theView.pix;
     
     lineDivider = [[LineDividerController alloc] initWithPix:thePix];
     [lineDivider setDistanceDict:divideInstructions];
@@ -165,8 +194,7 @@
                 
         [self addPoint:dicomCoords withName:r.name];
     }
-    [theView detect2DPointInThisSlice];
-    [theView display];
+    [lineDivider release];
 }
 
 

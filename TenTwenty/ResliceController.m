@@ -10,33 +10,15 @@
 
 @implementation ResliceController
 
-@synthesize mprViewer;
-
-- (id) initWithTenTwenty: (TenTwentyController *) theTenTwenty
+- (id) initWithFactor: (float) theFactor
 {
     if (self = [super init]) {
-        owner = theTenTwenty;
-        viewerController = [owner valueForKey:@"viewerController"];
+        factor = theFactor;
     } else {
         NSLog(@"failed to initialize ResliceController");
     }
 
     return self;
-}
-
-- (void) openMprViewer
-{
-    mprViewer = [viewerController openMPRViewer];
-    [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
-    [mprViewer showWindow:self];
-    [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
-    
-    factor                  = [[mprViewer valueForKey:@"hiddenVRView"] factor];
-}
-
-- (void) closeMprViewer
-{
-    [mprViewer close];
 }
 
 - (void) planeInView: (MPRDCMView *) theView
@@ -108,10 +90,6 @@
     [theView restoreCamera];
     
     [theView.windowController updateViewsAccordingToFrame:theView];
-    
-    [mprViewer.mprView1 display];
-    [mprViewer.mprView2 display];
-    [mprViewer.mprView3 display];
 }
 
 - (Point3D *) directionOfCamera: (Camera *) cam

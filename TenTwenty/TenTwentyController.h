@@ -26,11 +26,7 @@
     PluginFilter    *owner;
     
     ViewerController    *viewerController;
-    ViewerController    *viewerML;
-    
-    ResliceController       *reslicer;
-    TraceController         *tracer;
-    LineDividerController   *lineDivider;
+    MPRController       *mprViewer;
     
     NSMutableDictionary     *landmarks;
     NSMutableDictionary     *allPoints;
@@ -50,14 +46,21 @@
 
 - (void) identifyLandmarks;
 
+- (void) openMprViewer;
+
+- (NSDictionary *) loadInstructions;
+
 - (void) runInstructions: (NSDictionary *) theInstructions;
 
-- (ROI *) skullTraceInView: (MPRDCMView *) theView
-          fromInstructions: (NSDictionary *) traceInstructions;
+- (DCMPix *) resliceView: (MPRDCMView *) theView
+        fromInstructions: (NSDictionary *) sliceInstructions;
+
+- (ROI *) skullTraceInPix: (DCMPix *) thePix
+         fromInstructions: (NSDictionary *) traceInstructions;
 
 - (void) divideTrace: (ROI *) theTrace
-              inView: (MPRDCMView *) theView
-   usingInstructions: (NSDictionary *) divideInstructions;
+               inPix: (DCMPix *) thePix
+   fromInstructions: (NSDictionary *) divideInstructions;
 
 #pragma mark Work Methods
 
