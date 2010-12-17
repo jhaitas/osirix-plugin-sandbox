@@ -8,22 +8,21 @@
 
 #import "TraceController.h"
 
-
 @implementation TraceController
 
-- (id) initWithOwner: (id *) theOwner
-            minScalp: (float) minScalp
-            maxSkull: (float) maxSkull
+- (void) prepareWithTenTwenty: (TenTwentyController *) tenTwenty
+                     minScalp: (float) minScalp
+                     maxSkull: (float) maxSkull
 {
-    [self init];
-    owner = theOwner; 
+    owner = tenTwenty; 
     view = [[[owner valueForKey:@"reslicer"] valueForKey:@"mprViewer"] valueForKey:@"mprView3"];
     minScalpValue = minScalp;
     maxSkullValue = maxSkull;
-    return self;
 }
 
-- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions
+- (ROI *) skullTraceFromPtA: (Point3D *) pointAPt
+                   toPointB: (Point3D *) pointBPt
+                 withVertex: (Point3D *) vertexPt
 {
     int         i,numSections,numPoints;
     int         thisRoiType;
@@ -49,10 +48,9 @@
     pixelSpacingY   = [thePix pixelSpacingY];
     
     // get the DICOM coords of each point
-    [owner pointNamed:[traceInstructions objectForKey:@"point1"] toDicomCoords:point1DcmCoords];
-    [owner pointNamed:[traceInstructions objectForKey:@"vertex"] toDicomCoords:vertexDcmCoords];
-    [owner pointNamed:[traceInstructions objectForKey:@"point2"] toDicomCoords:point2DcmCoords];
-    
+    [self point3d: pointAPt toDicomCoords:point1DcmCoords];
+    [self point3d: pointBPt toDicomCoords:point2DcmCoords];
+    [self point3d: vertexPt toDicomCoords:vertexDcmCoords];
     
     // we are tracing from point A to point B ...
     // point A will be point 1
@@ -244,6 +242,13 @@
         return YES;
     }
     return NO;
+}
+
+- (void) point3d: (Point3D *) point toDicomCoords: (float [3]) dicomCoords
+{
+    dicomCoords[0] = point.x;
+    dicomCoords[1] = point.y;
+    dicomCoords[2] = point.z;
 }
 
 @end

@@ -17,7 +17,9 @@
 
 - (long) filterImage:(NSString*) menuName
 {
-    tenTwenty = [[TenTwentyController alloc] initWithOwner:(id *)self]; 
+    tenTwenty = [[TenTwentyController alloc] init];
+    
+    [tenTwenty prepareTenTwenty:self];
 
     return 0;
 }

@@ -23,7 +23,7 @@
 #define FBOX(x) [NSNumber numberWithFloat:x]
 
 @interface TenTwentyController : NSWindowController {
-    id owner;
+    PluginFilter    *owner;
     
     ViewerController    *viewerController;
     ViewerController    *viewerML;
@@ -45,7 +45,7 @@
 }
 
 - (id) init;
-- (id) initWithOwner:(id *) theOwner;
+- (void) prepareTenTwenty: (PluginFilter *) thePlugin;
 
 #pragma mark Interface Methods
 - (IBAction) performTenTwentyMeasurments: (id) sender;
@@ -53,6 +53,9 @@
 - (void) identifyLandmarks;
 
 - (void) runInstructions: (NSDictionary *) theInstructions;
+
+- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions;
+
 - (void) divideTrace: (ROI *) theTrace
               inView: (MPRDCMView *) theView
    usingInstructions: (NSDictionary *) divideInstructions;
@@ -62,7 +65,6 @@
 - (void) getROI: (ROI *)    thisROI 
         fromPix: (DCMPix *) thisPix 
   toDicomCoords: (float *)  location;
-
 
 - (void) pointNamed: (NSString *) name
       toDicomCoords: (float *) dicomCoords;

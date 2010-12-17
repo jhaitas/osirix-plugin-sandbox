@@ -27,27 +27,25 @@
     return self;
 }
 
-- (id) initWithOwner:(id *) theOwner
+- (void) prepareTenTwenty: (PluginFilter *) thePlugin
 {
-    [self init];
-    owner = theOwner;
+    owner = thePlugin;
+    
     viewerController    = [owner getViewerController];
     
     reslicer            = [[ResliceController alloc] initWithOwner:(id *) self];
     
     [reslicer openMprViewer];
     
-    tracer              = [[TraceController alloc] initWithOwner: (id *) self 
-                                                        minScalp: minScalpValue
-                                                        maxSkull: maxSkullValue];
+    tracer              = [[TraceController alloc] init];
+    
+    [tracer prepareWithTenTwenty:self minScalp:minScalpValue maxSkull:maxSkullValue];
     
     landmarks   = [[NSMutableDictionary alloc] init];
     allPoints   = [[NSMutableDictionary alloc] init];
     
     [self identifyLandmarks];
     [allPoints addEntriesFromDictionary:landmarks];
-    
-    return self;
 }
 
 #pragma mark Interface Methods
@@ -110,11 +108,24 @@
                withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
                withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
     
-    skullTrace = [tracer skullTraceFromInstructions:sliceInstructions];
+    skullTrace = [self skullTraceFromInstructions:sliceInstructions];
     
     [self divideTrace: skullTrace inView: theView usingInstructions: divideInstructions];
 }
 
+
+- (ROI *) skullTraceFromInstructions: (NSDictionary *) traceInstructions
+{
+    Point3D *pointA,*pointB,*vertex;
+    
+    pointA = [allPoints objectForKey:[traceInstructions objectForKey:@"point1"]];
+    pointB = [allPoints objectForKey:[traceInstructions objectForKey:@"point2"]];
+    vertex = [allPoints objectForKey:[traceInstructions objectForKey:@"vertex"]];
+    
+    return [tracer skullTraceFromPtA:pointA
+                            toPointB:pointB
+                          withVertex:vertex ]; 
+}
 
 - (void) divideTrace: (ROI *) theTrace
               inView: (MPRDCMView *) theView
