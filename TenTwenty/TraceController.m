@@ -10,7 +10,7 @@
 
 @implementation TraceController
 
-@synthesize searchPaths,minScalp,maxSkull;
+@synthesize minScalp,maxSkull,searchPaths,trace;
 
 - (id) initWithPix: (DCMPix *)  thePix
           minScalp: (float)     theMinScalp
@@ -26,17 +26,17 @@
     return self;
 }
 
-- (ROI *) traceFromPtA: (Point3D *) pointAPt
-              toPointB: (Point3D *) pointBPt
-            withVertex: (Point3D *) vertexPt
+- (void) traceFromPtA: (Point3D *) pointAPt
+             toPointB: (Point3D *) pointBPt
+           withVertex: (Point3D *) vertexPt
 {
     int         i,numSections,numPoints;
     float       pointA[3],pointB[3],vertex[3],midpoint[3],displacement[3],stepSize[3],searchDir[3];
     float       xVector[3],yVector[3],unitX[3],unitY[3];
     float       pixelSpacingX,pixelSpacingY;
-    NSMutableArray      *intermediatePoints;
+    NSMutableArray      *intermediatePoints,*theseSearchPaths;
     
-    searchPaths         = [[NSMutableArray alloc] init];
+    theseSearchPaths    = [[NSMutableArray alloc] init];
     intermediatePoints  = [[NSMutableArray alloc] init];
     
     numSections = 10;
@@ -111,37 +111,35 @@
         // search for skull
         endPoint = [self findFromPosition:startPosition inDirection:searchDir];
         
-        // allocate and initialize a new 'Arrow' ROI
-        thisSearchPath = [[ROI alloc] initWithType: tArrow
-                                                  : pixelSpacingX
-                                                  : pixelSpacingY
-                                                  : NSMakePoint(0.0, 0.0)];
+        // allocate and initialize a new 'tMesure' ROI
+        thisSearchPath = [[[ROI alloc] initWithType: tMesure
+                                                   : pixelSpacingX
+                                                   : pixelSpacingY
+                                                   : NSMakePoint(0.0, 0.0)] autorelease];
         
         thisSearchPath.name = [NSString stringWithFormat:@"point %d",i+1];
         
         [thisSearchPath setPoints:[NSMutableArray arrayWithObjects:[MyPoint point:startPoint],[MyPoint point:endPoint],nil]];
         
-        [searchPaths addObject:thisSearchPath];
+        [theseSearchPaths addObject:thisSearchPath];
         
         // add this point to intermediate points array
         [intermediatePoints addObject:[MyPoint point:endPoint]];
     }
     
-    ROI *trace;
+    searchPaths = [NSArray arrayWithArray:theseSearchPaths];
     
     // allocate and initialize a new 'Open Polygon' ROI
-    trace = [[ROI alloc] initWithType: tOPolygon
-                                     : pixelSpacingX
-                                     : pixelSpacingY
-                                     : NSMakePoint(0.0, 0.0)];
+    trace = [[[ROI alloc] initWithType: tOPolygon
+                                      : pixelSpacingX
+                                      : pixelSpacingY
+                                      : NSMakePoint(0.0, 0.0)] autorelease];
     
     
     trace.name = [NSString stringWithString:@"trace"];
     
     // set points for spline
     [trace setPoints:intermediatePoints];
-    
-    return trace;
 }
 
 - (NSPoint) findFromPosition: (float [3])    position

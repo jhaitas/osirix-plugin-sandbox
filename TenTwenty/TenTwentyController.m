@@ -194,6 +194,7 @@
 - (void) runInstructions: (NSDictionary *) theInstructions
 {
     NSDictionary    *sliceInstructions,*divideInstructions;
+    NSArray         *skullTraceWithSearchPaths;
     ROI             *skullTrace;
     MPRDCMView      *theView;
     
@@ -204,16 +205,21 @@
     
     [self resliceView:theView fromInstructions:sliceInstructions];
     
-    skullTrace = [self skullTraceInPix: theView.pix
-                      fromInstructions: sliceInstructions ];
+    skullTraceWithSearchPaths = [self skullTraceInPix: theView.pix
+                                     fromInstructions: sliceInstructions ];
+    
+    skullTrace = [skullTraceWithSearchPaths objectAtIndex:0];
     
     [self       divideTrace: skullTrace
                       inPix: theView.pix
            fromInstructions: divideInstructions     ];
     
+    // add the skull trace and search paths to view
+    [theView.curRoiList addObjectsFromArray:skullTraceWithSearchPaths];
     
+    // detect our new electrods
     [theView detect2DPointInThisSlice];
-    [theView.curRoiList addObject:skullTrace];
+    
     [theView display];
 }
 
@@ -233,11 +239,12 @@
 }
 
 
-- (ROI *) skullTraceInPix: (DCMPix *) thePix
-         fromInstructions: (NSDictionary *) traceInstructions
+- (NSArray *) skullTraceInPix: (DCMPix *) thePix
+             fromInstructions: (NSDictionary *) traceInstructions
 {
-    Point3D *pointA,*pointB,*vertex;
-    ROI     *skullTrace;
+    Point3D         *pointA,*pointB,*vertex;
+    ROI             *skullTrace;
+    NSMutableArray  *skullTraceWithSearchPaths;
     
     TraceController *tracer;
     
@@ -249,16 +256,21 @@
     pointB = [allPoints objectForKey:[traceInstructions objectForKey:@"point2"]];
     vertex = [allPoints objectForKey:[traceInstructions objectForKey:@"vertex"]];
     
-    skullTrace =  [tracer traceFromPtA: pointA
-                              toPointB: pointB
-                            withVertex: vertex ];
+    [tracer traceFromPtA: pointA
+                toPointB: pointB
+              withVertex: vertex ];
+    
+    skullTrace = tracer.trace;
     
     // set it selected so we can see how well our intermediate points fit
     [skullTrace setROIMode:ROI_selected];
     
+    skullTraceWithSearchPaths = [NSMutableArray arrayWithArray: tracer.searchPaths];
+    [skullTraceWithSearchPaths insertObject:skullTrace atIndex:0];
+    
     [tracer release];
     
-    return skullTrace;
+    return [NSArray arrayWithArray:skullTraceWithSearchPaths];
 }
 
 - (void) divideTrace: (ROI *)           theTrace

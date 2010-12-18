@@ -60,8 +60,8 @@
 - (void) resliceView: (MPRDCMView *)    theView
     fromInstructions: (NSDictionary *)  sliceInstructions;
 
-- (ROI *) skullTraceInPix: (DCMPix *) thePix
-         fromInstructions: (NSDictionary *) traceInstructions;
+- (NSArray *) skullTraceInPix: (DCMPix *) thePix
+             fromInstructions: (NSDictionary *) traceInstructions;
 
 - (void) divideTrace: (ROI *)           theTrace
                inPix: (DCMPix *)        thePix

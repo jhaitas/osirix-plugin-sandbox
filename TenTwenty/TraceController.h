@@ -22,9 +22,11 @@ dest[2]=v1[2]/MAG(v1);
 @interface TraceController : NSObject {
     DCMPix          *pix;
     float           minScalp,maxSkull;
-    NSMutableArray  *searchPaths;
+    ROI             *trace;
+    NSArray         *searchPaths;
 }
 
+@property (readonly)    ROI     *trace;
 @property (readonly)    NSArray *searchPaths;
 @property (assign)      float   minScalp,maxSkull;
 
@@ -32,9 +34,9 @@ dest[2]=v1[2]/MAG(v1);
           minScalp: (float)     theMinScalp
           maxSkull: (float)     theMaxSkull;
 
-- (ROI *) traceFromPtA: (Point3D *) pointAPt
-              toPointB: (Point3D *) pointBPt
-            withVertex: (Point3D *) vertexPt;
+- (void) traceFromPtA: (Point3D *) pointAPt
+             toPointB: (Point3D *) pointBPt
+           withVertex: (Point3D *) vertexPt;
 
 - (NSPoint) findFromPosition: (float [3]) position
                  inDirection: (float [3]) direction;
