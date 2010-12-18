@@ -20,23 +20,26 @@ dest[1]=v1[1]/MAG(v1); \
 dest[2]=v1[2]/MAG(v1);
 
 @interface TraceController : NSObject {
-    float minScalpValue,maxSkullValue;
+    DCMPix          *pix;
+    float           minScalp,maxSkull;
+    NSMutableArray  *searchPaths;
 }
-- (id) initWithMinScalp: (float) minScalp
-            andMaxSkull: (float) maxSkull;
 
-- (ROI *) skullTraceInPix: (DCMPix *)   pix
-                  fromPtA: (Point3D *)  pointAPt
-                 toPointB: (Point3D *)  pointBPt
-               withVertex: (Point3D *)  vertexPt;
+@property (readonly)    NSArray *searchPaths;
+@property (assign)      float   minScalp,maxSkull;
 
-- (void) findSkullInPix: (DCMPix *)     pix
-           fromPosition: (float [3])    position
-            inDirection: (float [3])    direction
-             toPosition: (float [3])    finalPosition;
+- (id) initWithPix: (DCMPix *)  thePix
+          minScalp: (float)     theMinScalp
+          maxSkull: (float)     theMaxSkull;
 
-- (BOOL) isPoint: (NSPoint)     point
-           onPix: (DCMPix *)    pix;
+- (ROI *) traceFromPtA: (Point3D *) pointAPt
+              toPointB: (Point3D *) pointBPt
+            withVertex: (Point3D *) vertexPt;
+
+- (NSPoint) findFromPosition: (float [3]) position
+                 inDirection: (float [3]) direction;
+
+- (BOOL) isPointOnPix: (NSPoint) point;
 
 - (void) point3d: (Point3D *) point
    toDicomCoords: (float [3]) dicomCoords;

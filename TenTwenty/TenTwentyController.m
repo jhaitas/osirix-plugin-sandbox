@@ -196,21 +196,19 @@
     NSDictionary    *sliceInstructions,*divideInstructions;
     ROI             *skullTrace;
     MPRDCMView      *theView;
-    DCMPix          *thePix;
     
     sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
     divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
     theView = mprViewer.mprView3;
     
-    thePix = [self      resliceView: theView
-                   fromInstructions: sliceInstructions  ];
+    [self resliceView:theView fromInstructions:sliceInstructions];
     
-    skullTrace = [self skullTraceInPix: thePix
+    skullTrace = [self skullTraceInPix: theView.pix
                       fromInstructions: sliceInstructions ];
     
     [self       divideTrace: skullTrace
-                      inPix: thePix
+                      inPix: theView.pix
            fromInstructions: divideInstructions     ];
     
     
@@ -219,8 +217,8 @@
     [theView display];
 }
 
-- (DCMPix *) resliceView: (MPRDCMView *) theView
-        fromInstructions: (NSDictionary *) sliceInstructions
+- (void) resliceView: (MPRDCMView *)    theView
+    fromInstructions: (NSDictionary *)  sliceInstructions
 {
     ResliceController *reslicer;
     
@@ -232,8 +230,6 @@
                withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
     
     [reslicer release];
-    
-    return theView.pix;
 }
 
 
@@ -245,16 +241,17 @@
     
     TraceController *tracer;
     
-    tracer  = [[TraceController alloc] initWithMinScalp:[minScalp floatValue] andMaxSkull:[maxSkull floatValue]];
+    tracer  = [[TraceController alloc] initWithPix: thePix
+                                          minScalp: [minScalp floatValue]
+                                          maxSkull: [maxSkull floatValue] ];
     
     pointA = [allPoints objectForKey:[traceInstructions objectForKey:@"point1"]];
     pointB = [allPoints objectForKey:[traceInstructions objectForKey:@"point2"]];
     vertex = [allPoints objectForKey:[traceInstructions objectForKey:@"vertex"]];
     
-    skullTrace =  [tracer skullTraceInPix: thePix
-                                  fromPtA: pointA
-                                 toPointB: pointB
-                               withVertex: vertex ];
+    skullTrace =  [tracer traceFromPtA: pointA
+                              toPointB: pointB
+                            withVertex: vertex ];
     
     // set it selected so we can see how well our intermediate points fit
     [skullTrace setROIMode:ROI_selected];
@@ -264,9 +261,9 @@
     return skullTrace;
 }
 
-- (void) divideTrace: (ROI *) theTrace
-               inPix: (DCMPix *) thePix
-    fromInstructions: (NSDictionary *) divideInstructions;
+- (void) divideTrace: (ROI *)           theTrace
+               inPix: (DCMPix *)        thePix
+    fromInstructions: (NSDictionary *)  divideInstructions;
 {
     LineDividerController *lineDivider;
     NSArray *newROIs;

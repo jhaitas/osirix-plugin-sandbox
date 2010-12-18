@@ -57,15 +57,15 @@
 
 - (void) runInstructions: (NSDictionary *) theInstructions;
 
-- (DCMPix *) resliceView: (MPRDCMView *) theView
-        fromInstructions: (NSDictionary *) sliceInstructions;
+- (void) resliceView: (MPRDCMView *)    theView
+    fromInstructions: (NSDictionary *)  sliceInstructions;
 
 - (ROI *) skullTraceInPix: (DCMPix *) thePix
          fromInstructions: (NSDictionary *) traceInstructions;
 
-- (void) divideTrace: (ROI *) theTrace
-               inPix: (DCMPix *) thePix
-   fromInstructions: (NSDictionary *) divideInstructions;
+- (void) divideTrace: (ROI *)           theTrace
+               inPix: (DCMPix *)        thePix
+    fromInstructions: (NSDictionary *)  divideInstructions;
 
 - (VRController *) openVrViewer;
 

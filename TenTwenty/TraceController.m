@@ -10,28 +10,34 @@
 
 @implementation TraceController
 
-- (id) initWithMinScalp: (float) minScalp
-            andMaxSkull: (float) maxSkull
+@synthesize searchPaths,minScalp,maxSkull;
+
+- (id) initWithPix: (DCMPix *)  thePix
+          minScalp: (float)     theMinScalp
+          maxSkull: (float)     theMaxSkull
 {
     if (self = [super init]) {
-        minScalpValue = minScalp;
-        maxSkullValue = maxSkull;
+        pix         = thePix;
+        minScalp    = theMinScalp;
+        maxSkull    = theMaxSkull;
+        
+        searchPaths = nil;
     }
     return self;
 }
 
-- (ROI *) skullTraceInPix: (DCMPix *)   pix
-                  fromPtA: (Point3D *)  pointAPt
-                 toPointB: (Point3D *)  pointBPt
-               withVertex: (Point3D *)  vertexPt
+- (ROI *) traceFromPtA: (Point3D *) pointAPt
+              toPointB: (Point3D *) pointBPt
+            withVertex: (Point3D *) vertexPt
 {
     int         i,numSections,numPoints;
     float       pointA[3],pointB[3],vertex[3],midpoint[3],displacement[3],stepSize[3],searchDir[3];
     float       xVector[3],yVector[3],unitX[3],unitY[3];
     float       pixelSpacingX,pixelSpacingY;
+    NSMutableArray      *intermediatePoints;
     
-    NSMutableArray          *intermediatePoints;
-    intermediatePoints      = [[NSMutableArray alloc] init];
+    searchPaths         = [[NSMutableArray alloc] init];
+    intermediatePoints  = [[NSMutableArray alloc] init];
     
     numSections = 10;
     numPoints = numSections + 1;
@@ -75,20 +81,27 @@
     
     for (i = 0; i < numPoints; i++)
     {
-        float   startPos[3],finalPosition[3],sliceCoords[3];
+        float   startPosition[3],sliceCoords[3];
         float   thetaRad;
-        NSPoint thisPoint;
+        NSPoint startPoint,endPoint;
+        ROI     *thisSearchPath;
         
+        // compute theta value ... 
+        // .. 0 at point A, PI at point B (180 degrees)
         thetaRad = i * (PI / (float)numSections);
         
-        // get starting positons
-        startPos[0] = pointA[0] + (stepSize[0] * (float) i);
-        startPos[1] = pointA[1] + (stepSize[1] * (float) i);
-        startPos[2] = pointA[2] + (stepSize[2] * (float) i);
+        // place points on straight line from point A to point B
+        startPosition[0] = pointA[0] + (stepSize[0] * (float) i);
+        startPosition[1] = pointA[1] + (stepSize[1] * (float) i);
+        startPosition[2] = pointA[2] + (stepSize[2] * (float) i);
         
-        startPos[0] += (yVector[0]) * sin(thetaRad);
-        startPos[1] += (yVector[1]) * sin(thetaRad);
-        startPos[2] += (yVector[2]) * sin(thetaRad);
+        // bend points toward vertex
+        startPosition[0] += (yVector[0]) * sin(thetaRad);
+        startPosition[1] += (yVector[1]) * sin(thetaRad);
+        startPosition[2] += (yVector[2]) * sin(thetaRad);
+        
+        [pix convertDICOMCoords:startPosition toSliceCoords:sliceCoords];
+        startPoint = NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
         
         // compute search direction
         searchDir[0] = (unitX[0] * cos(thetaRad)) + (unitY[0] * sin(thetaRad));
@@ -96,74 +109,75 @@
         searchDir[2] = (unitX[2] * cos(thetaRad)) + (unitY[2] * sin(thetaRad));        
         
         // search for skull
-        [self findSkullInPix:pix fromPosition:startPos inDirection:searchDir toPosition:finalPosition];
+        endPoint = [self findFromPosition:startPosition inDirection:searchDir];
         
-        // get the slice coordinates
-        [pix convertDICOMCoords:finalPosition toSliceCoords:sliceCoords];
+        // allocate and initialize a new 'Arrow' ROI
+        thisSearchPath = [[ROI alloc] initWithType: tArrow
+                                                  : pixelSpacingX
+                                                  : pixelSpacingY
+                                                  : NSMakePoint(0.0, 0.0)];
         
+        thisSearchPath.name = [NSString stringWithFormat:@"point %d",i+1];
         
-        thisPoint = NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
+        [thisSearchPath setPoints:[NSMutableArray arrayWithObjects:[MyPoint point:startPoint],[MyPoint point:endPoint],nil]];
+        
+        [searchPaths addObject:thisSearchPath];
         
         // add this point to intermediate points array
-        [intermediatePoints addObject:[MyPoint point:thisPoint]];
+        [intermediatePoints addObject:[MyPoint point:endPoint]];
     }
     
-    ROI *thisROI;
+    ROI *trace;
     
     // allocate and initialize a new 'Open Polygon' ROI
-    thisROI = [[ROI alloc] initWithType:tOPolygon
-                                       :pixelSpacingX
-                                       :pixelSpacingY
-                                       :NSMakePoint(0.0, 0.0)];
+    trace = [[ROI alloc] initWithType: tOPolygon
+                                     : pixelSpacingX
+                                     : pixelSpacingY
+                                     : NSMakePoint(0.0, 0.0)];
     
     
-    thisROI.name = [NSString stringWithString:@"skull trace"];
+    trace.name = [NSString stringWithString:@"trace"];
     
     // set points for spline
-    [thisROI setPoints:intermediatePoints];
+    [trace setPoints:intermediatePoints];
     
-    return thisROI;
+    return trace;
 }
 
-- (void) findSkullInPix: (DCMPix *)     pix
-           fromPosition: (float [3])    position
-            inDirection: (float [3])    direction
-             toPosition: (float [3])    finalPosition
+- (NSPoint) findFromPosition: (float [3])    position
+                 inDirection: (float [3])    direction
 {
     float   sliceCoords[3],pixelSpacingX,pixelSpacingY;
     float   scalingFactor;
     float   thisMin,thisMean,thisMax;
     BOOL    foundScalp,foundSkull;
     ROI     *thisROI;
+    NSPoint point;
     
     foundScalp = NO;
     foundSkull = NO;
     
     scalingFactor = 0.1;
     
-    finalPosition[0] = position[0];
-    finalPosition[1] = position[1];
-    finalPosition[2] = position[2];
-    
     pixelSpacingX   = pix.pixelSpacingX;
     pixelSpacingY   = pix.pixelSpacingY;
     
     
     // allocate and initialize a new ROI
-    thisROI = [[ROI alloc] initWithType:t2DPoint
-                                       :pixelSpacingX
-                                       :pixelSpacingY
-                                       :NSMakePoint(0.0, 0.0)];
+    thisROI = [[ROI alloc] initWithType: t2DPoint
+                                       : pixelSpacingX
+                                       : pixelSpacingY
+                                       : NSMakePoint(0.0, 0.0)];
     
     // look for scalp
     while (!foundScalp) {
         // move point in direction
-        finalPosition[0] += (direction[0] * scalingFactor);
-        finalPosition[1] += (direction[1] * scalingFactor);
-        finalPosition[2] += (direction[2] * scalingFactor);
+        position[0] += (direction[0] * scalingFactor);
+        position[1] += (direction[1] * scalingFactor);
+        position[2] += (direction[2] * scalingFactor);
         
         // convert back to slice coords
-        [pix convertDICOMCoords:finalPosition toSliceCoords:sliceCoords];
+        [pix convertDICOMCoords:position toSliceCoords:sliceCoords];
         
         // set the position of the ROI
         thisROI.rect = NSMakeRect(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY, 0.0, 0.0);
@@ -172,12 +186,12 @@
         [pix computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
         
         // detect if we have found the scalp
-        if (thisMax > minScalpValue) {
+        if (thisMax > minScalp) {
             foundScalp = YES;
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (![self isPoint:thisROI.rect.origin onPix:pix]) {
+        if (![self isPointOnPix:thisROI.rect.origin]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
@@ -186,12 +200,12 @@
     // reverse direction and locate the skull
     while (!foundSkull) {
         // move point in opposite direction
-        finalPosition[0] -= (direction[0] * scalingFactor);
-        finalPosition[1] -= (direction[1] * scalingFactor);
-        finalPosition[2] -= (direction[2] * scalingFactor);
+        position[0] -= (direction[0] * scalingFactor);
+        position[1] -= (direction[1] * scalingFactor);
+        position[2] -= (direction[2] * scalingFactor);
         
         // convert back to slice coords
-        [pix convertDICOMCoords:finalPosition toSliceCoords:sliceCoords];
+        [pix convertDICOMCoords:position toSliceCoords:sliceCoords];
         
         // set the position of the ROI
         thisROI.rect = NSMakeRect(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY, 0.0, 0.0);
@@ -200,21 +214,25 @@
         [pix computeROI:thisROI :&thisMean :NULL :NULL :&thisMin :&thisMax];
         
         // detect if we have found the scalp
-        if (thisMin < maxSkullValue) {
+        if (thisMin < maxSkull) {
             foundSkull = YES;
         }
         
         // be sure we haven't fallen to the bottom of the slice
-        if (![self isPoint:thisROI.rect.origin onPix:pix]) {
+        if (![self isPointOnPix:thisROI.rect.origin]) {
             DLog(@"%@ falling off slice!!!\n",thisROI.name);
             break;
         }
     }
-    
     [thisROI release];
+    
+    [pix convertDICOMCoords:position toSliceCoords:sliceCoords];
+    point = NSMakePoint(sliceCoords[0]/pixelSpacingX, sliceCoords[1]/pixelSpacingY);
+
+    return point;
 }
 
-- (BOOL) isPoint: (NSPoint) point onPix: (DCMPix *) pix
+- (BOOL) isPointOnPix: (NSPoint) point
 {
     if (point.x >= 0 && point.y >= 0 && point.x < pix.pwidth && point.y < pix.pheight) {
         return YES;
