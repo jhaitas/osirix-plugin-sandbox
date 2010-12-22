@@ -349,18 +349,11 @@
 - (void) roiWithName: (NSString *) name
        toDicomCoords: (float *) dicomCoords
 {
-    [self roiWithName:name inViewerController: viewerController toDicomCoords:dicomCoords];
-}
-
-- (void) roiWithName: (NSString *) name
-  inViewerController: (ViewerController *) vc
-       toDicomCoords: (float *) dicomCoords
-{
     DCMPix              *pix;
     ROI                 *roi;
     
-    roi = [self findRoiWithName:name inViewerController:vc];
-    pix = [self findPixWithROI:roi inViewerController:vc];
+    roi = [self findRoiWithName:name];
+    pix = [self findPixWithROI:roi];
     
     if (pix == nil || roi == nil) {
         NSLog(@"Failed to find ROI named %@ in viewerController",name);
@@ -371,13 +364,12 @@
 }
 
 - (ROI *) findRoiWithName: (NSString *) thisName
-       inViewerController: (ViewerController *)vc
 {
     ROI     *thisROI;
     
     thisROI = nil;
     
-    for (NSArray *roiList in [[vc imageView] dcmRoiList]) {
+    for (NSArray *roiList in [[viewerController imageView] dcmRoiList]) {
         for (ROI *r in roiList) {
             if ([r.name isEqualToString:thisName]) {
                 thisROI = r;
@@ -388,22 +380,16 @@
     return thisROI;
 }
 
-- (ROI *) findRoiWithName: (NSString *) thisName
-{
-    return [self findRoiWithName:thisName inViewerController:viewerController];
-}
-
 - (DCMPix *) findPixWithROI: (ROI *) thisROI
-         inViewerController: (ViewerController *) vc
 {
     int     thisIndex;
     NSArray *thisRoiList;
     
     thisIndex = -1;
     
-    for (thisRoiList in [[vc imageView] dcmRoiList]) {
+    for (thisRoiList in [[viewerController imageView] dcmRoiList]) {
         if ([thisRoiList containsObject:thisROI]) {
-            thisIndex = [[[vc imageView] dcmRoiList] indexOfObjectIdenticalTo:thisRoiList];
+            thisIndex = [[[viewerController imageView] dcmRoiList] indexOfObjectIdenticalTo:thisRoiList];
         }
     }
     
@@ -411,14 +397,8 @@
         return nil;
     }
     
-    return [[[vc imageView] dcmPixList] objectAtIndex:thisIndex];
+    return [[[viewerController imageView] dcmPixList] objectAtIndex:thisIndex];
 }
-
-- (DCMPix *) findPixWithROI: (ROI *) thisROI
-{
-    return [self findPixWithROI:thisROI inViewerController:viewerController];
-}
-
 
 - (void) placeElectrodes: (NSArray *) electrodesToPlace
 {

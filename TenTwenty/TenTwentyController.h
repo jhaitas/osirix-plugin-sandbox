@@ -74,21 +74,14 @@
         fromPix: (DCMPix *) thisPix 
   toDicomCoords: (float *)  location;
 
-- (void) pointNamed: (NSString *) name
-      toDicomCoords: (float *) dicomCoords;
+- (void) pointNamed: (NSString *)   name
+      toDicomCoords: (float [3])    dicomCoords;
 
-- (void) roiWithName: (NSString *) name 
-       toDicomCoords: (float *) dicomCoords;
-- (void) roiWithName: (NSString *) name 
-  inViewerController: (ViewerController *) vc 
-       toDicomCoords: (float *) dicomCoords;
+- (void) roiWithName: (NSString *)  name 
+       toDicomCoords: (float [3])   dicomCoords;
 
-- (ROI *) findRoiWithName: (NSString *) thisName
-       inViewerController: (ViewerController *)vc;
 - (ROI *) findRoiWithName: (NSString *) thisName;
 
-- (DCMPix *) findPixWithROI: (ROI *) thisROI
-         inViewerController: (ViewerController *) vc;
 - (DCMPix *) findPixWithROI: (ROI *) thisROI;
 
 - (void) placeElectrodes: (NSArray *) electrodesToPlace;
