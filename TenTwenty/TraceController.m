@@ -117,7 +117,7 @@
                                                    : pixelSpacingY
                                                    : NSMakePoint(0.0, 0.0)] autorelease];
         
-        thisSearchPath.name = [NSString stringWithFormat:@"point %d",i+1];
+        thisSearchPath.name = [NSString stringWithFormat:@"point %d search path",i+1];
         
         [thisSearchPath setPoints:[NSMutableArray arrayWithObjects:[MyPoint point:startPoint],[MyPoint point:endPoint],nil]];
         

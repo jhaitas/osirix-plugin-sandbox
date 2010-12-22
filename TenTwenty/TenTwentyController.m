@@ -19,6 +19,7 @@
         
         // set ROIs to display name only
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ROITEXTNAMEONLY"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"ROITEXTIFSELECTED"];
     }
     return self;
 }
@@ -197,27 +198,28 @@
 
 - (void) runInstructions: (NSDictionary *) theInstructions
 {
-    NSDictionary    *sliceInstructions,*divideInstructions;
-    NSArray         *skullTraceWithSearchPaths;
-    ROI             *skullTrace;
+    NSDictionary *sliceInstructions,*divideInstructions;
     
     sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
     divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
-    [self resliceViewFromInstructions:sliceInstructions];
+    [self resliceViewFromInstructions: sliceInstructions];
     
-    skullTraceWithSearchPaths = [self skullTraceFromInstructions: sliceInstructions ];
+    [self skullTraceFromInstructions: sliceInstructions];
     
-    skullTrace = [skullTraceWithSearchPaths objectAtIndex:0];
+    [self divideTraceFromInstructions: divideInstructions];
     
-    [self       divideTrace: skullTrace
-           fromInstructions: divideInstructions     ];
-    
-    // add the skull trace and search paths to view
-    [sliceView.curRoiList addObjectsFromArray:skullTraceWithSearchPaths];
-    
-    // detect our new electrods
+    // detect our new electrodes
     [sliceView detect2DPointInThisSlice];
+    
+    // add the search paths and search paths to view
+    [sliceView.curRoiList addObjectsFromArray:searchPaths];
+    
+    // add the skull trace
+    [sliceView.curRoiList addObject:skullTrace];
+    
+    // select the skull trace
+    [skullTrace setROIMode:ROI_selected];
     
     [sliceView display];
     
@@ -237,12 +239,9 @@
 }
 
 
-- (NSArray *) skullTraceFromInstructions: (NSDictionary *) traceInstructions
+- (void) skullTraceFromInstructions: (NSDictionary *) traceInstructions
 {
     Point3D         *pointA,*pointB,*vertex;
-    ROI             *skullTrace;
-    NSMutableArray  *skullTraceWithSearchPaths;
-    
     TraceController *tracer;
     
     tracer  = [[TraceController alloc] initWithPix: sliceView.pix
@@ -257,32 +256,22 @@
                 toPointB: pointB
               withVertex: vertex ];
     
-    skullTrace = tracer.trace;
-    
-    // set it selected so we can see how well our intermediate points fit
-    [skullTrace setROIMode:ROI_selected];
-    
-    skullTraceWithSearchPaths = [NSMutableArray arrayWithArray: tracer.searchPaths];
-    [skullTraceWithSearchPaths insertObject:skullTrace atIndex:0];
+    skullTrace  = tracer.trace;
+    searchPaths = tracer.searchPaths;
     
     [tracer release];
-    
-    return [NSArray arrayWithArray:skullTraceWithSearchPaths];
 }
 
-- (void) divideTrace: (ROI *)           theTrace
-    fromInstructions: (NSDictionary *)  divideInstructions;
+- (void) divideTraceFromInstructions: (NSDictionary *)  divideInstructions;
 {
     LineDividerController *lineDivider;
-    NSArray *newROIs;
     
     lineDivider = [[LineDividerController alloc] initWithPix:sliceView.pix];
     [lineDivider setDistanceDict:divideInstructions];
-    [lineDivider divideLine:theTrace];
+    [lineDivider divideLine:skullTrace];
     
-    newROIs = [lineDivider intermediateROIs];
-    
-    for (ROI *r in newROIs) {
+    // Step through each of the intermediate ROIs
+    for (ROI *r in [lineDivider intermediateROIs]) {
         float dicomCoords[3];
         
         //get the dicom coords

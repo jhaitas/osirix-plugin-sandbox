@@ -26,9 +26,12 @@
     PluginFilter    *owner;
     
     ViewerController    *viewerController;
-    MPRController       *mprViewer;
     
+    MPRController       *mprViewer;
     MPRDCMView          *sliceView;
+    
+    ROI                 *skullTrace;
+    NSArray             *searchPaths;
     
     NSMutableDictionary     *landmarks;
     NSMutableDictionary     *allPoints;
@@ -59,10 +62,9 @@
 
 - (void) runInstructions: (NSDictionary *) theInstructions;
 
-- (void) resliceViewFromInstructions: (NSDictionary *)  sliceInstructions;
-- (NSArray *) skullTraceFromInstructions: (NSDictionary *) traceInstructions;
-- (void) divideTrace: (ROI *)           theTrace
-    fromInstructions: (NSDictionary *)  divideInstructions;
+- (void) resliceViewFromInstructions:   (NSDictionary *) sliceInstructions;
+- (void) skullTraceFromInstructions:    (NSDictionary *) traceInstructions;
+- (void) divideTraceFromInstructions:   (NSDictionary *) divideInstructions;
 
 - (VRController *) openVrViewer;
 
