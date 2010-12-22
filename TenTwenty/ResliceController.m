@@ -53,6 +53,12 @@
     // direction is the cross product of the two vectors
     CROSS(direction,vector1,vector2);
     
+    // it is more intuitive for trace to go from left to right...
+    // ... to achieve that we will simply reverse the direction
+    direction[0] = -direction[0];
+    direction[1] = -direction[1];
+    direction[2] = -direction[2];
+    
     // view up points at the vertex 'pos1' from camera position
     viewUp[0] = vertex[0] - camPos[0];
     viewUp[1] = vertex[1] - camPos[1];
