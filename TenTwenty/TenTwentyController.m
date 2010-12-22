@@ -227,12 +227,11 @@
 {
     ResliceController *reslicer;
     
-    reslicer = [[ResliceController alloc] initWithFactor:[sliceView.vrView factor]];
+    reslicer = [[ResliceController alloc] initWithView:sliceView];
     
-    [reslicer planeInView:sliceView
-               withVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
-               withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
-               withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
+    [reslicer planeWithVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
+                   withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
+                   withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
     
     [reslicer release];
 }

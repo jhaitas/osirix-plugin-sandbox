@@ -29,19 +29,15 @@ dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
 dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
 dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 
-@interface ResliceController : NSObject {    
-    float factor;
+@interface ResliceController : NSObject {
+    MPRDCMView *view;
 }
 
-- (id) initWithFactor: (float) theFactor;
+- (id) initWithView: (MPRDCMView *) theView;
 
-- (void) planeInView: (MPRDCMView *) theView
-          withVertex: (Point3D *) vertexPt
-          withPoint1: (Point3D *) point1Pt
-          withPoint2: (Point3D *) point2Pt;
-
-- (Point3D *) directionOfCamera: (Camera *) cam;
-- (Point3D *) unitVectorFromVector: (Point3D *) vector;
+- (void) planeWithVertex: (Point3D *) vertexPt
+              withPoint1: (Point3D *) point1Pt
+              withPoint2: (Point3D *) point2Pt;
 
 - (void) point3d: (Point3D *) point toWorldCoords: (float *) worldCoords;
 

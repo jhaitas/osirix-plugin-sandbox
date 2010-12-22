@@ -10,10 +10,10 @@
 
 @implementation ResliceController
 
-- (id) initWithFactor: (float) theFactor
+- (id) initWithView: (MPRDCMView *) theView
 {
     if (self = [super init]) {
-        factor = theFactor;
+        view = theView;
     } else {
         NSLog(@"failed to initialize ResliceController");
     }
@@ -21,10 +21,9 @@
     return self;
 }
 
-- (void) planeInView: (MPRDCMView *) theView
-          withVertex: (Point3D *) vertexPt
-          withPoint1: (Point3D *) point1Pt
-          withPoint2: (Point3D *) point2Pt
+- (void) planeWithVertex: (Point3D *) vertexPt
+              withPoint1: (Point3D *) point1Pt
+              withPoint2: (Point3D *) point2Pt
 {
     float   vertex[3],point1[3],point2[3];
     float   vector1[3],vector2[3],camPos[3],direction[3],viewUp[3];
@@ -64,7 +63,7 @@
     UNIT(unitViewUp,viewUp);
     
     // modify the camera
-    theCam = theView.camera;
+    theCam = view.camera;
     
     camPosition     = [Point3D pointWithX:camPos[0]
                                         y:camPos[1]
@@ -85,39 +84,17 @@
     theCam.focalPoint   = camFocalPoint;
     theCam.viewUp       = camViewUp;
     
-    theView.camera = theCam;
+    view.camera = theCam;
     
-    [theView restoreCamera];
+    [view restoreCamera];
     
-    [theView.windowController updateViewsAccordingToFrame:theView];
-}
-
-- (Point3D *) directionOfCamera: (Camera *) cam
-{
-    Point3D *direction;
-    
-    // compute direction of projection vector
-    direction   = [[[Point3D alloc] initWithPoint3D:cam.focalPoint] autorelease];
-    [direction subtract:cam.position];
-    
-    return direction;
-}
-
-- (Point3D *) unitVectorFromVector: (Point3D *) vector
-{
-    double vec[3],unitVec[3];
-    
-    vec[0] = vector.x;
-    vec[1] = vector.y;
-    vec[2] = vector.z;
-    
-    UNIT(unitVec,vec);
-    
-    return [Point3D pointWithX:(float)unitVec[0] y:(float)unitVec[1] z:(float)unitVec[2]];
+    [view.windowController updateViewsAccordingToFrame:view];
 }
 
 - (void) point3d: (Point3D *) point toWorldCoords: (float *) worldCoords
 {
+    float factor;
+    factor = [view.vrView factor];
     worldCoords[0] = point.x * factor;
     worldCoords[1] = point.y * factor;
     worldCoords[2] = point.z * factor;
