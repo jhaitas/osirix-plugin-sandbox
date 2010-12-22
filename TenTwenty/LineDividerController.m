@@ -29,7 +29,7 @@
     return self;
 }
 
-- (id) initWithPix:(DCMPix *) pix
+- (id) initWithPix: (DCMPix *) pix
 {
     [self init];
     thePix = pix;
@@ -116,7 +116,7 @@
     return [NSArray arrayWithArray:newROIs];
 }
 
-- (NSMutableArray *)computePercentLength:(ROI *)thisROI
+- (NSMutableArray *) computePercentLength: (ROI *) thisROI
 {
 	long			i,numPoints;
 	float			totalLength,thisLength,thisPercent;
@@ -129,7 +129,7 @@
 	
 	// allocate subsequent arrays
 	distanceFromStart	= [[NSMutableArray alloc] initWithCapacity:numPoints];
-	percentLength		= [[NSMutableArray alloc] initWithCapacity:numPoints];
+	percentLength		= [[[NSMutableArray alloc] initWithCapacity:numPoints] autorelease];
 	
 	// the first element in both cases is 0
 	[distanceFromStart addObject:FBOX(0.0)];
@@ -147,17 +147,21 @@
 		[distanceFromStart addObject:FBOX(thisLength)];
 		[percentLength addObject:FBOX(thisPercent)];
 	}
+    
+    // release object no longer needed
 	[distanceFromStart release];
-	[percentLength autorelease];
+    
 	return percentLength;
 }
 
-- (float)measureOPolyLength:(ROI *)thisROI fromPointAtIndex:(long)indexPointA toPointAtIndex:(long)indexPointB
+- (float) measureOPolyLength: (ROI *)   roi 
+            fromPointAtIndex: (long)    indexPointA 
+              toPointAtIndex: (long)    indexPointB
 {
 	long i;
 	float length = 0;
 	
-	NSMutableArray *splinePoints = [thisROI splinePoints: scaleValue];
+	NSMutableArray *splinePoints = [roi splinePoints: scaleValue];
 	
 	// we can't count up to an index that doesn't exist...
 	// ... a negative length should be regarded as invalid
@@ -168,44 +172,20 @@
 	// accumulate distance between consective points on spline
 	for(i = 0; i < indexPointB; i++)
 	{
-		length += [thisROI Length:[[splinePoints objectAtIndex:i] point] :[[splinePoints objectAtIndex:i+1] point]];
+		length += [roi Length:[[splinePoints objectAtIndex:i] point] :[[splinePoints objectAtIndex:i+1] point]];
 	}
     
 	return length;
 }
 
-- (float)measureOPolyLength:(ROI *)thisROI
+- (float) measureOPolyLength: (ROI *) roi
 {
 	long			lastIndex;
-	NSMutableArray	*splinePoints = [thisROI splinePoints: scaleValue];
+	NSMutableArray	*splinePoints = [roi splinePoints: scaleValue];
 	
 	lastIndex = [splinePoints count] - 1;
 	
-	return [self measureOPolyLength: thisROI fromPointAtIndex: 0 toPointAtIndex: lastIndex];
-}
-
-
-
-
-- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toCoords:(float *) location
-{                
-    NSMutableArray *roiPoints = [ thisROI points ];
-    NSPoint roiCenterPoint;
-    
-    // calc center of the ROI
-    if ( [ thisROI type ] == t2DPoint ) {
-        // ROI has a bug which causes miss-calculating center of 2DPoint roi
-        roiCenterPoint = [ [ roiPoints objectAtIndex: 0 ] point ];
-    } else {
-        roiCenterPoint = [ thisROI centroid ];
-    }
-    
-    // convert pixel values to mm values
-    [thisPix convertPixX:roiCenterPoint.x
-                    pixY:roiCenterPoint.y
-           toDICOMCoords:location           ];
-    
-    DLog(@"%@ coordinates (AP,ML,DV) = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
+	return [self measureOPolyLength: roi fromPointAtIndex: 0 toPointAtIndex: lastIndex];
 }
 
 @end

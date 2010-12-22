@@ -225,7 +225,7 @@
     
 }
 
-- (void) resliceViewFromInstructions: (NSDictionary *)  sliceInstructions
+- (void) resliceViewFromInstructions: (NSDictionary *) sliceInstructions
 {
     ResliceController *reslicer;
     
@@ -262,7 +262,7 @@
     [tracer release];
 }
 
-- (void) divideTraceFromInstructions: (NSDictionary *)  divideInstructions;
+- (void) divideTraceFromInstructions: (NSDictionary *) divideInstructions;
 {
     LineDividerController *lineDivider;
     

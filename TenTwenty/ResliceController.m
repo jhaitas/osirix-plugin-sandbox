@@ -97,7 +97,7 @@
     [view.windowController updateViewsAccordingToFrame:view];
 }
 
-- (void) point3d: (Point3D *) point toWorldCoords: (float *) worldCoords
+- (void) point3d: (Point3D *) point toWorldCoords: (float [3]) worldCoords
 {
     float factor;
     factor = [view.vrView factor];

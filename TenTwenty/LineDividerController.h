@@ -22,7 +22,7 @@
 }
 
 - (id) init;
-- (id) initWithPix:(DCMPix *) pix;
+- (id) initWithPix: (DCMPix *) pix;
 
 - (void) setDistanceDict: (NSDictionary *) inputDict;
 
@@ -31,9 +31,11 @@
 - (NSArray *) intermediateROIs;
 
 - (NSMutableArray *) computePercentLength:(ROI *)thisROI;
-- (float) measureOPolyLength:(ROI *)thisROI 
-            fromPointAtIndex:(long)indexPointA 
-              toPointAtIndex:(long)indexPointB;
-- (float) measureOPolyLength:(ROI *)thisROI;
+
+- (float) measureOPolyLength: (ROI *)   roi 
+            fromPointAtIndex: (long)    indexPointA 
+              toPointAtIndex: (long)    indexPointB;
+
+- (float) measureOPolyLength: (ROI *) roi;
 
 @end
