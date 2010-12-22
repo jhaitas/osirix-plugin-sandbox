@@ -54,7 +54,9 @@
     instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"]; 
     
     for (NSDictionary *theseInstructions in instructionList) {
+        int stepNum = 1 + [instructionList indexOfObject:theseInstructions];
         [self runInstructions:theseInstructions];
+        [self sliceToFileNamed:[NSString stringWithFormat:@"step-%d.png",stepNum]];
         
     }
     
@@ -179,6 +181,8 @@
     [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
     [mprViewer showWindow:self];
     [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
+    
+    sliceView = mprViewer.mprView3;
 }
 
 - (NSDictionary *) loadInstructions
@@ -196,41 +200,36 @@
     NSDictionary    *sliceInstructions,*divideInstructions;
     NSArray         *skullTraceWithSearchPaths;
     ROI             *skullTrace;
-    MPRDCMView      *theView;
     
     sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
     divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
-    theView = mprViewer.mprView3;
+    [self resliceViewFromInstructions:sliceInstructions];
     
-    [self resliceView:theView fromInstructions:sliceInstructions];
-    
-    skullTraceWithSearchPaths = [self skullTraceInPix: theView.pix
-                                     fromInstructions: sliceInstructions ];
+    skullTraceWithSearchPaths = [self skullTraceFromInstructions: sliceInstructions ];
     
     skullTrace = [skullTraceWithSearchPaths objectAtIndex:0];
     
     [self       divideTrace: skullTrace
-                      inPix: theView.pix
            fromInstructions: divideInstructions     ];
     
     // add the skull trace and search paths to view
-    [theView.curRoiList addObjectsFromArray:skullTraceWithSearchPaths];
+    [sliceView.curRoiList addObjectsFromArray:skullTraceWithSearchPaths];
     
     // detect our new electrods
-    [theView detect2DPointInThisSlice];
+    [sliceView detect2DPointInThisSlice];
     
-    [theView display];
+    [sliceView display];
+    
 }
 
-- (void) resliceView: (MPRDCMView *)    theView
-    fromInstructions: (NSDictionary *)  sliceInstructions
+- (void) resliceViewFromInstructions: (NSDictionary *)  sliceInstructions
 {
     ResliceController *reslicer;
     
-    reslicer = [[ResliceController alloc] initWithFactor:[[mprViewer valueForKey:@"hiddenVRView"] factor]];
+    reslicer = [[ResliceController alloc] initWithFactor:[sliceView.vrView factor]];
     
-    [reslicer planeInView:theView
+    [reslicer planeInView:sliceView
                withVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
                withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
                withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
@@ -239,8 +238,7 @@
 }
 
 
-- (NSArray *) skullTraceInPix: (DCMPix *) thePix
-             fromInstructions: (NSDictionary *) traceInstructions
+- (NSArray *) skullTraceFromInstructions: (NSDictionary *) traceInstructions
 {
     Point3D         *pointA,*pointB,*vertex;
     ROI             *skullTrace;
@@ -248,7 +246,7 @@
     
     TraceController *tracer;
     
-    tracer  = [[TraceController alloc] initWithPix: thePix
+    tracer  = [[TraceController alloc] initWithPix: sliceView.pix
                                           minScalp: [minScalp floatValue]
                                           maxSkull: [maxSkull floatValue] ];
     
@@ -274,13 +272,12 @@
 }
 
 - (void) divideTrace: (ROI *)           theTrace
-               inPix: (DCMPix *)        thePix
     fromInstructions: (NSDictionary *)  divideInstructions;
 {
     LineDividerController *lineDivider;
     NSArray *newROIs;
     
-    lineDivider = [[LineDividerController alloc] initWithPix:thePix];
+    lineDivider = [[LineDividerController alloc] initWithPix:sliceView.pix];
     [lineDivider setDistanceDict:divideInstructions];
     [lineDivider divideLine:theTrace];
     
@@ -290,7 +287,7 @@
         float dicomCoords[3];
         
         //get the dicom coords
-        [thePix convertPixX:r.rect.origin.x pixY:r.rect.origin.y toDICOMCoords:dicomCoords];
+        [sliceView.pix convertPixX:r.rect.origin.x pixY:r.rect.origin.y toDICOMCoords:dicomCoords];
         
         [allPoints setObject:[Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]] forKey:r.name]; 
                 
@@ -491,6 +488,21 @@
         
         [[NSNotificationCenter defaultCenter] postNotificationName: OsirixROIChangeNotification object: roi userInfo: nil];
     }
+}
+
+
+- (void) sliceToFileNamed: (NSString *)  fileName
+{
+    NSImage             *image;
+    NSBitmapImageRep    *imageRep;
+    NSData              *imageRepData;
+    
+    image           = [sliceView nsimage];
+    imageRep        = [[image representations] objectAtIndex: 0];
+    imageRepData    = [imageRep representationUsingType: NSPNGFileType
+                                             properties: nil];
+    [imageRepData writeToFile: fileName
+                   atomically: NO];
 }
 
 @end

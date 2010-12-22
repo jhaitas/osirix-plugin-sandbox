@@ -28,6 +28,8 @@
     ViewerController    *viewerController;
     MPRController       *mprViewer;
     
+    MPRDCMView          *sliceView;
+    
     NSMutableDictionary     *landmarks;
     NSMutableDictionary     *allPoints;
     
@@ -57,14 +59,9 @@
 
 - (void) runInstructions: (NSDictionary *) theInstructions;
 
-- (void) resliceView: (MPRDCMView *)    theView
-    fromInstructions: (NSDictionary *)  sliceInstructions;
-
-- (NSArray *) skullTraceInPix: (DCMPix *) thePix
-             fromInstructions: (NSDictionary *) traceInstructions;
-
+- (void) resliceViewFromInstructions: (NSDictionary *)  sliceInstructions;
+- (NSArray *) skullTraceFromInstructions: (NSDictionary *) traceInstructions;
 - (void) divideTrace: (ROI *)           theTrace
-               inPix: (DCMPix *)        thePix
     fromInstructions: (NSDictionary *)  divideInstructions;
 
 - (VRController *) openVrViewer;
@@ -97,5 +94,7 @@
 - (void) addPoint: (float [3]) dicomCoords;
 - (void) addPoint: (float [3]) dicomCoords
          withName: (NSString *) name;
+
+- (void) sliceToFileNamed: (NSString *)  fileName;
 
 @end
