@@ -70,9 +70,9 @@
 
 #pragma mark Work Methods
 
-- (void) getROI: (ROI *)    thisROI 
-        fromPix: (DCMPix *) thisPix 
-  toDicomCoords: (float *)  location;
+- (void) getROI: (ROI *)        roi
+        fromPix: (DCMPix *)     pix 
+  toDicomCoords: (float [3])    location;
 
 - (void) pointNamed: (NSString *)   name
       toDicomCoords: (float [3])    dicomCoords;
@@ -82,7 +82,7 @@
 
 - (ROI *) findRoiWithName: (NSString *) thisName;
 
-- (DCMPix *) findPixWithROI: (ROI *) thisROI;
+- (DCMPix *) findPixWithROI: (ROI *) roi;
 
 - (void) placeElectrodes: (NSArray *) electrodesToPlace;
 

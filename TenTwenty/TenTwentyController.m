@@ -241,8 +241,8 @@
 
 - (void) skullTraceFromInstructions: (NSDictionary *) traceInstructions
 {
-    Point3D         *pointA,*pointB,*vertex;
     TraceController *tracer;
+    Point3D         *pointA,*pointB,*vertex;
     
     tracer  = [[TraceController alloc] initWithPix: sliceView.pix
                                           minScalp: [minScalp floatValue]
@@ -308,29 +308,31 @@
 
 #pragma mark Work Methods
 
-- (void) getROI: (ROI *) thisROI fromPix: (DCMPix *) thisPix toDicomCoords:(float *) location
+- (void) getROI: (ROI *)        roi
+        fromPix: (DCMPix *)     pix
+  toDicomCoords: (float [3])    location
 {                
-    NSMutableArray *roiPoints = [ thisROI points ];
+    NSMutableArray *roiPoints = [ roi points ];
     NSPoint roiCenterPoint;
     
     // calc center of the ROI
-    if ( [ thisROI type ] == t2DPoint ) {
+    if ( [ roi type ] == t2DPoint ) {
         // ROI has a bug which causes miss-calculating center of 2DPoint roi
         roiCenterPoint = [ [ roiPoints objectAtIndex: 0 ] point ];
     } else {
-        roiCenterPoint = [ thisROI centroid ];
+        roiCenterPoint = [ roi centroid ];
     }
     
     // convert pixel values to mm values
-    [thisPix convertPixX:roiCenterPoint.x
-                    pixY:roiCenterPoint.y
-           toDICOMCoords:location            ];
-    DLog(@"%@ coordinates = (%.3f,%.3f,%.3f)\n",thisROI.name,location[0],location[1],location[2]);
+    [pix convertPixX:roiCenterPoint.x
+                pixY:roiCenterPoint.y
+       toDICOMCoords:location            ];
+    DLog(@"%@ coordinates = (%.3f,%.3f,%.3f)\n",roi.name,location[0],location[1],location[2]);
 }
 
 
-- (void) pointNamed: (NSString *) name
-      toDicomCoords: (float *) dicomCoords
+- (void) pointNamed: (NSString *)   name
+      toDicomCoords: (float [3])      dicomCoords
 {
     Point3D *point;
     
@@ -365,22 +367,22 @@
 
 - (ROI *) findRoiWithName: (NSString *) thisName
 {
-    ROI     *thisROI;
+    ROI     *roi;
     
-    thisROI = nil;
+    roi = nil;
     
     for (NSArray *roiList in [[viewerController imageView] dcmRoiList]) {
         for (ROI *r in roiList) {
             if ([r.name isEqualToString:thisName]) {
-                thisROI = r;
+                roi = r;
             }
         }
     }
     
-    return thisROI;
+    return roi;
 }
 
-- (DCMPix *) findPixWithROI: (ROI *) thisROI
+- (DCMPix *) findPixWithROI: (ROI *) roi
 {
     int     thisIndex;
     NSArray *thisRoiList;
@@ -388,7 +390,7 @@
     thisIndex = -1;
     
     for (thisRoiList in [[viewerController imageView] dcmRoiList]) {
-        if ([thisRoiList containsObject:thisROI]) {
+        if ([thisRoiList containsObject:roi]) {
             thisIndex = [[[viewerController imageView] dcmRoiList] indexOfObjectIdenticalTo:thisRoiList];
         }
     }
@@ -441,7 +443,7 @@
     
     sliceCoords[2] = round(sliceCoords[2]);
     
-    if (sliceCoords[ 2] >= 0 && sliceCoords[ 2] < [[viewerController pixList] count])
+    if (sliceCoords[ 2] >= 0 && sliceCoords[2] < [[viewerController pixList] count])
     {
         roi = [[[ROI alloc] initWithType: t2DPoint 
                                         : pix.pixelSpacingX 
@@ -450,9 +452,9 @@
         
         roi.name = name;
         
-        [roi setROIRect: NSMakeRect( sliceCoords[ 0], sliceCoords[ 1], 0, 0)];
+        [roi setROIRect: NSMakeRect( sliceCoords[0], sliceCoords[1], 0, 0)];
         
-        [[[viewerController roiList] objectAtIndex: sliceCoords[ 2]] addObject: roi];
+        [[[viewerController roiList] objectAtIndex: sliceCoords[2]] addObject: roi];
         
         [[NSNotificationCenter defaultCenter] postNotificationName: OsirixROIChangeNotification object: roi userInfo: nil];
     }
