@@ -72,13 +72,18 @@
     [viewerController roiDeleteAll:self];
     
     // place electrodes according to dictionary
-    [self placeElectrodes:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]];
+//    [self placeElectrodes:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]];
     
     // update the view
     [viewerController updateImage:self];
     
     // display 3D Viewer
-    [self openVrViewer];
+    VRController *vrViewer;
+    vrViewer = [self openVrViewer];
+    
+    // add electrodes to 3D viewer
+    [self add3DPointsNamed:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]
+                to3DViewer:vrViewer                                                     ];
 }
 
 - (void) identifyLandmarks
@@ -184,6 +189,10 @@
     [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
     
     sliceView = mprViewer.mprView3;
+    
+    // make only sliceView visible rather than 3 views visible
+    [mprViewer.horizontalSplit  setPosition: [mprViewer.horizontalSplit minPossiblePositionOfDividerAtIndex: 0] ofDividerAtIndex: 0];
+    [mprViewer.verticalSplit    setPosition: [mprViewer.verticalSplit   minPossiblePositionOfDividerAtIndex: 0] ofDividerAtIndex: 0];
 }
 
 - (NSDictionary *) loadInstructions
@@ -460,6 +469,25 @@
     }
 }
 
+- (void) add3DPointsNamed: (NSArray *)      pointsToAdd
+               to3DViewer: (VRController *) theViewer
+{
+    // ****** place 3d electrodes
+    double   dicomCoords[3];
+    Point3D *point;
+    
+    for (NSString *name in pointsToAdd) {
+        point = [allPoints objectForKey:name];
+        
+        dicomCoords[0] = point.x;
+        dicomCoords[1] = point.y;
+        dicomCoords[2] = point.z;
+        
+        [theViewer.view add3DPoint:dicomCoords[0] :dicomCoords[1] :dicomCoords[2]];
+    }
+    
+    [theViewer.view display];
+}
 
 - (void) sliceToFileNamed: (NSString *)  fileName
 {

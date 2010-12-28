@@ -90,6 +90,9 @@
 - (void) addPoint: (float [3]) dicomCoords
          withName: (NSString *) name;
 
+- (void) add3DPointsNamed: (NSArray *)      pointsToAdd
+               to3DViewer: (VRController *) theViewer;
+
 - (void) sliceToFileNamed: (NSString *)  fileName;
 
 @end
