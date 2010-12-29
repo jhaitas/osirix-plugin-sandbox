@@ -30,13 +30,21 @@
     
     viewerController    = [owner valueForKey:@"viewerController"];
     
+    // get name of study and series for saving and archiving data
+    studyName = [[[[viewerController imageView] seriesObj] valueForKey:@"study"] valueForKey:@"name"];
+    seriesName = [[[viewerController imageView] seriesObj] valueForKey:@"name"];
     
+    // get the brain segmentation ROIs
     brainROIs   = [[viewerController roisWithName:@"Brain"] retain];
     
+    // allocate and initialize dictionaries to store landmarks and computed points
     landmarks   = [[NSMutableDictionary alloc] init];
     allPoints   = [[NSMutableDictionary alloc] init];
     
+    // identify landmarks in series
     [self identifyLandmarks];
+    
+    // add landmarks to allPoints dictionary
     [allPoints addEntriesFromDictionary:landmarks];
 }
 
@@ -46,10 +54,12 @@
     NSDictionary    *tenTwentyInstructions;
     NSArray         *instructionList;
     
+    // note time measurements were started
+    startTime = [NSDate date];
+    
     [self removeBrain];
     
     [self openMprViewer];
-    
     
     tenTwentyInstructions   = [self loadInstructions];
     instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"]; 
@@ -57,7 +67,7 @@
     for (NSDictionary *theseInstructions in instructionList) {
         int stepNum = 1 + [instructionList indexOfObject:theseInstructions];
         [self runInstructions:theseInstructions];
-        [self sliceToFileNamed:[NSString stringWithFormat:@"step-%d.png",stepNum]];
+        [self sliceToFileNamed:[NSString stringWithFormat:@"%@/step-%d.png",[self pathForAnalysisData],stepNum]];
         
     }
     
@@ -489,6 +499,77 @@
     [theViewer.view display];
 }
 
+- (NSString *) pathForTenTwentyData
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    NSString *folder = @"~/Library/Application Support/OsiriX/TenTwenty";
+    folder = [folder stringByExpandingTildeInPath];
+    
+    // create the folder if it doesn't exist    
+    if ([fileManager fileExistsAtPath: folder] == NO) {
+        DLog(@"Creating TenTwenty data folder at: %@",folder);
+        [fileManager createDirectoryAtPath: folder attributes: nil];
+    }
+    
+    return folder;
+}
+
+- (NSString *) pathForStudyData
+{
+    NSFileManager *fileManager;
+    NSString *studyFolder;
+    
+    fileManager     = [NSFileManager defaultManager];
+    studyFolder     = [[self pathForTenTwentyData] stringByAppendingFormat:@"/%@",studyName];
+    
+    // create the study folder if it doesn't exist    
+    if ([fileManager fileExistsAtPath: studyFolder] == NO) {
+        DLog(@"Creating study folder at: %@",studyFolder);
+        [fileManager createDirectoryAtPath: studyFolder attributes: nil];
+    }
+    
+    return studyFolder;
+}
+
+- (NSString *) pathForSeriesData
+{
+    NSFileManager *fileManager;
+    NSString *seriesFolder;
+    
+    fileManager     = [NSFileManager defaultManager];
+    seriesFolder    = [[self pathForStudyData] stringByAppendingFormat:@"/%@",seriesName];
+    
+    // create the series folder if it doesn't exist    
+    if ([fileManager fileExistsAtPath: seriesFolder] == NO) {
+        DLog(@"Creating series folder at: %@",seriesFolder);
+        [fileManager createDirectoryAtPath: seriesFolder attributes: nil];
+    }
+    
+    return seriesFolder;
+}
+
+- (NSString *) pathForAnalysisData
+{
+    NSFileManager *fileManager;
+    NSString *analysisFolder,*dateString;
+    
+    fileManager     = [NSFileManager defaultManager];
+    dateString      = [startTime descriptionWithCalendarFormat:@"%Y%m%dT%H%M"
+                                                      timeZone:[NSTimeZone localTimeZone]
+                                                        locale:[[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
+    analysisFolder    = [[self pathForSeriesData] stringByAppendingFormat:@"/%@",dateString];
+    
+    // create the analysis folder if it doesn't exist    
+    if ([fileManager fileExistsAtPath: analysisFolder] == NO) {
+        DLog(@"Creating analysis folder at: %@",analysisFolder);
+        [fileManager createDirectoryAtPath: analysisFolder attributes: nil];
+    }
+    
+    return analysisFolder;
+}
+
+// save image in sliceView to a png file
 - (void) sliceToFileNamed: (NSString *)  fileName
 {
     NSImage             *image;

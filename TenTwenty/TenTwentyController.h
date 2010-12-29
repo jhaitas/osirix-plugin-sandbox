@@ -27,6 +27,11 @@
     
     ViewerController    *viewerController;
     
+    NSDate              *startTime;
+    
+    NSString            *studyName;
+    NSString            *seriesName;
+    
     MPRController       *mprViewer;
     MPRDCMView          *sliceView;
     
@@ -92,6 +97,12 @@
 
 - (void) add3DPointsNamed: (NSArray *)      pointsToAdd
                to3DViewer: (VRController *) theViewer;
+
+
+- (NSString *) pathForTenTwentyData;
+- (NSString *) pathForStudyData;
+- (NSString *) pathForSeriesData;
+- (NSString *) pathForAnalysisData;
 
 - (void) sliceToFileNamed: (NSString *)  fileName;
 
