@@ -40,6 +40,7 @@
     
     NSMutableDictionary     *landmarks;
     NSMutableDictionary     *allPoints;
+    NSMutableDictionary     *extraPoints;
     
     NSArray *brainROIs;
     
@@ -98,6 +99,8 @@
 - (void) add3DPointsNamed: (NSArray *)      pointsToAdd
                to3DViewer: (VRController *) theViewer;
 
+- (void) addPointToAllPoints: (Point3D *)   point
+                    withName: (NSString *)  name;
 
 - (NSString *) pathForTenTwentyData;
 - (NSString *) pathForStudyData;

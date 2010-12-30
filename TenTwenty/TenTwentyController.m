@@ -40,6 +40,7 @@
     // allocate and initialize dictionaries to store landmarks and computed points
     landmarks   = [[NSMutableDictionary alloc] init];
     allPoints   = [[NSMutableDictionary alloc] init];
+    extraPoints = [[NSMutableDictionary alloc] init];
     
     // identify landmarks in series
     [self identifyLandmarks];
@@ -81,8 +82,8 @@
     // delete all existing ROIs
     [viewerController roiDeleteAll:self];
     
-    // place electrodes according to dictionary
-//    [self placeElectrodes:[tenTwentyInstructions objectForKey:@"electrodesToPlace"]];
+    // save data
+    [allPoints writeToFile:[NSString stringWithFormat:@"%@/allPoints.plist",[self pathForAnalysisData]] atomically:YES];
     
     // update the view
     [viewerController updateImage:self];
@@ -103,11 +104,18 @@
     
     landmarkNames = [NSArray arrayWithObjects:@"brow",@"apex",@"inion",@"A1",@"A2",nil];
     
+    // step through each predefined landmark name
     for (NSString *name in landmarkNames) {
         float dicomCoords[3];
+        
+        // find a ROI with the current name and get its DICOM coordinates
         [self roiWithName:name toDicomCoords:dicomCoords];
+        
+        // make a point from the DICOM coordinates
         dicomPoint = [Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]];
         NSLog(@"%@ %@",name,dicomPoint);
+        
+        // save the point to our 'landmarks' dictionary
         [landmarks setObject:dicomPoint forKey:name]; 
     }
 }
@@ -193,11 +201,13 @@
                     
 - (void) openMprViewer
 {
+    // create a new MPR viewer
     mprViewer = [viewerController openMPRViewer];
     [viewerController place3DViewerWindow:(NSWindowController *)mprViewer];
     [mprViewer showWindow:self];
     [[mprViewer window] setTitle: [NSString stringWithFormat:@"%@: %@", [[mprViewer window] title], [[viewerController window] title]]];
     
+    // get the viewer's largest view for reslicing
     sliceView = mprViewer.mprView3;
     
     // make only sliceView visible rather than 3 views visible
@@ -222,10 +232,13 @@
     sliceInstructions = [theInstructions objectForKey:@"sliceInstructions"];
     divideInstructions = [theInstructions objectForKey:@"divideInstructions"];
     
+    // slice
     [self resliceViewFromInstructions: sliceInstructions];
     
+    // trace
     [self skullTraceFromInstructions: sliceInstructions];
     
+    // divide
     [self divideTraceFromInstructions: divideInstructions];
     
     // detect our new electrodes
@@ -296,7 +309,9 @@
         //get the dicom coords
         [sliceView.pix convertPixX:r.rect.origin.x pixY:r.rect.origin.y toDICOMCoords:dicomCoords];
         
-        [allPoints setObject:[Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]] forKey:r.name]; 
+        [self addPointToAllPoints: [Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]] withName: r.name];
+        
+        
                 
         [self addPoint:dicomCoords withName:r.name];
     }
@@ -479,21 +494,65 @@
     }
 }
 
+- (void) addPointToAllPoints: (Point3D *)   point
+                    withName: (NSString *)  name
+{
+    
+    if ([allPoints objectForKey:name] != nil) {
+        // do we already have extra points ?
+        if ([extraPoints objectForKey:name] != nil) {
+            // we do have extra points - add to that array
+            NSMutableArray *pointsArray = [extraPoints objectForKey:name];
+            [pointsArray addObject:[allPoints objectForKey:name]];
+            [extraPoints setObject:[NSArray arrayWithArray:pointsArray] forKey:name];
+        } else {
+            // this is the first extra point with this name ...
+            // ... creating new array with this point
+            [extraPoints setObject:[NSArray arrayWithObject:[allPoints objectForKey:name]] forKey:name];
+        }
+    }
+             
+    // the point of record will be the point most recently calculated
+    [allPoints setObject:point forKey:name]; 
+}
+
 - (void) add3DPointsNamed: (NSArray *)      pointsToAdd
                to3DViewer: (VRController *) theViewer
 {
     // ****** place 3d electrodes
-    double   dicomCoords[3];
-    Point3D *point;
-    
+    double  dicomCoords[3];
+    float   red,green,blue,radius;
     for (NSString *name in pointsToAdd) {
-        point = [allPoints objectForKey:name];
+        Point3D *point = [allPoints objectForKey:name];
         
         dicomCoords[0] = point.x;
         dicomCoords[1] = point.y;
         dicomCoords[2] = point.z;
         
         [theViewer.view add3DPoint:dicomCoords[0] :dicomCoords[1] :dicomCoords[2]];
+    }
+    
+    // set display properties of point
+    red = 0.0;
+    green = 0.0;
+    blue = 1.0;
+    radius = [[NSUserDefaults standardUserDefaults] floatForKey:@"points3Dradius"];
+    
+    // add extra points
+    for (NSString *name in pointsToAdd) {
+        NSArray *pointArray = [extraPoints objectForKey:name];
+        for (Point3D *point in pointArray) {            dicomCoords[0] = point.x;
+            dicomCoords[1] = point.y;
+            dicomCoords[2] = point.z;
+            
+            [theViewer.view add3DPoint: dicomCoords[0]
+                                      : dicomCoords[1]
+                                      : dicomCoords[2]
+                                      : radius
+                                      : red
+                                      : green
+                                      : blue            ];
+        }
     }
     
     [theViewer.view display];
@@ -555,7 +614,7 @@
     NSString *analysisFolder,*dateString;
     
     fileManager     = [NSFileManager defaultManager];
-    dateString      = [startTime descriptionWithCalendarFormat:@"%Y%m%dT%H%M"
+    dateString      = [startTime descriptionWithCalendarFormat:@"%Y%m%dt%H%M"
                                                       timeZone:[NSTimeZone localTimeZone]
                                                         locale:[[NSUserDefaults standardUserDefaults] dictionaryRepresentation]];
     analysisFolder    = [[self pathForSeriesData] stringByAppendingFormat:@"/%@",dateString];
