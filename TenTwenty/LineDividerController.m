@@ -54,7 +54,7 @@
     currentInterPoints	= [[NSMutableDictionary alloc] initWithCapacity:0];
     percentLength		= [self computePercentLength:roiOPoly];
     
-    DLog(@"oPoly length = %f mm",[self measureOPolyLength:roiOPoly]);
+    DLog(@"oPoly length = %f cm",[self measureOPolyLength:roiOPoly]);
         
     while (key = [enumerator nextObject]) {
         pointIndex = 0;
