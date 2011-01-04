@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5837760D12D3D7D600704695 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 5837760C12D3D7D600704695 /* COPYING */; };
 		5859052312B7CF3200AFD2A8 /* ResliceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 5859052112B7CF3200AFD2A8 /* ResliceController.h */; };
 		5859052412B7CF3200AFD2A8 /* ResliceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5859052212B7CF3200AFD2A8 /* ResliceController.m */; };
 		585B6A38125E5BC400D42896 /* LineDividerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 585B6A36125E5BC400D42896 /* LineDividerController.h */; };
@@ -60,6 +61,7 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* TenTwenty_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TenTwenty_Prefix.pch; sourceTree = "<group>"; };
+		5837760C12D3D7D600704695 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		5859052112B7CF3200AFD2A8 /* ResliceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResliceController.h; sourceTree = "<group>"; };
 		5859052212B7CF3200AFD2A8 /* ResliceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResliceController.m; sourceTree = "<group>"; };
 		585B6A36125E5BC400D42896 /* LineDividerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LineDividerController.h; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5837760C12D3D7D600704695 /* COPYING */,
 				58915D0412B83394007A10A9 /* tenTwentyInstructions.plist */,
 				585B740D1264B64F00D42896 /* TenTwentyHUD.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
@@ -355,6 +358,7 @@
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				585B740E1264B64F00D42896 /* TenTwentyHUD.xib in Resources */,
 				58915D0512B83394007A10A9 /* tenTwentyInstructions.plist in Resources */,
+				5837760D12D3D7D600704695 /* COPYING in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
