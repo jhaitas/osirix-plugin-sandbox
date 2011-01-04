@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5837763212D3D89400704695 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 5837763112D3D89400704695 /* COPYING */; };
 		58D2652912887C870022DDFE /* MprInspectorHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 58D2652812887C870022DDFE /* MprInspectorHUD.xib */; };
 		58DBD6F2127F18D6008EB99D /* MPRInspectorController.h in Headers */ = {isa = PBXBuildFile; fileRef = 58DBD6F0127F18D6008EB99D /* MPRInspectorController.h */; };
 		58DBD6F3127F18D6008EB99D /* MPRInspectorController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58DBD6F1127F18D6008EB99D /* MPRInspectorController.m */; };
@@ -53,6 +54,7 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* MPRInspector_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRInspector_Prefix.pch; sourceTree = "<group>"; };
+		5837763112D3D89400704695 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		58D2652812887C870022DDFE /* MprInspectorHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MprInspectorHUD.xib; sourceTree = "<group>"; };
 		58DBD6F0127F18D6008EB99D /* MPRInspectorController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MPRInspectorController.h; sourceTree = "<group>"; };
 		58DBD6F1127F18D6008EB99D /* MPRInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MPRInspectorController.m; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 		089C167CFE841241C02AAC07 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				5837763112D3D89400704695 /* COPYING */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
 				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
 				58D2652812887C870022DDFE /* MprInspectorHUD.xib */,
@@ -330,6 +333,7 @@
 			files = (
 				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				58D2652912887C870022DDFE /* MprInspectorHUD.xib in Resources */,
+				5837763212D3D89400704695 /* COPYING in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
