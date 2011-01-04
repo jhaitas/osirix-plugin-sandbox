@@ -10,19 +10,12 @@
 #import "PluginFilter.h"
 #import "MPRHeaders.h"
 
-#define PRECISION 0.0001
-
-#define PI 3.14159265358979
-
-
 #define MAG(v1) sqrt(v1[0]*v1[0]+v1[1]*v1[1]+v1[2]*v1[2]);
 
 #define UNIT(dest,v1) \
 dest[0]=v1[0]/MAG(v1); \
 dest[1]=v1[1]/MAG(v1); \
 dest[2]=v1[2]/MAG(v1);
-
-#define DOT(v1,v2) v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2];
 
 #define CROSS(dest,v1,v2) \
 dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
