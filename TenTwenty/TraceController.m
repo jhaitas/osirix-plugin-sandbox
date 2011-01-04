@@ -39,7 +39,7 @@
     theseSearchPaths    = [[NSMutableArray alloc] init];
     intermediatePoints  = [[NSMutableArray alloc] init];
     
-    numSections = 10;
+    numSections = 20;
     numPoints = numSections + 1;
     
     // parameters necessary for initializting a new ROI
