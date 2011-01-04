@@ -66,9 +66,8 @@
     instructionList         = [tenTwentyInstructions objectForKey:@"instructionSteps"]; 
     
     for (NSDictionary *theseInstructions in instructionList) {
-        int stepNum = 1 + [instructionList indexOfObject:theseInstructions];
+        stepNumber = 1 + [instructionList indexOfObject:theseInstructions];
         [self runInstructions:theseInstructions];
-        [self sliceToFileNamed:[NSString stringWithFormat:@"%@/step-%d.png",[self pathForAnalysisData],stepNum]];
         
     }
     
@@ -81,9 +80,6 @@
     
     // delete all existing ROIs
     [viewerController roiDeleteAll:self];
-    
-    // save data
-    [allPoints writeToFile:[NSString stringWithFormat:@"%@/allPoints.plist",[self pathForAnalysisData]] atomically:YES];
     
     // update the view
     [viewerController updateImage:self];
@@ -126,8 +122,6 @@
     short   allRois;
     BOOL    propagateIn4D,outside,revert;
     float   minValue,maxValue,newValue;
-    
-    
     
     roi             = [brainROIs objectAtIndex:0];
     allRois         = 0;
@@ -241,17 +235,6 @@
     // divide
     [self divideTraceFromInstructions: divideInstructions];
     
-    // detect our new electrodes
-    [sliceView detect2DPointInThisSlice];
-    
-    // add the search paths and search paths to view
-    [sliceView.curRoiList addObjectsFromArray:searchPaths];
-    
-    // add the skull trace
-    [sliceView.curRoiList addObject:skullTrace];
-    
-    // select the skull trace
-    [skullTrace setROIMode:ROI_selected];
     
     [sliceView display];
     
@@ -266,6 +249,10 @@
     [reslicer planeWithVertex:[allPoints objectForKey:[sliceInstructions objectForKey:@"vertex"]]
                    withPoint1:[allPoints objectForKey:[sliceInstructions objectForKey:@"point1"]]
                    withPoint2:[allPoints objectForKey:[sliceInstructions objectForKey:@"point2"]] ];
+    
+    [sliceView display];
+    
+    [self sliceToFileNamed:[NSString stringWithFormat:@"%@/slice-%d.png",[self pathForAnalysisData],stepNumber]];
     
     [reslicer release];
 }
@@ -291,6 +278,20 @@
     skullTrace  = tracer.trace;
     searchPaths = tracer.searchPaths;
     
+    // add the search paths and search paths to view
+    [sliceView.curRoiList addObjectsFromArray:searchPaths];
+    
+    
+    // add the skull trace
+    [sliceView.curRoiList addObject:skullTrace];
+    
+    // select the skull trace
+    [skullTrace setROIMode:ROI_selected];
+    
+    [sliceView display];
+    
+    [self sliceToFileNamed:[NSString stringWithFormat:@"%@/trace-%d.png",[self pathForAnalysisData],stepNumber]];
+    
     [tracer release];
 }
 
@@ -311,10 +312,16 @@
         
         [self addPointToAllPoints: [Point3D pointWithX:dicomCoords[0] y:dicomCoords[1] z:dicomCoords[2]] withName: r.name];
         
-        
-                
         [self addPoint:dicomCoords withName:r.name];
     }
+    
+    // detect our new electrodes
+    [sliceView detect2DPointInThisSlice];
+    
+    [sliceView display];
+    
+    [self sliceToFileNamed:[NSString stringWithFormat:@"%@/divide-%d.png",[self pathForAnalysisData],stepNumber]];
+    
     [lineDivider release];
 }
 

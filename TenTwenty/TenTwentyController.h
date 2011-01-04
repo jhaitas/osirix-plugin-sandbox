@@ -35,6 +35,8 @@
     MPRController       *mprViewer;
     MPRDCMView          *sliceView;
     
+    int                 stepNumber;
+    
     ROI                 *skullTrace;
     NSArray             *searchPaths;
     
