@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5811CECB12DE14B300F872CE /* StereotaxOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 5811CEC912DE14B300F872CE /* StereotaxOrientation.h */; };
+		5811CECC12DE14B300F872CE /* StereotaxOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5811CECA12DE14B300F872CE /* StereotaxOrientation.m */; };
 		5837788212D65B3800704695 /* StereotaxPointController.h in Headers */ = {isa = PBXBuildFile; fileRef = 5837788012D65B3800704695 /* StereotaxPointController.h */; };
 		5837788312D65B3800704695 /* StereotaxPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5837788112D65B3800704695 /* StereotaxPointController.m */; };
 		583778BC12D65DF800704695 /* StereotaxPointHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 583778BB12D65DF800704695 /* StereotaxPointHUD.xib */; };
@@ -53,6 +55,8 @@
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* StereotaxPoint_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxPoint_Prefix.pch; sourceTree = "<group>"; };
+		5811CEC912DE14B300F872CE /* StereotaxOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxOrientation.h; sourceTree = "<group>"; };
+		5811CECA12DE14B300F872CE /* StereotaxOrientation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxOrientation.m; sourceTree = "<group>"; };
 		5837788012D65B3800704695 /* StereotaxPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxPointController.h; sourceTree = "<group>"; };
 		5837788112D65B3800704695 /* StereotaxPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxPointController.m; sourceTree = "<group>"; };
 		583778BB12D65DF800704695 /* StereotaxPointHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StereotaxPointHUD.xib; sourceTree = "<group>"; };
@@ -208,6 +212,8 @@
 		AB2C26750677B0C400A08910 /* StereotaxPointFilter */ = {
 			isa = PBXGroup;
 			children = (
+				5811CEC912DE14B300F872CE /* StereotaxOrientation.h */,
+				5811CECA12DE14B300F872CE /* StereotaxOrientation.m */,
 				5837788012D65B3800704695 /* StereotaxPointController.h */,
 				5837788112D65B3800704695 /* StereotaxPointController.m */,
 				ABA48A640680BB600089EB4F /* StereotaxPointFilter.h */,
@@ -273,6 +279,7 @@
 				589A042C12D7AC710020A7E6 /* WaitRendering.h in Headers */,
 				589A042D12D7AC710020A7E6 /* Window3DController.h in Headers */,
 				589A043712D7AC820020A7E6 /* MPRHeaders.h in Headers */,
+				5811CECB12DE14B300F872CE /* StereotaxOrientation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +359,7 @@
 			files = (
 				ABA48A670680BB690089EB4F /* StereotaxPointFilter.m in Sources */,
 				5837788312D65B3800704695 /* StereotaxPointController.m in Sources */,
+				5811CECC12DE14B300F872CE /* StereotaxOrientation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

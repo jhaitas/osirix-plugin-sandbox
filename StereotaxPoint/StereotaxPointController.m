@@ -11,6 +11,7 @@
 
 @implementation StereotaxPointController
 
+@synthesize apViewSelect,mlViewSelect,dvViewSelect;
 @synthesize originX,originY,originZ;
 @synthesize apX,apY,apZ;
 @synthesize mlX,mlY,mlZ;
@@ -70,6 +71,7 @@
     float dir[3],unitDir[3],displacement[3],origin[3];
     Point3D *thisDirection,*thisPosition;
     Camera  *cam;
+    MPRDCMView *apView,*mlView,*dvView;
     
     cam = mprViewer.mprView1.camera;
     
@@ -102,25 +104,28 @@
     [originY setFloatValue: origin[1]];
     [originZ setFloatValue: origin[2]];
     
+    // get view selections from interface
+    apView = [mprViewer valueForKey:[apViewSelect stringValue]];
+    mlView = [mprViewer valueForKey:[mlViewSelect stringValue]];
+    dvView = [mprViewer valueForKey:[dvViewSelect stringValue]];
     
     // AP vector
-    [self setAxisComponents: mprViewer.mprView2
+    [self setAxisComponents: apView
                      xField: apX
                      yField: apY
-                     zField: apZ                    ];
+                     zField: apZ        ];
     
     // ML vector
-    [self setAxisComponents: mprViewer.mprView3
+    [self setAxisComponents: mlView
                      xField: mlX
                      yField: mlY
-                     zField: mlZ                    ];
+                     zField: mlZ        ];
     
     // DV vector
-    
-    [self setAxisComponents: mprViewer.mprView1
+    [self setAxisComponents: dvView
                      xField: dvX
                      yField: dvY
-                     zField: dvZ                    ];  
+                     zField: dvZ        ];  
 }
 
 - (IBAction) openVrViewer: (id) sender
@@ -226,34 +231,33 @@
 
 - (void) setPoint:(NSDictionary *) dict
 {
+    enum planes{AP,ML,DV};
     float x,y,z;
     float distAP,distML,distDV;
-    float xDiff[3],yDiff[3],zDiff[3];    
-    
-    NSLog(@"%@",dict);
+    float xDiff[3],yDiff[3],zDiff[3]; 
     
     distAP = [[dict objectForKey:@"ap"] floatValue];
     distML = [[dict objectForKey:@"dv"] floatValue];
     distDV = [[dict objectForKey:@"ml"] floatValue];
     
     // brute force for now
-    xDiff[0] = distAP * [apX floatValue];
-    yDiff[0] = distAP * [apY floatValue];
-    zDiff[0] = distAP * [apZ floatValue];
+    xDiff[AP] = distAP * [apX floatValue];
+    yDiff[AP] = distAP * [apY floatValue];
+    zDiff[AP] = distAP * [apZ floatValue];
     
     
-    xDiff[1] = distML * [mlX floatValue];
-    yDiff[1] = distML * [mlY floatValue];
-    zDiff[1] = distML * [mlZ floatValue];
+    xDiff[ML] = distML * [mlX floatValue];
+    yDiff[ML] = distML * [mlY floatValue];
+    zDiff[ML] = distML * [mlZ floatValue];
     
     
-    xDiff[2] = distDV * [dvX floatValue];
-    yDiff[2] = distDV * [dvY floatValue];
-    zDiff[2] = distDV * [dvZ floatValue];
+    xDiff[DV] = distDV * [dvX floatValue];
+    yDiff[DV] = distDV * [dvY floatValue];
+    zDiff[DV] = distDV * [dvZ floatValue];
     
-    x = [originX floatValue] + xDiff[0] + xDiff[1] + xDiff[2];
-    y = [originY floatValue] + yDiff[0] + yDiff[1] + yDiff[2];
-    z = [originZ floatValue] + zDiff[0] + zDiff[1] + zDiff[2];
+    x = [originX floatValue] + xDiff[AP] + xDiff[ML] + xDiff[DV];
+    y = [originY floatValue] + yDiff[AP] + yDiff[ML] + yDiff[DV];
+    z = [originZ floatValue] + zDiff[AP] + zDiff[ML] + zDiff[DV];
     
     [vrViewer.view add3DPoint: x : y : z];
     

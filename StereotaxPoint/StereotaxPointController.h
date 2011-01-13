@@ -25,6 +25,7 @@ dest[2]=v1[2]/MAG(v1);
     MPRController       *mprViewer;
     VRController        *vrViewer;
     
+    NSComboBox  *apViewSelect,*mlViewSelect,*dvViewSelect;
     NSTextField *originX,*originY,*originZ;
     NSTextField *apX,*apY,*apZ;
     NSTextField *mlX,*mlY,*mlZ;
@@ -33,6 +34,7 @@ dest[2]=v1[2]/MAG(v1);
     NSButton    *addPoint;
 }
 
+@property (assign) IBOutlet NSComboBox  *apViewSelect,*mlViewSelect,*dvViewSelect;
 @property (assign) IBOutlet NSTextField *originX,*originY,*originZ;
 @property (assign) IBOutlet NSTextField *pointAP,*pointML,*pointDV;
 @property (assign) IBOutlet NSTextField *apX,*apY,*apZ;
