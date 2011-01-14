@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5807CE2812E0F555007B0D76 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5807CE2612E0F555007B0D76 /* InfoPlist.strings */; };
 		5837760D12D3D7D600704695 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 5837760C12D3D7D600704695 /* COPYING */; };
 		5859052312B7CF3200AFD2A8 /* ResliceController.h in Headers */ = {isa = PBXBuildFile; fileRef = 5859052112B7CF3200AFD2A8 /* ResliceController.h */; };
 		5859052412B7CF3200AFD2A8 /* ResliceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5859052212B7CF3200AFD2A8 /* ResliceController.m */; };
@@ -43,7 +44,6 @@
 		58CF976D12BAAA0200FCFBBF /* TraceController.m in Sources */ = {isa = PBXBuildFile; fileRef = 58CF976B12BAAA0200FCFBBF /* TraceController.m */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* TenTwenty_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* TenTwenty_Prefix.pch */; };
-		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		ABA48A650680BB600089EB4F /* TenTwentyFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = ABA48A640680BB600089EB4F /* TenTwentyFilter.h */; };
 		ABA48A670680BB690089EB4F /* TenTwentyFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA48A660680BB690089EB4F /* TenTwentyFilter.m */; };
@@ -57,10 +57,10 @@
 
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* TenTwenty_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TenTwenty_Prefix.pch; sourceTree = "<group>"; };
+		5807CE2712E0F555007B0D76 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5837760C12D3D7D600704695 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		5859052112B7CF3200AFD2A8 /* ResliceController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResliceController.h; sourceTree = "<group>"; };
 		5859052212B7CF3200AFD2A8 /* ResliceController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ResliceController.m; sourceTree = "<group>"; };
@@ -148,7 +148,7 @@
 				58915D0412B83394007A10A9 /* tenTwentyInstructions.plist */,
 				585B740D1264B64F00D42896 /* TenTwentyHUD.xib */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
-				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+				5807CE2612E0F555007B0D76 /* InfoPlist.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -355,10 +355,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				585B740E1264B64F00D42896 /* TenTwentyHUD.xib in Resources */,
 				58915D0512B83394007A10A9 /* tenTwentyInstructions.plist in Resources */,
 				5837760D12D3D7D600704695 /* COPYING in Resources */,
+				5807CE2812E0F555007B0D76 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,10 +390,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
+		5807CE2612E0F555007B0D76 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				089C167EFE841241C02AAC07 /* English */,
+				5807CE2712E0F555007B0D76 /* English */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
