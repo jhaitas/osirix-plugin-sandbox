@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5807CE6F12E0F7E0007B0D76 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5807CE6D12E0F7E0007B0D76 /* InfoPlist.strings */; };
 		5837788212D65B3800704695 /* StereotaxPointController.h in Headers */ = {isa = PBXBuildFile; fileRef = 5837788012D65B3800704695 /* StereotaxPointController.h */; };
 		5837788312D65B3800704695 /* StereotaxPointController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5837788112D65B3800704695 /* StereotaxPointController.m */; };
 		583778BC12D65DF800704695 /* StereotaxPointHUD.xib in Resources */ = {isa = PBXBuildFile; fileRef = 583778BB12D65DF800704695 /* StereotaxPointHUD.xib */; };
@@ -34,7 +35,6 @@
 		589A043712D7AC820020A7E6 /* MPRHeaders.h in Headers */ = {isa = PBXBuildFile; fileRef = 589A043612D7AC820020A7E6 /* MPRHeaders.h */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* StereotaxPoint_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* StereotaxPoint_Prefix.pch */; };
-		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		ABA48A650680BB600089EB4F /* StereotaxPointFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = ABA48A640680BB600089EB4F /* StereotaxPointFilter.h */; };
 		ABA48A670680BB690089EB4F /* StereotaxPointFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA48A660680BB690089EB4F /* StereotaxPointFilter.m */; };
@@ -49,10 +49,10 @@
 
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* StereotaxPoint_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxPoint_Prefix.pch; sourceTree = "<group>"; };
+		5807CE6E12E0F7E0007B0D76 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5837788012D65B3800704695 /* StereotaxPointController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxPointController.h; sourceTree = "<group>"; };
 		5837788112D65B3800704695 /* StereotaxPointController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxPointController.m; sourceTree = "<group>"; };
 		583778BB12D65DF800704695 /* StereotaxPointHUD.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StereotaxPointHUD.xib; sourceTree = "<group>"; };
@@ -129,7 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				8D5B49B7048680CD000E48DA /* Info.plist */,
-				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+				5807CE6D12E0F7E0007B0D76 /* InfoPlist.strings */,
 				583778BB12D65DF800704695 /* StereotaxPointHUD.xib */,
 			);
 			name = Resources;
@@ -328,8 +328,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				583778BC12D65DF800704695 /* StereotaxPointHUD.xib in Resources */,
+				5807CE6F12E0F7E0007B0D76 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,10 +358,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
+		5807CE6D12E0F7E0007B0D76 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				089C167EFE841241C02AAC07 /* English */,
+				5807CE6E12E0F7E0007B0D76 /* English */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
