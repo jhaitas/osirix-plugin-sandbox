@@ -30,17 +30,17 @@ dest[2]=v1[2]/MAG(v1);
     NSTextField *apX,*apY,*apZ;
     NSTextField *mlX,*mlY,*mlZ;
     NSTextField *dvX,*dvY,*dvZ;
+    NSColorWell *pointColor;
     NSTextField *pointAP,*pointML,*pointDV;
-    NSButton    *addPoint;
 }
 
 @property (assign) IBOutlet NSComboBox  *apViewSelect,*mlViewSelect,*dvViewSelect;
 @property (assign) IBOutlet NSTextField *originX,*originY,*originZ;
-@property (assign) IBOutlet NSTextField *pointAP,*pointML,*pointDV;
 @property (assign) IBOutlet NSTextField *apX,*apY,*apZ;
 @property (assign) IBOutlet NSTextField *mlX,*mlY,*mlZ;
 @property (assign) IBOutlet NSTextField *dvX,*dvY,*dvZ;
-@property (assign) IBOutlet NSButton *addPoint;
+@property (assign) IBOutlet NSColorWell *pointColor;
+@property (assign) IBOutlet NSTextField *pointAP,*pointML,*pointDV;
 
 - (id) init;
 
@@ -63,5 +63,6 @@ dest[2]=v1[2]/MAG(v1);
                     zField: (NSTextField *) zField;
 
 - (void) setPoint:(NSDictionary *) dict;
+- (void) getVrViewer3dPointColor;
 
 @end

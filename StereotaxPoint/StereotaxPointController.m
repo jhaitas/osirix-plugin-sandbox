@@ -16,8 +16,8 @@
 @synthesize apX,apY,apZ;
 @synthesize mlX,mlY,mlZ;
 @synthesize dvX,dvY,dvZ;
+@synthesize pointColor;
 @synthesize pointAP,pointML,pointDV;
-@synthesize addPoint;
 
 - (id) init
 {
@@ -131,9 +131,9 @@
 - (IBAction) openVrViewer: (id) sender
 {
     float           iwl, iww;
-    
+
     vrViewer = [viewerController openVRViewerForMode:@"VR"];
-    
+
     [vrViewer ApplyCLUTString: [viewerController curCLUTMenu]];
     [[viewerController imageView] getWLWW:&iwl :&iww];
     [vrViewer setWLWW:iwl :iww];
@@ -142,29 +142,31 @@
     [vrViewer showWindow:viewerController];			
     [[vrViewer window] makeKeyAndOrderFront:viewerController];
     [[vrViewer window] display];
+
+    [self getVrViewer3dPointColor];
 }
 
 - (IBAction) importCSV: (id) sender
 {
     // Create the File Open Dialog class.
     NSOpenPanel* openDlg = [NSOpenPanel openPanel];
-    
+
     // Enable the selection of files in the dialog.
     [openDlg setCanChooseFiles:YES];
-    
+
     // Disable the selection of directories in the dialog.
     [openDlg setCanChooseDirectories:NO];
-    
+
     // Disable the ability to select multiple files
     [openDlg setAllowsMultipleSelection:NO];
-    
+
     // Display the dialog.  If the OK button was pressed,
     // process the files.
     if ( [openDlg runModalForDirectory:nil file:nil] == NSOKButton )
     {        
         // We only want one file - first element of URLs array        
         NSURL* fileName = [[[openDlg URLs] objectAtIndex:0] retain];
-        
+
         [self readCsvFromURL:fileName];
     }
 }
@@ -172,12 +174,12 @@
 - (IBAction) addPoint: (id) sender
 {
     NSDictionary *point;
-    
+
     point = [NSDictionary dictionaryWithObjectsAndKeys: [NSNumber numberWithFloat:[pointAP floatValue]],@"ap",
                                                         [NSNumber numberWithFloat:[pointML floatValue]],@"ml",
                                                         [NSNumber numberWithFloat:[pointDV floatValue]],@"dv",
                                                         nil                                                     ];
-    
+
     [self setPoint:point];
 }
 
@@ -185,26 +187,25 @@
 {
     NSString *fileContents;
     NSArray *rows;
-    
+
     fileContents = [NSString stringWithContentsOfURL:absoluteURL
                                           encoding:NSUTF8StringEncoding
                                              error:nil];
-    
+
     if ( nil == fileContents ) return NO;
-    
+
     rows = [fileContents componentsSeparatedByString:@"\r"];
-    
+
     for (NSString *row in rows) {
         NSArray *cells = [row componentsSeparatedByString:@","];
-        
+
         NSDictionary *point = [NSDictionary dictionaryWithObjectsAndKeys:[cells objectAtIndex:0],@"name",
                                                                          [NSNumber numberWithFloat:[[cells objectAtIndex:1] floatValue]],@"ap",
                                                                          [NSNumber numberWithFloat:[[cells objectAtIndex:2] floatValue]],@"ml",
                                                                          [NSNumber numberWithFloat:[[cells objectAtIndex:3] floatValue]],@"dv",
                                                                          nil];
-        
+
         [self setPoint:point];
-        
     }
     return YES;
 }
@@ -234,36 +235,52 @@
     enum planes{AP,ML,DV};
     float x,y,z;
     float distAP,distML,distDV;
-    float xDiff[3],yDiff[3],zDiff[3]; 
-    
+    float xDiff[3],yDiff[3],zDiff[3];
+
+    // get the AP,ML,DV distances from origin
     distAP = [[dict objectForKey:@"ap"] floatValue];
     distML = [[dict objectForKey:@"dv"] floatValue];
     distDV = [[dict objectForKey:@"ml"] floatValue];
-    
-    // brute force for now
+
+    // compute x,y,z components of AP plane
     xDiff[AP] = distAP * [apX floatValue];
     yDiff[AP] = distAP * [apY floatValue];
     zDiff[AP] = distAP * [apZ floatValue];
-    
-    
+
+    // compute x,y,z components of ML plane
     xDiff[ML] = distML * [mlX floatValue];
     yDiff[ML] = distML * [mlY floatValue];
     zDiff[ML] = distML * [mlZ floatValue];
-    
-    
+
+    // compute x,y,z components of DV plane
     xDiff[DV] = distDV * [dvX floatValue];
     yDiff[DV] = distDV * [dvY floatValue];
     zDiff[DV] = distDV * [dvZ floatValue];
-    
+
+    // compute x,y,z by adding AP,ML,and DV components to stereotax origin
     x = [originX floatValue] + xDiff[AP] + xDiff[ML] + xDiff[DV];
     y = [originY floatValue] + yDiff[AP] + yDiff[ML] + yDiff[DV];
     z = [originZ floatValue] + zDiff[AP] + zDiff[ML] + zDiff[DV];
-    
-    [vrViewer.view add3DPoint: x : y : z];
-    
+
+    [vrViewer.view add3DPoint: x 
+                             : y 
+                             : z 
+                             : [[vrViewer.view valueForKey:@"point3DDefaultRadius"] floatValue]
+                             : [[pointColor color] redComponent] 
+                             : [[pointColor color] greenComponent] 
+                             : [[pointColor color] blueComponent]                               ];
+
+    // update the display
     [vrViewer.view display];
-    
-    NSLog(@"x,y,z = %f,%f,%f",x,y,z);
 }
+
+- (void) getVrViewer3dPointColor
+{
+    [pointColor setColor:[NSColor colorWithCalibratedRed: [[vrViewer.view valueForKey:@"point3DDefaultColorRed"] floatValue]
+                                                   green: [[vrViewer.view valueForKey:@"point3DDefaultColorGreen"] floatValue]
+                                                    blue: [[vrViewer.view valueForKey:@"point3DDefaultColorBlue"] floatValue]
+                                                   alpha: [[vrViewer.view valueForKey:@"point3DDefaultColorAlpha"] floatValue] ]];   
+}
+         
 
 @end
