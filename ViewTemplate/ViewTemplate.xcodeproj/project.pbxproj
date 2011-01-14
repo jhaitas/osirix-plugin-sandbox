@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5807CEA112E0F8FD007B0D76 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5807CE9F12E0F8FD007B0D76 /* InfoPlist.strings */; };
 		5837761712D3D85000704695 /* COPYING in Resources */ = {isa = PBXBuildFile; fileRef = 5837761612D3D85000704695 /* COPYING */; };
 		58ADBBCB124A79F800DC7F62 /* StereotaxCoord.h in Headers */ = {isa = PBXBuildFile; fileRef = 58ADBBC9124A79F800DC7F62 /* StereotaxCoord.h */; };
 		58ADBBCC124A79F800DC7F62 /* StereotaxCoord.m in Sources */ = {isa = PBXBuildFile; fileRef = 58ADBBCA124A79F800DC7F62 /* StereotaxCoord.m */; };
@@ -18,7 +19,6 @@
 		58C3703C1247AE52009883A4 /* zeroedTemplate.csv in Resources */ = {isa = PBXBuildFile; fileRef = 58C3703B1247AE52009883A4 /* zeroedTemplate.csv */; };
 		59C2B9290FF0ED7100B50385 /* Notifications.h in Headers */ = {isa = PBXBuildFile; fileRef = 59C2B9280FF0ED7100B50385 /* Notifications.h */; };
 		8D5B49AE048680CD000E48DA /* ViewTemplate_Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 32DBCF630370AF2F00C91783 /* ViewTemplate_Prefix.pch */; };
-		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		8D5B49B4048680CD000E48DA /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */; };
 		ABA48A650680BB600089EB4F /* ViewTemplateFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = ABA48A640680BB600089EB4F /* ViewTemplateFilter.h */; };
 		ABA48A670680BB690089EB4F /* ViewTemplateFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = ABA48A660680BB690089EB4F /* ViewTemplateFilter.m */; };
@@ -33,10 +33,10 @@
 
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		089C167FFE841241C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF630370AF2F00C91783 /* ViewTemplate_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ViewTemplate_Prefix.pch; sourceTree = "<group>"; };
+		5807CEA012E0F8FD007B0D76 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5837761612D3D85000704695 /* COPYING */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = COPYING; sourceTree = "<group>"; };
 		58ADBBC9124A79F800DC7F62 /* StereotaxCoord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StereotaxCoord.h; sourceTree = "<group>"; };
 		58ADBBCA124A79F800DC7F62 /* StereotaxCoord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StereotaxCoord.m; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 				58B1568212834A55004EAF70 /* tenTwentyTemplateHUD.xib */,
 				58C3703B1247AE52009883A4 /* zeroedTemplate.csv */,
 				8D5B49B7048680CD000E48DA /* Info.plist */,
-				089C167DFE841241C02AAC07 /* InfoPlist.strings */,
+				5807CE9F12E0F8FD007B0D76 /* InfoPlist.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -252,10 +252,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */,
 				58C3703C1247AE52009883A4 /* zeroedTemplate.csv in Resources */,
 				58B1568312834A55004EAF70 /* tenTwentyTemplateHUD.xib in Resources */,
 				5837761712D3D85000704695 /* COPYING in Resources */,
+				5807CEA112E0F8FD007B0D76 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,10 +286,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		089C167DFE841241C02AAC07 /* InfoPlist.strings */ = {
+		5807CE9F12E0F8FD007B0D76 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				089C167EFE841241C02AAC07 /* English */,
+				5807CEA012E0F8FD007B0D76 /* English */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
